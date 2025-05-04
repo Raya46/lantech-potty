@@ -7,4 +7,5 @@ class Player {
   Id id = Isar.autoIncrement;
   int? level;
   bool? isFocused;
+  String? gender;
 }

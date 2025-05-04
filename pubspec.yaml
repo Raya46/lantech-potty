@@ -27,7 +27,6 @@ environment:
 # dependencies can be manually updated by changing the version numbers below to
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
-isar_version: &isar_version 3.1.8
 dependencies:
   flutter:
     sdk: flutter
@@ -37,14 +36,15 @@ dependencies:
   cupertino_icons: ^1.0.8
   flame: ^1.28.1
   isar: 
-    version: *isar_version
+    version: 3.1.8
     hosted: https://pub.isar-community.dev/
   isar_flutter_libs: 
-    version: *isar_version
+    version: 3.1.8
     hosted: https://pub.isar-community.dev/
   rive: ^0.13.20
   confetti: ^0.8.0
   path_provider: ^2.1.5
+  get: ^4.7.2
 
 dev_dependencies:
   flutter_test:
@@ -57,7 +57,7 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
   isar_generator: 
-    version: *isar_version
+    version: 3.1.8
     hosted: https://pub.isar-community.dev/
   build_runner: any
 
