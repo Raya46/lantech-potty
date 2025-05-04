@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:toilet_training/screens/choose_level_screen.dart';
+import 'package:toilet_training/screens/menus/choose_gender_screen.dart';
 
 class StartScreen extends StatefulWidget {
   const StartScreen({super.key});
@@ -39,7 +39,7 @@ class _StartScreenState extends State<StartScreen> {
                       opaque: false,
                       pageBuilder:
                           (context, animation, secondaryAnimation) =>
-                              ChooseLevelScreen(),
+                              ChooseGenderScreen(),
                     ),
                   );
                 },
