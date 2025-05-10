@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:toilet_training/screens/menus/choose_level_screen.dart';
+import "package:toilet_training/widgets/card_gender.dart";
+import 'package:toilet_training/widgets/background.dart';
+import "package:toilet_training/widgets/header.dart";
 
 class ChooseGenderScreen extends StatefulWidget {
   const ChooseGenderScreen({super.key});
@@ -35,71 +38,46 @@ class _ChooseGenderScreenState extends State<ChooseGenderScreen>
     return AnimatedBuilder(
       animation: _controller,
       child: Scaffold(
-        backgroundColor: Colors.redAccent,
-        body: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    _controller.reverse().then(
-                      (value) => Navigator.of(context).pop(),
-                    );
-                  },
-                  child: Text("back"),
-                ),
-                Card(child: Text("Next")),
-              ],
-            ),
-            Center(child: Text("Pilih Jenis Kelamin Mu")),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                InkWell(
-                  onTap: () {
-                    Get.to(
-                      () => ChooseLevelScreen(),
-                      transition: Transition.circularReveal,
-                      duration: Duration(milliseconds: 1500),
-                    );
-                  },
-                  child: Column(
-                    children: [
-                      Image.network(
-                        "https://images.unsplash.com/photo-1484517586036-ed3db9e3749e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80",
-                        width: 200.0,
-                        height: 200.0,
-                        fit: BoxFit.cover,
-                      ),
-                      Text("Laki-laki"),
-                    ],
+        body: Background(
+          gender: 'male',
+          child: Column(
+            children: [
+              Header(
+                title: "Pilih Gender",
+                onTapBack: () {
+                  Get.back();
+                },
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  GenderCard(
+                    text: "Perempuan",
+                    gender: Gender.female,
+                    onTap: () {
+                      Get.to(
+                        () => ChooseLevelScreen(),
+                        transition: Transition.leftToRight,
+                        duration: Duration(milliseconds: 1500),
+                      );
+                    },
                   ),
-                ),
-                SizedBox(width: 10.0),
-                InkWell(
-                  onTap: () {
-                    Get.to(
-                      () => ChooseLevelScreen(),
-                      transition: Transition.circularReveal,
-                      duration: Duration(milliseconds: 1500),
-                    );
-                  },
-                  child: Column(
-                    children: [
-                      Image.network(
-                        "https://images.unsplash.com/photo-1484517586036-ed3db9e3749e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80",
-                        width: 200.0,
-                        height: 200.0,
-                        fit: BoxFit.cover,
-                      ),
-                      Text("Perempuan"),
-                    ],
+                  SizedBox(width: 40),
+                  GenderCard(
+                    text: "Laki-laki",
+                    gender: Gender.male,
+                    onTap: () {
+                      Get.to(
+                        () => ChooseLevelScreen(),
+                        transition: Transition.leftToRight,
+                        duration: Duration(milliseconds: 1500),
+                      );
+                    },
                   ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
       builder: (context, child) {
