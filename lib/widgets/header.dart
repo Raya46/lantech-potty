@@ -1,60 +1,40 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart'; // Diperlukan untuk class Paint
+import 'package:toilet_training/widgets/modal_setting.dart';
 
 class Header extends StatelessWidget {
-  final VoidCallback?
-  onTapBack; // Fungsi yang dipanggil saat tombol kembali diklik
-  final VoidCallback?
-  onTapSettings; // Fungsi yang dipanggil saat tombol pengaturan diklik
-  final String title; // Judul yang ditampilkan di tengah
+  final VoidCallback? onTapBack;
+  final VoidCallback? onTapSettings;
+  final String title;
 
   const Header({
     Key? key,
     this.onTapBack,
     this.onTapSettings,
-    this.title = "Pilih Level!", // Nilai default jika tidak disediakan
+    this.title = "Pilih Level!",
   }) : super(key: key);
 
-  // Fungsi untuk menampilkan modal setting
   void _showSettingsModal(BuildContext context) {
     showDialog(
       context: context,
+      barrierDismissible: true,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Pengaturan'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.music_note),
-                title: const Text('Musik'),
-                trailing: Switch(
-                  value: true, // Default value
-                  onChanged: (value) {
-                    // Logic untuk toggle musik
-                  },
-                ),
-              ),
-              ListTile(
-                leading: const Icon(Icons.volume_up),
-                title: const Text('Suara'),
-                trailing: Switch(
-                  value: true, // Default value
-                  onChanged: (value) {
-                    // Logic untuk toggle suara
-                  },
-                ),
-              ),
-            ],
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: SettingsModalContent(
+            onClose: () {
+              Navigator.of(context).pop();
+            },
+            onTapSound: () {
+              print("Sound Tapped");
+            },
+            onTapMusic: () {
+              print("Music Tapped");
+            },
+            onTapColor: () {
+              print("Color Tapped");
+            },
           ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Tutup'),
-            ),
-          ],
         );
       },
     );
@@ -62,13 +42,8 @@ class Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Mendefinisikan warna berdasarkan gambar
-    const Color buttonBackgroundColor = Color(
-      0xFF3498DB,
-    ); // Perkiraan warna biru untuk tombol lingkaran
-    const Color buttonOutlineColor = Color(
-      0xFF2C3E50,
-    ); // Perkiraan warna outline tombol (biru tua/abu-abu)
+    const Color buttonBackgroundColor = Color(0xFF3498DB);
+    const Color buttonOutlineColor = Color(0xFF2C3E50);
     const Color textFillColor = Color(0xFFFFA07A);
     const Color textOutlineColor = Color(0xFF808080);
 
@@ -83,34 +58,26 @@ class Header extends StatelessWidget {
         children: [
           InkWell(
             onTap: onTapBack,
-            customBorder:
-                const CircleBorder(), // Pastikan area tap dan riak berbentuk lingkaran
+            customBorder: const CircleBorder(),
             child: Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(
-                  color: buttonOutlineColor, // Warna outline
-                  width: 2.0, // Ketebalan outline
-                ),
-                color: buttonBackgroundColor, // Warna isi lingkaran
+                border: Border.all(color: buttonOutlineColor, width: 2.0),
+                color: buttonBackgroundColor,
               ),
-              padding: const EdgeInsets.all(
-                8.0,
-              ), // Padding di dalam lingkaran untuk ikon
+              padding: const EdgeInsets.all(8.0),
               child: const Icon(
-                Icons.arrow_back, // Ikon kembali
-                size: 24, // Ukuran ikon, sesuaikan
-                color: Colors.white, // Warna ikon
+                Icons.arrow_back,
+                size: 24,
+                color: Colors.white,
               ),
             ),
           ),
 
-          // Teks Judul di Tengah dengan Stack untuk efek outline
           Expanded(
             child: Stack(
               alignment: Alignment.center,
               children: [
-                // Text untuk outline (stroke)
                 Text(
                   title,
                   textAlign: TextAlign.center,
@@ -124,7 +91,6 @@ class Header extends StatelessWidget {
                           ..color = textOutlineColor,
                   ),
                 ),
-                // Text untuk fill
                 Text(
                   title,
                   textAlign: TextAlign.center,
@@ -138,37 +104,23 @@ class Header extends StatelessWidget {
             ),
           ),
 
-          // Tombol Kanan (Pengaturan)
           InkWell(
-            // Membuat lingkaran bisa diklik dengan efek riak
             onTap: () {
-              // Panggil fungsi callback jika disediakan, atau tampilkan modal jika tidak
               if (onTapSettings != null) {
                 onTapSettings!();
               } else {
                 _showSettingsModal(context);
               }
             },
-            customBorder:
-                const CircleBorder(), // Pastikan area tap dan riak berbentuk lingkaran
+            customBorder: const CircleBorder(),
             child: Container(
-              // Container untuk membuat lingkaran dengan outline
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(
-                  color: buttonOutlineColor, // Warna outline
-                  width: 2.0, // Ketebalan outline
-                ),
-                color: buttonBackgroundColor, // Warna isi lingkaran
+                border: Border.all(color: buttonOutlineColor, width: 2.0),
+                color: buttonBackgroundColor,
               ),
-              padding: const EdgeInsets.all(
-                8.0,
-              ), // Padding di dalam lingkaran untuk ikon
-              child: const Icon(
-                Icons.settings, // Ikon pengaturan (gear)
-                size: 24, // Ukuran ikon, sesuaikan
-                color: Colors.white, // Warna ikon
-              ),
+              padding: const EdgeInsets.all(8.0),
+              child: const Icon(Icons.settings, size: 24, color: Colors.white),
             ),
           ),
         ],

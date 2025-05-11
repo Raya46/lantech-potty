@@ -30,7 +30,7 @@ class _ChooseLevelScreenState extends State<ChooseLevelScreen> {
               },
             ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 GenderCard(
                   text: "Level 1",
