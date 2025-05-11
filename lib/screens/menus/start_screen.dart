@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:toilet_training/screens/menus/choose_gender_screen.dart';
 import 'package:toilet_training/widgets/background.dart';
+import 'package:get/get.dart';
 
 class StartScreen extends StatefulWidget {
   const StartScreen({super.key});
@@ -14,13 +15,12 @@ class _StartScreenState extends State<StartScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Background(
-        gender: 'male', // Default gender adalah laki-laki
+        gender: 'male',
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Sisi Kiri: Ilustrasi
             Expanded(
-              flex: 3, // Beri lebih banyak ruang untuk ilustrasi
+              flex: 3,
               child: Container(
                 padding: const EdgeInsets.only(bottom: 0),
                 child: Image.asset(
@@ -30,9 +30,8 @@ class _StartScreenState extends State<StartScreen> {
               ),
             ),
 
-            // Sisi Kanan: Teks dan Tombol
             Expanded(
-              flex: 3, // Beri ruang yang lebih kecil untuk teks
+              flex: 3,
               child: Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 24.0,
@@ -42,10 +41,8 @@ class _StartScreenState extends State<StartScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Teks "APLIKASI INTERAKTIF"
                     Stack(
                       children: [
-                        // Outline text
                         Text(
                           "APLIKASI INTERAKTIF",
                           style: TextStyle(
@@ -58,7 +55,6 @@ class _StartScreenState extends State<StartScreen> {
                                   ..color = const Color(0xFF4A2C2A),
                           ),
                         ),
-                        // Fill text
                         Text(
                           "APLIKASI INTERAKTIF",
                           style: const TextStyle(
@@ -69,11 +65,9 @@ class _StartScreenState extends State<StartScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8), // Spasi antar baris teks
-                    // Teks "POTTYFUN KID'S"
+                    const SizedBox(height: 8),
                     Stack(
                       children: [
-                        // Outline text
                         Text(
                           "POTTYFUN KID'S",
                           style: TextStyle(
@@ -86,7 +80,6 @@ class _StartScreenState extends State<StartScreen> {
                                   ..color = const Color(0xFF4A2C2A),
                           ),
                         ),
-                        // Fill text
                         Text(
                           "POTTYFUN KID'S",
                           style: const TextStyle(
@@ -97,35 +90,25 @@ class _StartScreenState extends State<StartScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 20), // Spasi antara teks dan tombol
-                    // Tombol Play (Bentuk Lingkaran)
+                    const SizedBox(height: 20),
                     Padding(
                       padding: const EdgeInsets.only(right: 100.0),
                       child: Center(
                         child: GestureDetector(
-                          // Menggunakan GestureDetector untuk area tap kustom
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              PageRouteBuilder(
-                                opaque:
-                                    false, // Jika ingin transparan saat navigasi
-                                pageBuilder:
-                                    (context, animation, secondaryAnimation) =>
-                                        const ChooseGenderScreen(),
-                              ),
+                            Get.to(
+                              () => const ChooseGenderScreen(),
+                              transition: Transition.circularReveal,
+                              duration: Duration(milliseconds: 1500),
                             );
                           },
                           child: CircleAvatar(
-                            // Menggunakan CircleAvatar untuk latar belakang lingkaran
-                            radius: 35, // Sesuaikan ukuran lingkaran
-                            backgroundColor: const Color(
-                              0xFF52AACA,
-                            ), // Warna lingkaran (sama dengan latar bawah)
+                            radius: 35,
+                            backgroundColor: const Color(0xFF52AACA),
                             child: const Icon(
                               Icons.play_arrow,
-                              size: 45, // Sesuaikan ukuran ikon play
-                              color: Colors.white, // Warna ikon play
+                              size: 45,
+                              color: Colors.white,
                             ),
                           ),
                         ),
