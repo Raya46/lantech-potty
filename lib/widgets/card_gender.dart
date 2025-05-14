@@ -23,8 +23,8 @@ class GenderCard extends StatelessWidget {
 
     final String imageAssetPath =
         gender == Gender.female
-            ? 'lib/assets/images/female-goto-toilet.png'
-            : 'lib/assets/images/male-goto-toilet.png';
+            ? 'assets/images/female-goto-toilet.png'
+            : 'assets/images/male-goto-toilet.png';
 
     final Color topBackgroundColor = const Color(0xFFFFF8E1);
 

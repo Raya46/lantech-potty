@@ -24,7 +24,7 @@ class _StartScreenState extends State<StartScreen> {
               child: Container(
                 padding: const EdgeInsets.only(bottom: 0),
                 child: Image.asset(
-                  'lib/assets/images/male-goto-toilet.png',
+                  'assets/images/male-goto-toilet.png',
                   fit: BoxFit.contain,
                 ),
               ),

@@ -23,12 +23,7 @@ class _ChooseLevelScreenState extends State<ChooseLevelScreen> {
         gender: 'female',
         child: Column(
           children: [
-            Header(
-              title: "Pilih level",
-              onTapBack: () {
-                Get.back();
-              },
-            ),
+            Header(title: "Pilih level"),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
