@@ -13,8 +13,6 @@ class ChooseGenderScreen extends StatefulWidget {
 }
 
 class _ChooseGenderScreenState extends State<ChooseGenderScreen> {
-  
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,12 +20,7 @@ class _ChooseGenderScreenState extends State<ChooseGenderScreen> {
         gender: 'male',
         child: Column(
           children: [
-            Header(
-              title: "Pilih Gender",
-              onTapBack: () {
-                Get.back();
-              },
-            ),
+            Header(title: "Pilih Gender"),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -62,4 +55,3 @@ class _ChooseGenderScreenState extends State<ChooseGenderScreen> {
     );
   }
 }
-
