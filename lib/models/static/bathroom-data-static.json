@@ -1,0 +1,87 @@
+[
+  {
+    "id": 1,
+    "name": "Sikat Gigi",
+    "image": "assets/bathroom_items/sikat_gigi.png"
+  },
+  {
+    "id": 2,
+    "name": "Pasta Gigi",
+    "image": "assets/bathroom_items/pasta_gigi.png"
+  },
+  {
+    "id": 3,
+    "name": "Sabun Mandi",
+    "image": "assets/bathroom_items/sabun_mandi.png"
+  },
+  {
+    "id": 4,
+    "name": "Shampoo",
+    "image": "assets/bathroom_items/shampoo.png"
+  },
+  {
+    "id": 6,
+    "name": "Handuk",
+    "image": "assets/bathroom_items/handuk.png"
+  },
+  {
+    "id": 7,
+    "name": "Cermin",
+    "image": "assets/bathroom_items/cermin.png"
+  },
+  {
+    "id": 8,
+    "name": "Gayung",
+    "image": "assets/bathroom_items/gayung.png"
+  },
+  {
+    "id": 9,
+    "name": "Ember",
+    "image": "assets/bathroom_items/ember.png"
+  },
+  {
+    "id": 10,
+    "name": "Toilet",
+    "image": "assets/bathroom_items/toilet.png"
+  },
+  {
+    "id": 11,
+    "name": "Tisu Toilet",
+    "image": "assets/bathroom_items/tisu_toilet.png"
+  },
+  {
+    "id": 12,
+    "name": "Sikat Toilet",
+    "image": "assets/bathroom_items/sikat_toilet.png"
+  },
+  {
+    "id": 13,
+    "name": "Tempat Sampah Kamar Mandi",
+    "image": "assets/bathroom_items/tempat_sampah.png"
+  },
+  {
+    "id": 14,
+    "name": "Keset Kamar Mandi",
+    "image": "assets/bathroom_items/keset.png"
+  },
+  {
+    "id": 15,
+    "name": "Keran Air",
+    "image": "assets/bathroom_items/keran.png"
+  },
+  {
+    "id": 16,
+    "name": "Shower",
+    "image": "assets/bathroom_items/shower.png"
+  },
+  {
+    "id": 17,
+    "name": "Wastafel",
+    "image": "assets/bathroom_items/wastafel.png"
+  },
+  {
+    "id": 18,
+    "name": "Tempat Sabun",
+    "image": "assets/bathroom_items/tempat_sabun.png"
+  }
+]

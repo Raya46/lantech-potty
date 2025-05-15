@@ -1,0 +1,102 @@
+[
+    {
+      "id": 1,
+      "name": "Sikat Gigi",
+      "image": "assets/bathroom_items/sikat_gigi.png"
+    },
+    {
+      "id": 2,
+      "name": "Pasta Gigi",
+      "image": "assets/bathroom_items/pasta_gigi.png"
+    },
+    {
+      "id": 3,
+      "name": "Shampoo",
+      "image": "assets/bathroom_items/shampoo.png"
+    },
+    {
+      "id": 4,
+      "name": "Handuk",
+      "image": "assets/bathroom_items/handuk.png"
+    },
+    {
+      "id": 5,
+      "name": "Gayung",
+      "image": "assets/bathroom_items/gayung.png"
+    },
+    {
+      "id": 6,
+      "name": "Toilet",
+      "image": "assets/bathroom_items/toilet.png"
+    },
+    {
+      "id": 7,
+      "name": "Sikat Toilet",
+      "image": "assets/bathroom_items/sikat_toilet.png"
+    },
+    {
+      "id": 8,
+      "name": "Keran Air",
+      "image": "assets/bathroom_items/keran.png"
+    },
+    {
+      "id": 9,
+      "name": "Wastafel",
+      "image": "assets/bathroom_items/wastafel.png"
+    },
+    {
+      "id": 10,
+      "name": "Kunci Rumah",
+      "image": "assets/random_items/kunci_rumah.png"
+    },
+    {
+      "id": 11,
+      "name": "Buku Catatan",
+      "image": "assets/random_items/buku_catatan.png"
+    },
+    {
+      "id": 12,
+      "name": "Pensil",
+      "image": "assets/random_items/pensil.png"
+    },
+    {
+      "id": 13,
+      "name": "Botol Minum",
+      "image": "assets/random_items/botol_minum.png"
+    },
+    {
+      "id": 14,
+      "name": "Payung",
+      "image": "assets/random_items/payung.png"
+    },
+    {
+      "id": 15,
+      "name": "Headset",
+      "image": "assets/random_items/headset.png"
+    },
+    {
+      "id": 16,
+      "name": "Sepatu Olahraga",
+      "image": "assets/random_items/sepatu_olahraga.png"
+    },
+    {
+      "id": 17,
+      "name": "Tas Ransel",
+      "image": "assets/random_items/tas_ransel.png"
+    },
+    {
+      "id": 18,
+      "name": "Kacamata",
+      "image": "assets/random_items/kacamata.png"
+    },
+    {
+      "id": 19,
+      "name": "Jam Tangan",
+      "image": "assets/random_items/jam_tangan.png"
+    },
+    {
+      "id": 20,
+      "name": "Dompet",
+      "image": "assets/random_items/dompet.png"
+    }
+  ]
