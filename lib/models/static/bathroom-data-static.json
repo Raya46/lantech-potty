@@ -1,0 +1,67 @@
+[
+  {
+    "id": 1,
+    "name": "Sikat Gigi",
+    "image": "assets/images/sikat-gigi.png"
+  },
+  {
+    "id": 2,
+    "name": "Pasta Gigi",
+    "image": "assets/images/pasta-gigi.png"
+  },
+  {
+    "id": 3,
+    "name": "Sabun Mandi",
+    "image": "assets/images/sabun.png"
+  },
+  {
+    "id": 6,
+    "name": "Handuk",
+    "image": "assets/images/handuk.png"
+  },
+  {
+    "id": 8,
+    "name": "Gayung",
+    "image": "assets/images/gayung.png"
+  },
+  {
+    "id": 9,
+    "name": "Ember",
+    "image": "assets/images/ember.png"
+  },
+  {
+    "id": 10,
+    "name": "Toilet",
+    "image": "assets/images/toilet.png"
+  },
+  {
+    "id": 11,
+    "name": "Tisu Toilet",
+    "image": "assets/images/tisu-toilet.png"
+  },
+  {
+    "id": 12,
+    "name": "Sikat Toilet",
+    "image": "assets/images/sikat-toilet.png"
+  },
+  {
+    "id": 14,
+    "name": "Keset Kamar Mandi",
+    "image": "assets/images/keset.png"
+  },
+  {
+    "id": 15,
+    "name": "Keran Air",
+    "image": "assets/images/keran-air.png"
+  },
+  {
+    "id": 16,
+    "name": "Shower",
+    "image": "assets/images/shower.png"
+  },
+  {
+    "id": 17,
+    "name": "Wastafel",
+    "image": "assets/images/wastafel.png"
+  }
+]

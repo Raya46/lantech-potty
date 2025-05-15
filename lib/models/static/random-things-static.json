@@ -1,0 +1,87 @@
+[
+    {
+      "id": 1,
+      "name": "Tisu Toilet",
+      "image": "assets/images/tisu-toilet.png"
+    },
+    {
+      "id": 2,
+      "name": "Sabun",
+      "image": "assets/images/sabun.png"
+    },
+    {
+      "id": 4,
+      "name": "Handuk",
+      "image": "assets/images/handuk.png"
+    },
+    {
+      "id": 5,
+      "name": "Gayung",
+      "image": "assets/images/gayung.png"
+    },
+    {
+      "id": 6,
+      "name": "Toilet",
+      "image": "assets/images/toilet.png"
+    },
+    {
+      "id": 8,
+      "name": "Keran Air",
+      "image": "assets/images/keran-air.png"
+    },
+    {
+      "id": 9,
+      "name": "Wastafel",
+      "image": "assets/images/wastafel.png"
+    },
+    {
+      "id": 11,
+      "name": "Buku Catatan",
+      "image": "assets/images/buku.png"
+    },
+    {
+      "id": 12,
+      "name": "Pensil",
+      "image": "assets/images/pencil.png"
+    },
+    {
+      "id": 13,
+      "name": "Botol Minum",
+      "image": "assets/images/botol-minum.png"
+    },
+    {
+      "id": 14,
+      "name": "Payung",
+      "image": "assets/images/payung.png"
+    },
+    {
+      "id": 15,
+      "name": "Headset",
+      "image": "assets/images/headset.png"
+    },
+    {
+      "id": 16,
+      "name": "Sepatu Olahraga",
+      "image": "assets/images/sepatu.png"
+    },
+    {
+      "id": 17,
+      "name": "Tas Ransel",
+      "image": "assets/images/tas-ransel.png"
+    },
+    {
+      "id": 18,
+      "name": "Kacamata",
+      "image": "assets/images/kacamata.png"
+    },
+    {
+      "id": 19,
+      "name": "Jam Tangan",
+      "image": "assets/images/jam-tangan.png"
+    },
+    {
+      "id": 20,
+      "name": "Dompet",
+      "image": "assets/images/dompet.png"
+    }
+  ]
