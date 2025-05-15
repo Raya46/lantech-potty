@@ -77,6 +77,8 @@ flutter:
   assets:
     - assets/images/
     - assets/sounds/
+    - lib/models/static/bathroom-data-static.json
+    - lib/models/static/random-things-static.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
