@@ -8,4 +8,9 @@ class Player {
   int? level;
   bool? isFocused;
   String? gender;
+  int? level1Score;
+  int? level2Score;
+  int? level3Score;
+  int? level4Score;
+  int? level5Score;
 }

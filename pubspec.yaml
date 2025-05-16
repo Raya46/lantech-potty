@@ -30,11 +30,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  # flame: ^1.17.0 # Hapus ini
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
-  flame: ^1.28.1
+  flame: ^1.28.1 # Gunakan versi ini
   isar: 
     version: 3.1.8
     hosted: https://pub.isar-community.dev/
@@ -79,6 +80,7 @@ flutter:
     - assets/sounds/
     - lib/models/static/bathroom-data-static.json
     - lib/models/static/random-things-static.json
+    - lib/models/static/step-static.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

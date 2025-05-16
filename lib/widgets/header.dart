@@ -5,11 +5,17 @@ import 'package:get/get.dart';
 class Header extends StatelessWidget {
   final VoidCallback? onTapSettings;
   final String title;
+  final bool showInfoButton;
+  final VoidCallback? onTapInfoButton;
+  final IconData infoButtonIcon;
 
   const Header({
     Key? key,
     this.onTapSettings,
     this.title = "Pilih Level!",
+    this.showInfoButton = false,
+    this.onTapInfoButton,
+    this.infoButtonIcon = Icons.info_outline,
   }) : super(key: key);
 
   void _showSettingsModal(BuildContext context) {
@@ -39,7 +45,7 @@ class Header extends StatelessWidget {
     );
   }
 
-  void onTapBack(){
+  void onTapBack() {
     Get.back();
   }
 
@@ -109,7 +115,9 @@ class Header extends StatelessWidget {
 
           InkWell(
             onTap: () {
-              if (onTapSettings != null) {
+              if (showInfoButton && onTapInfoButton != null) {
+                onTapInfoButton!();
+              } else if (onTapSettings != null) {
                 onTapSettings!();
               } else {
                 _showSettingsModal(context);
@@ -123,7 +131,11 @@ class Header extends StatelessWidget {
                 color: buttonBackgroundColor,
               ),
               padding: const EdgeInsets.all(8.0),
-              child: const Icon(Icons.settings, size: 24, color: Colors.white),
+              child: Icon(
+                showInfoButton ? infoButtonIcon : Icons.settings,
+                size: 24,
+                color: Colors.white,
+              ),
             ),
           ),
         ],

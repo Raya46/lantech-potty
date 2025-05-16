@@ -3,6 +3,8 @@ import 'package:toilet_training/screens/levels/level1_screen.dart';
 import 'package:get/get.dart';
 import 'package:toilet_training/screens/levels/level2_screen.dart';
 import 'package:toilet_training/screens/levels/level3_screen.dart';
+import 'package:toilet_training/screens/levels/level4_screen.dart';
+import 'package:toilet_training/screens/levels/level5_screen.dart';
 import 'package:toilet_training/widgets/background.dart';
 import "package:toilet_training/widgets/card_gender.dart";
 import "package:toilet_training/widgets/header.dart";
@@ -24,43 +26,83 @@ class _ChooseLevelScreenState extends State<ChooseLevelScreen> {
         child: Column(
           children: [
             Header(title: "Pilih level"),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                GenderCard(
-                  text: "Level 1",
-                  gender: Gender.female,
-                  onTap: () {
-                    Get.to(
-                      () => LevelOneScreen(),
-                      transition: Transition.circularReveal,
-                      duration: Duration(milliseconds: 1500),
-                    );
-                  },
-                ),
-                GenderCard(
-                  text: "Level 2",
-                  gender: Gender.female,
-                  onTap: () {
-                    Get.to(
-                      () => LevelTwoScreen(),
-                      transition: Transition.circularReveal,
-                      duration: Duration(milliseconds: 1500),
-                    );
-                  },
-                ),
-                GenderCard(
-                  gender: Gender.female,
-                  text: "Level 3",
-                  onTap: () {
-                    Get.to(
-                      () => LevelThreeScreen(),
-                      transition: Transition.circularReveal,
-                      duration: Duration(milliseconds: 1500),
-                    );
-                  },
-                ),
-              ],
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: GenderCard(
+                      text: "Level 1",
+                      gender: Gender.female,
+                      onTap: () {
+                        Get.to(
+                          () => LevelOneScreen(),
+                          transition: Transition.circularReveal,
+                          duration: Duration(milliseconds: 1500),
+                        );
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: GenderCard(
+                      text: "Level 2",
+                      gender: Gender.female,
+                      onTap: () {
+                        Get.to(
+                          () => LevelTwoScreen(),
+                          transition: Transition.circularReveal,
+                          duration: Duration(milliseconds: 1500),
+                        );
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: GenderCard(
+                      text: "Level 3",
+                      gender: Gender.female,
+                      onTap: () {
+                        Get.to(
+                          () => LevelThreeScreen(),
+                          transition: Transition.circularReveal,
+                          duration: Duration(milliseconds: 1500),
+                        );
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: GenderCard(
+                      text: "Level 4",
+                      gender: Gender.female,
+                      onTap: () {
+                        Get.to(
+                          () => LevelFourScreen(),
+                          transition: Transition.circularReveal,
+                          duration: Duration(milliseconds: 1500),
+                        );
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: GenderCard(
+                      text: "Level 5",
+                      gender: Gender.female,
+                      onTap: () {
+                        Get.to(
+                          () => LevelFiveScreen(),
+                          transition: Transition.circularReveal,
+                          duration: Duration(milliseconds: 1500),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
