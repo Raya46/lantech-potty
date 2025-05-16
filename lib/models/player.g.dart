@@ -31,6 +31,31 @@ const PlayerSchema = CollectionSchema(
       id: 2,
       name: r'level',
       type: IsarType.long,
+    ),
+    r'level1Score': PropertySchema(
+      id: 3,
+      name: r'level1Score',
+      type: IsarType.long,
+    ),
+    r'level2Score': PropertySchema(
+      id: 4,
+      name: r'level2Score',
+      type: IsarType.long,
+    ),
+    r'level3Score': PropertySchema(
+      id: 5,
+      name: r'level3Score',
+      type: IsarType.long,
+    ),
+    r'level4Score': PropertySchema(
+      id: 6,
+      name: r'level4Score',
+      type: IsarType.long,
+    ),
+    r'level5Score': PropertySchema(
+      id: 7,
+      name: r'level5Score',
+      type: IsarType.long,
     )
   },
   estimateSize: _playerEstimateSize,
@@ -71,6 +96,11 @@ void _playerSerialize(
   writer.writeString(offsets[0], object.gender);
   writer.writeBool(offsets[1], object.isFocused);
   writer.writeLong(offsets[2], object.level);
+  writer.writeLong(offsets[3], object.level1Score);
+  writer.writeLong(offsets[4], object.level2Score);
+  writer.writeLong(offsets[5], object.level3Score);
+  writer.writeLong(offsets[6], object.level4Score);
+  writer.writeLong(offsets[7], object.level5Score);
 }
 
 Player _playerDeserialize(
@@ -85,6 +115,11 @@ Player _playerDeserialize(
   object.gender = reader.readStringOrNull(offsets[0]);
   object.id = id;
   object.isFocused = reader.readBoolOrNull(offsets[1]);
+  object.level1Score = reader.readLongOrNull(offsets[3]);
+  object.level2Score = reader.readLongOrNull(offsets[4]);
+  object.level3Score = reader.readLongOrNull(offsets[5]);
+  object.level4Score = reader.readLongOrNull(offsets[6]);
+  object.level5Score = reader.readLongOrNull(offsets[7]);
   return object;
 }
 
@@ -100,6 +135,16 @@ P _playerDeserializeProp<P>(
     case 1:
       return (reader.readBoolOrNull(offset)) as P;
     case 2:
+      return (reader.readLongOrNull(offset)) as P;
+    case 3:
+      return (reader.readLongOrNull(offset)) as P;
+    case 4:
+      return (reader.readLongOrNull(offset)) as P;
+    case 5:
+      return (reader.readLongOrNull(offset)) as P;
+    case 6:
+      return (reader.readLongOrNull(offset)) as P;
+    case 7:
       return (reader.readLongOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -485,6 +530,351 @@ extension PlayerQueryFilter on QueryBuilder<Player, Player, QFilterCondition> {
       ));
     });
   }
+
+  QueryBuilder<Player, Player, QAfterFilterCondition> level1ScoreIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'level1Score',
+      ));
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterFilterCondition> level1ScoreIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'level1Score',
+      ));
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterFilterCondition> level1ScoreEqualTo(
+      int? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'level1Score',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterFilterCondition> level1ScoreGreaterThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'level1Score',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterFilterCondition> level1ScoreLessThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'level1Score',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterFilterCondition> level1ScoreBetween(
+    int? lower,
+    int? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'level1Score',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterFilterCondition> level2ScoreIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'level2Score',
+      ));
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterFilterCondition> level2ScoreIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'level2Score',
+      ));
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterFilterCondition> level2ScoreEqualTo(
+      int? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'level2Score',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterFilterCondition> level2ScoreGreaterThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'level2Score',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterFilterCondition> level2ScoreLessThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'level2Score',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterFilterCondition> level2ScoreBetween(
+    int? lower,
+    int? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'level2Score',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterFilterCondition> level3ScoreIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'level3Score',
+      ));
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterFilterCondition> level3ScoreIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'level3Score',
+      ));
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterFilterCondition> level3ScoreEqualTo(
+      int? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'level3Score',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterFilterCondition> level3ScoreGreaterThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'level3Score',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterFilterCondition> level3ScoreLessThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'level3Score',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterFilterCondition> level3ScoreBetween(
+    int? lower,
+    int? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'level3Score',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterFilterCondition> level4ScoreIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'level4Score',
+      ));
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterFilterCondition> level4ScoreIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'level4Score',
+      ));
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterFilterCondition> level4ScoreEqualTo(
+      int? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'level4Score',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterFilterCondition> level4ScoreGreaterThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'level4Score',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterFilterCondition> level4ScoreLessThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'level4Score',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterFilterCondition> level4ScoreBetween(
+    int? lower,
+    int? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'level4Score',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterFilterCondition> level5ScoreIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'level5Score',
+      ));
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterFilterCondition> level5ScoreIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'level5Score',
+      ));
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterFilterCondition> level5ScoreEqualTo(
+      int? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'level5Score',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterFilterCondition> level5ScoreGreaterThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'level5Score',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterFilterCondition> level5ScoreLessThan(
+    int? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'level5Score',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterFilterCondition> level5ScoreBetween(
+    int? lower,
+    int? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'level5Score',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
 }
 
 extension PlayerQueryObject on QueryBuilder<Player, Player, QFilterCondition> {}
@@ -525,6 +915,66 @@ extension PlayerQuerySortBy on QueryBuilder<Player, Player, QSortBy> {
   QueryBuilder<Player, Player, QAfterSortBy> sortByLevelDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'level', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterSortBy> sortByLevel1Score() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'level1Score', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterSortBy> sortByLevel1ScoreDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'level1Score', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterSortBy> sortByLevel2Score() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'level2Score', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterSortBy> sortByLevel2ScoreDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'level2Score', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterSortBy> sortByLevel3Score() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'level3Score', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterSortBy> sortByLevel3ScoreDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'level3Score', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterSortBy> sortByLevel4Score() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'level4Score', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterSortBy> sortByLevel4ScoreDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'level4Score', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterSortBy> sortByLevel5Score() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'level5Score', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterSortBy> sortByLevel5ScoreDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'level5Score', Sort.desc);
     });
   }
 }
@@ -577,6 +1027,66 @@ extension PlayerQuerySortThenBy on QueryBuilder<Player, Player, QSortThenBy> {
       return query.addSortBy(r'level', Sort.desc);
     });
   }
+
+  QueryBuilder<Player, Player, QAfterSortBy> thenByLevel1Score() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'level1Score', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterSortBy> thenByLevel1ScoreDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'level1Score', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterSortBy> thenByLevel2Score() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'level2Score', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterSortBy> thenByLevel2ScoreDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'level2Score', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterSortBy> thenByLevel3Score() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'level3Score', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterSortBy> thenByLevel3ScoreDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'level3Score', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterSortBy> thenByLevel4Score() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'level4Score', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterSortBy> thenByLevel4ScoreDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'level4Score', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterSortBy> thenByLevel5Score() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'level5Score', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterSortBy> thenByLevel5ScoreDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'level5Score', Sort.desc);
+    });
+  }
 }
 
 extension PlayerQueryWhereDistinct on QueryBuilder<Player, Player, QDistinct> {
@@ -596,6 +1106,36 @@ extension PlayerQueryWhereDistinct on QueryBuilder<Player, Player, QDistinct> {
   QueryBuilder<Player, Player, QDistinct> distinctByLevel() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'level');
+    });
+  }
+
+  QueryBuilder<Player, Player, QDistinct> distinctByLevel1Score() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'level1Score');
+    });
+  }
+
+  QueryBuilder<Player, Player, QDistinct> distinctByLevel2Score() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'level2Score');
+    });
+  }
+
+  QueryBuilder<Player, Player, QDistinct> distinctByLevel3Score() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'level3Score');
+    });
+  }
+
+  QueryBuilder<Player, Player, QDistinct> distinctByLevel4Score() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'level4Score');
+    });
+  }
+
+  QueryBuilder<Player, Player, QDistinct> distinctByLevel5Score() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'level5Score');
     });
   }
 }
@@ -622,6 +1162,36 @@ extension PlayerQueryProperty on QueryBuilder<Player, Player, QQueryProperty> {
   QueryBuilder<Player, int?, QQueryOperations> levelProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'level');
+    });
+  }
+
+  QueryBuilder<Player, int?, QQueryOperations> level1ScoreProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'level1Score');
+    });
+  }
+
+  QueryBuilder<Player, int?, QQueryOperations> level2ScoreProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'level2Score');
+    });
+  }
+
+  QueryBuilder<Player, int?, QQueryOperations> level3ScoreProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'level3Score');
+    });
+  }
+
+  QueryBuilder<Player, int?, QQueryOperations> level4ScoreProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'level4Score');
+    });
+  }
+
+  QueryBuilder<Player, int?, QQueryOperations> level5ScoreProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'level5Score');
     });
   }
 }
