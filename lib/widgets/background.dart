@@ -16,7 +16,7 @@ class Background extends StatelessWidget {
               flex: 3,
               child: Container(
                 color:
-                    gender == 'male'
+                    gender == 'laki-laki'
                         ? const Color(0xFFC2E0FF)
                         : const Color(0xFFFFDDD2),
               ),
@@ -25,7 +25,7 @@ class Background extends StatelessWidget {
               flex: 1,
               child: Container(
                 color:
-                    gender == 'male'
+                    gender == 'laki-laki'
                         ? const Color(0xFF52AACA)
                         : const Color(0xFFFC9D99),
               ),

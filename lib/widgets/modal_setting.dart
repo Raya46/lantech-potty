@@ -1,40 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:toilet_training/models/player.dart';
+import 'package:toilet_training/services/player_service.dart';
 
 class _SettingOption extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback? onTap;
+  final bool isActive;
 
-  const _SettingOption({required this.icon, required this.label, this.onTap});
+  const _SettingOption({
+    required this.icon,
+    required this.label,
+    this.onTap,
+    this.isActive = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(10), 
+      borderRadius: BorderRadius.circular(10),
       child: Padding(
-        padding: const EdgeInsets.all(8.0), 
+        padding: const EdgeInsets.all(8.0),
         child: Column(
-          mainAxisSize: MainAxisSize.min, 
+          mainAxisSize: MainAxisSize.min,
           children: [
             CircleAvatar(
-              radius: 25, 
-              backgroundColor: const Color(
-                0xFF3498DB,
-              ),  
-              child: Icon(
-                icon,
-                size: 30, 
-                color: Colors.white
-              ),
+              radius: 25,
+              backgroundColor:
+                  isActive ? Color(0xFF2ECC71) : const Color(0xFF3498DB),
+              child: Icon(icon, size: 30, color: Colors.white),
             ),
-            const SizedBox(height: 4), 
+            const SizedBox(height: 4),
             Text(
               label,
               style: const TextStyle(
-                fontSize: 14, 
+                fontSize: 14,
                 fontWeight: FontWeight.bold,
-                color: Colors.black87, 
+                color: Colors.black87,
               ),
             ),
           ],
@@ -44,53 +47,93 @@ class _SettingOption extends StatelessWidget {
   }
 }
 
-class SettingsModalContent extends StatelessWidget {
-  final VoidCallback? onClose; 
+class SettingsModalContent extends StatefulWidget {
+  final VoidCallback? onClose;
   final VoidCallback? onTapSound;
   final VoidCallback? onTapMusic;
-  final VoidCallback? onTapColor;
 
   const SettingsModalContent({
     Key? key,
     this.onClose,
     this.onTapSound,
     this.onTapMusic,
-    this.onTapColor,
   }) : super(key: key);
+
+  @override
+  State<SettingsModalContent> createState() => _SettingsModalContentState();
+}
+
+class _SettingsModalContentState extends State<SettingsModalContent> {
+  Player? _player;
+  bool _isLoadingPlayer = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPlayerData();
+  }
+
+  Future<void> _loadPlayerData() async {
+    setState(() {
+      _isLoadingPlayer = true;
+    });
+    try {
+      Player p = await getPlayer();
+      setState(() {
+        _player = p;
+        _isLoadingPlayer = false;
+      });
+    } catch (e) {
+      print("Error loading player in modal: $e. Creating new player.");
+      Player newPlayer = Player(null);
+      newPlayer.isFocused = false;
+      await savePlayer(newPlayer);
+      setState(() {
+        _player = newPlayer;
+        _isLoadingPlayer = false;
+      });
+    }
+  }
+
+  Future<void> _toggleFocusMode() async {
+    if (_player != null) {
+      setState(() {
+        _player!.isFocused = !(_player!.isFocused ?? false);
+      });
+      await updatePlayer(_player!);
+      print("Focus mode updated to: ${_player!.isFocused}");
+    } else {
+      print("Player data not available to toggle focus mode.");
+      await _loadPlayerData();
+      if (_player != null) {
+        setState(() {
+          _player!.isFocused = !(_player!.isFocused ?? false);
+        });
+        await updatePlayer(_player!);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     const Color cardBackgroundColor = Color(0xFFFFF8E1);
-
     const Color titleFillColor = Color(0xFFFFA07A);
-
     const Color titleOutlineColor = Color(0xFF808080);
-
-    const Color closeButtonColor =
-        Colors.redAccent; 
+    const Color closeButtonColor = Colors.redAccent;
 
     return Stack(
-      clipBehavior:
-          Clip.none, 
+      clipBehavior: Clip.none,
       children: [
         Container(
-          width: 400, 
+          width: 400,
           height: 250,
-          padding: const EdgeInsets.fromLTRB(
-            24,
-            32,
-            24,
-            24,
-          ), 
+          padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
           decoration: BoxDecoration(
             color: cardBackgroundColor,
-            borderRadius: BorderRadius.circular(
-              20,
-            ), 
+            borderRadius: BorderRadius.circular(20),
           ),
           child: Column(
-            mainAxisSize:
-                MainAxisSize.min, 
+            mainAxisSize: MainAxisSize.min,
             children: [
               Stack(
                 alignment: Alignment.center,
@@ -119,48 +162,42 @@ class SettingsModalContent extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 24), 
-              Row(
-                mainAxisAlignment:
-                    MainAxisAlignment
-                        .spaceEvenly, 
-                children: [
-                  _SettingOption(
-                    icon: Icons.volume_up, 
-                    label: "Suara",
-                    onTap: onTapSound,  
+              const SizedBox(height: 24),
+              _isLoadingPlayer
+                  ? CircularProgressIndicator()
+                  : Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _SettingOption(
+                        icon: Icons.volume_up,
+                        label: "Suara",
+                        onTap: widget.onTapSound,
+                      ),
+                      _SettingOption(
+                        icon: Icons.music_note,
+                        label: "Musik",
+                        onTap: widget.onTapMusic,
+                      ),
+                      _SettingOption(
+                        icon: Icons.center_focus_strong,
+                        label: "Mode Fokus",
+                        onTap: _toggleFocusMode,
+                        isActive: _player?.isFocused ?? false,
+                      ),
+                    ],
                   ),
-                  _SettingOption(
-                    icon: Icons.music_note, 
-                    label: "Musik",
-                    onTap: onTapMusic, 
-                  ),
-                  _SettingOption(
-                    icon:
-                        Icons
-                            .color_lens, 
-                    label: "Warna",
-                    onTap: onTapColor, 
-                  ),
-                ],
-              ),
             ],
           ),
         ),
-
         Positioned(
-          top: -15,  
-          right: -15, 
+          top: -15,
+          right: -15,
           child: GestureDetector(
-            onTap: onClose, 
+            onTap: widget.onClose,
             child: CircleAvatar(
-              radius: 18, 
+              radius: 18,
               backgroundColor: closeButtonColor,
-              child: const Icon(
-                Icons.close, 
-                size: 20, 
-                color: Colors.white, 
-              ),
+              child: const Icon(Icons.close, size: 20, color: Colors.white),
             ),
           ),
         ),

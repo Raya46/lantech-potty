@@ -4,6 +4,8 @@ import 'package:toilet_training/screens/menus/choose_level_screen.dart';
 import "package:toilet_training/widgets/card_gender.dart";
 import 'package:toilet_training/widgets/background.dart';
 import "package:toilet_training/widgets/header.dart";
+import 'package:toilet_training/services/player_service.dart';
+import 'package:toilet_training/models/player.dart';
 
 class ChooseGenderScreen extends StatefulWidget {
   const ChooseGenderScreen({super.key});
@@ -13,42 +15,80 @@ class ChooseGenderScreen extends StatefulWidget {
 }
 
 class _ChooseGenderScreenState extends State<ChooseGenderScreen> {
+  Player? _player;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPlayerData();
+  }
+
+  Future<void> _loadPlayerData() async {
+    try {
+      Player player = await getPlayer();
+      setState(() {
+        _player = player;
+      });
+    } catch (e) {
+      // Jika belum ada player, buat player baru dengan nilai default
+      print("Error loading player: $e. Creating a new player.");
+      Player newPlayer = Player(null); // Level awal null atau sesuai kebutuhan
+      newPlayer.isFocused = false; // Default focus mode
+      await savePlayer(newPlayer);
+      setState(() {
+        _player = newPlayer;
+      });
+    }
+  }
+
+  Future<void> _updateAndNavigate(String gender) async {
+    if (_player != null) {
+      _player!.gender = gender;
+      await updatePlayer(_player!);
+      Get.to(
+        () => ChooseLevelScreen(),
+        transition: Transition.leftToRight,
+        duration: Duration(milliseconds: 1500),
+      );
+    } else {
+      // Handle jika _player masih null, meskipun _loadPlayerData seharusnya sudah mengatasi ini
+      print("Player data is not available to update gender.");
+      // Mungkin tampilkan error atau coba load lagi
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Background(
-        gender: 'male',
+        // Tentukan gender default untuk background jika _player belum termuat
+        gender: _player?.gender ?? 'male',
         child: Column(
           children: [
             Header(title: "Pilih Gender"),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                GenderCard(
-                  text: "Perempuan",
-                  gender: Gender.female,
-                  onTap: () {
-                    Get.to(
-                      () => ChooseLevelScreen(),
-                      transition: Transition.leftToRight,
-                      duration: Duration(milliseconds: 1500),
-                    );
-                  },
-                ),
-                SizedBox(width: 40),
-                GenderCard(
-                  text: "Laki-laki",
-                  gender: Gender.male,
-                  onTap: () {
-                    Get.to(
-                      () => ChooseLevelScreen(),
-                      transition: Transition.leftToRight,
-                      duration: Duration(milliseconds: 1500),
-                    );
-                  },
-                ),
-              ],
-            ),
+            if (_player == null)
+              Center(child: CircularProgressIndicator())
+            else
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  GenderCard(
+                    text: "Perempuan",
+                    gender: Gender.female,
+                    onTap: () {
+                      _updateAndNavigate("perempuan");
+                    },
+                  ),
+                  SizedBox(width: 40),
+                  GenderCard(
+                    text: "Laki-laki",
+                    gender: Gender.male,
+                    onTap: () {
+                      _updateAndNavigate("laki-laki");
+                    },
+                  ),
+                ],
+              ),
           ],
         ),
       ),

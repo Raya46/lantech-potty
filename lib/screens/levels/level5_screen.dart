@@ -1,6 +1,8 @@
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:toilet_training/games/puzzle/puzzle_game.dart';
+import 'package:toilet_training/widgets/background.dart';
+import 'package:toilet_training/widgets/header.dart';
 
 class LevelFiveScreen extends StatefulWidget {
   const LevelFiveScreen({super.key});
@@ -81,6 +83,19 @@ class _LevelFiveScreenState extends State<LevelFiveScreen> {
     }
 
     // Jika _puzzleGame berhasil diinisialisasi
-    return Scaffold(body: GameWidget(game: _puzzleGame!));
+    return Scaffold(
+      body: Background(
+        gender: 'perempuan',
+        child: Column(
+          children: [
+            Header(title: 'Level 5'),
+            Expanded(child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: GameWidget(game: _puzzleGame!),
+            )),
+          ],
+        ),
+      ),
+    );
   }
 }

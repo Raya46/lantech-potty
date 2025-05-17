@@ -4,6 +4,7 @@ class ToiletStep {
   final String image;
   final bool focus;
   final String gender;
+  final String? type;
 
   ToiletStep({
     required this.id,
@@ -11,6 +12,7 @@ class ToiletStep {
     required this.image,
     required this.focus,
     required this.gender,
+    this.type,
   });
 
   factory ToiletStep.fromJson(Map<String, dynamic> json) {
@@ -18,8 +20,9 @@ class ToiletStep {
       id: json['id'],
       name: json['name'],
       image: json['image'],
-      focus: json['focus'],
+      focus: json['focus'] ?? false,
       gender: json['gender'],
+      type: json['type'],
     );
   }
 }

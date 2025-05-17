@@ -28,16 +28,13 @@ class Header extends StatelessWidget {
           elevation: 0,
           child: SettingsModalContent(
             onClose: () {
-              Navigator.of(context).pop();
+              Get.back(canPop: false);
             },
             onTapSound: () {
               print("Sound Tapped");
             },
             onTapMusic: () {
               print("Music Tapped");
-            },
-            onTapColor: () {
-              print("Color Tapped");
             },
           ),
         );
