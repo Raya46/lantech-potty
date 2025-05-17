@@ -2,15 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:toilet_training/screens/menus/start_screen.dart';
+import 'package:toilet_training/services/player_service.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations([
+  await SystemChrome.setPreferredOrientations([
     DeviceOrientation.landscapeLeft,
     DeviceOrientation.landscapeRight,
-  ]).then((_) {
-    runApp(const MyApp());
-  });
+  ]);
+  db = openDB();
+  await db;
+
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {

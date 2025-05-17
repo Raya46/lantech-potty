@@ -1,14 +1,15 @@
-import 'dart:convert';
-import 'dart:math';
+import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
+import 'package:toilet_training/games/hidden_object_game.dart';
+import 'package:toilet_training/widgets/background.dart';
+import 'package:toilet_training/widgets/header.dart'; // Import game Flame baru
 
 class SceneObject {
-  final dynamic id; 
+  final dynamic id;
   final String name;
   final String imagePath;
-  Offset position; 
-  Size size; 
+  Offset position;
+  Size size;
   bool isTarget;
   bool isFound;
 
@@ -31,9 +32,8 @@ class SceneObject {
       id: json['id'].toString(),
       name: json['name'],
       imagePath: json['image'],
-      position:
-          defaultPosition, 
-      size: defaultSize, 
+      position: defaultPosition,
+      size: defaultSize,
     );
   }
 }
@@ -46,120 +46,66 @@ class LevelThreeScreen extends StatefulWidget {
 }
 
 class _LevelThreeScreenState extends State<LevelThreeScreen> {
-  List<SceneObject> _sceneObjects = [];
-  List<SceneObject> _targetObjects = [];
-  final Set<String> _foundTargetIds = {};
-  bool _allTargetsFound = false;
-  bool _isLoading = true;
+  late HiddenObjectGame _game;
+  List<SceneObjectData> _currentTargets = [];
+  Set<String> _currentFoundIds = {};
+  bool _isLoadingGame = true; // Awalnya true sampai game selesai load
 
-  final double sceneWidth = 800; 
-  final double sceneHeight = 500; 
+  final double sceneWidth = 800;
+  final double sceneHeight = 500;
   final int numberOfTargets = 3;
 
   @override
   void initState() {
     super.initState();
-    _initializeScene();
+    _initializeGame();
   }
 
-  Future<void> _initializeScene() async {
-    setState(() {
-      _isLoading = true;
-      _allTargetsFound = false;
-      _foundTargetIds.clear();
-      _targetObjects.clear();
-      _sceneObjects.clear();
-    });
-
-    try {
-      final String response = await rootBundle.loadString(
-        'lib/models/static/random-things-static.json',
-      );
-      final List<dynamic> data = json.decode(response);
-
-      final random = Random();
-      List<SceneObject> loadedObjects = [];
-
-      for (var itemJson in data) {
-        double objWidth = 80 + random.nextDouble() * 50;
-        double objHeight = 80 + random.nextDouble() * 50;
-
-        double posX = random.nextDouble() * (sceneWidth - objWidth);
-        double posY = random.nextDouble() * (sceneHeight - objHeight);
-
-        loadedObjects.add(
-          SceneObject.fromJson(
-            itemJson,
-            Offset(posX, posY),
-            Size(objWidth, objHeight),
-          ),
-        );
-      }
-
-      _sceneObjects = List.from(loadedObjects);
-
-      List<SceneObject> potentialTargets =
-          loadedObjects.where((obj) {
-            int? id = int.tryParse(obj.id.toString());
-            return id != null && id >= 1 && id <= 9;
-          }).toList();
-
-      if (potentialTargets.isNotEmpty) {
-        potentialTargets.shuffle(random);
-        for (
-          int i = 0;
-          i < min(numberOfTargets, potentialTargets.length);
-          i++
-        ) {
-          final targetId = potentialTargets[i].id;
-          final sceneObjectTarget = _sceneObjects.firstWhere(
-            (so) => so.id == targetId,
-            orElse: () => potentialTargets[i],
-          );
-
-          sceneObjectTarget.isTarget = true;
-          _targetObjects.add(sceneObjectTarget);
+  void _initializeGame() {
+    _game = HiddenObjectGame(
+      onTargetsUpdated: (targets, foundIds) {
+        // Dipanggil oleh game ketika daftar target atau yang ditemukan berubah
+        if (mounted) {
+          // Pastikan widget masih ada di tree
+          setState(() {
+            _currentTargets = List.from(targets);
+            _currentFoundIds = Set.from(foundIds);
+            if (_isLoadingGame) _isLoadingGame = false; // Game sudah load
+          });
         }
-      } else {
-        print(
-          "Tidak ada objek toilet (ID 1-9) yang ditemukan untuk dijadikan target.",
-        );
-      }
-
-      _sceneObjects.shuffle(random);
-    } catch (e) {
-      print("Error loading or processing scene objects: $e");
-    }
-
-    setState(() {
-      _isLoading = false;
-    });
+      },
+      onAllTargetsFound: () {
+        // Dipanggil oleh game ketika semua target ditemukan
+        if (mounted) {
+          _showSuccessDialog();
+        }
+      },
+      onShowFeedback: (message) {
+        if (mounted && message.isNotEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(message),
+              duration: Duration(seconds: 1),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+      },
+    );
+    // Tidak perlu setState di sini karena GameWidget akan dibangun dengan _game ini
+    // dan callback onTargetsUpdated akan menangani update UI awal.
   }
 
-  void _onObjectTap(SceneObject tappedObject) {
-    if (_allTargetsFound || tappedObject.isFound || _isLoading) return;
-
-    if (!_isLoading) {
-      if (tappedObject.isTarget) {
-        setState(() {
-          tappedObject.isFound = true;
-          _foundTargetIds.add(tappedObject.id.toString());
-
-          if (_foundTargetIds.length == _targetObjects.length) {
-            _allTargetsFound = true;
-            _showSuccessDialog();
-          }
-        });
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Itu bukan target, coba cari yang lain!"),
-            duration: Duration(seconds: 1),
-            backgroundColor: Colors.orange,
-          ),
-        );
-      }
-    }
+  void _resetLevel() {
+    setState(() {
+      _isLoadingGame = true; // Tampilkan loading saat game direset
+      _currentTargets.clear();
+      _currentFoundIds.clear();
+    });
+    _game.resetGame().then((_) {
+      // Game akan memanggil onTargetsUpdated setelah reset selesai,
+      // yang akan mengatur _isLoadingGame = false dan update UI.
+    });
   }
 
   void _showSuccessDialog() {
@@ -186,7 +132,7 @@ class _LevelThreeScreenState extends State<LevelThreeScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                "Selamat! kamu mendapatkan ${_targetObjects.length} ⭐",
+                "Selamat! kamu mendapatkan ${_currentTargets.length} ⭐",
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 18, color: Color(0xFFD98555)),
               ),
@@ -196,14 +142,17 @@ class _LevelThreeScreenState extends State<LevelThreeScreen> {
                 runSpacing: 4.0,
                 alignment: WrapAlignment.center,
                 children:
-                    _targetObjects
+                    _currentTargets
                         .map(
                           (obj) => Chip(
                             label: Text(
                               obj.name,
                               style: TextStyle(color: Colors.white),
                             ),
-                            backgroundColor: _getChipColor(obj.name, true),
+                            backgroundColor: _getChipColor(
+                              obj.name,
+                              true,
+                            ), // Semua pasti sudah found
                             padding: EdgeInsets.symmetric(
                               horizontal: 12,
                               vertical: 8,
@@ -235,7 +184,7 @@ class _LevelThreeScreenState extends State<LevelThreeScreen> {
                 ),
                 onPressed: () {
                   Navigator.of(context).pop();
-                  _initializeScene();
+                  _resetLevel(); // Reset game untuk level berikutnya atau attempt baru
                 },
               ),
             ),
@@ -261,136 +210,79 @@ class _LevelThreeScreenState extends State<LevelThreeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFDF3E6),
-      body:
-          _isLoading
-              ? Center(child: CircularProgressIndicator())
-              : Column(
-                children: [
-                  SizedBox(height: 40),
-                  Text(
-                    _allTargetsFound
-                        ? "Semua Benda Ditemukan!"
-                        : "Temukanlah benda berikut ini!",
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF8B5A2B),
-                    ),
-                  ),
-                  SizedBox(height: 15),
-                  if (_targetObjects.isNotEmpty)
-                    Wrap(
-                      spacing: 10.0,
-                      runSpacing: 8.0,
-                      alignment: WrapAlignment.center,
-                      children:
-                          _targetObjects.map((obj) {
-                            bool isActuallyFound = _foundTargetIds.contains(
-                              obj.id.toString(),
-                            );
-                            return Chip(
-                              label: Text(
-                                obj.name,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              backgroundColor: _getChipColor(
-                                obj.name,
-                                isActuallyFound,
-                              ),
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 10,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                                side: BorderSide(
-                                  color: Colors.white,
-                                  width: 1.5,
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                    )
-                  else
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 20.0),
-                      child: Text(
-                        "Tidak ada target untuk ditemukan.",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ),
-                  SizedBox(height: 20),
-                  Expanded(
-                    child: InteractiveViewer(
-                      boundaryMargin: EdgeInsets.all(20.0),
-                      minScale:
-                          0.1,
-                      maxScale: 3.0,
-                      child: Container(
-                        width: sceneWidth, 
-                        height:
-                            sceneHeight, 
-                        child: Stack(
-                          children:
-                              _sceneObjects.map((obj) {
-                                return Positioned(
-                                  left: obj.position.dx,
-                                  top: obj.position.dy,
-                                  width: obj.size.width,
-                                  height: obj.size.height,
-                                  child: GestureDetector(
-                                    onTap: () => _onObjectTap(obj),
-                                    child: Stack(
-                                      alignment: Alignment.center,
-                                      children: [
-                                        Image.asset(
-                                          obj.imagePath,
-                                          fit: BoxFit.contain,
-                                          errorBuilder:
-                                              (
-                                                context,
-                                                error,
-                                                stackTrace,
-                                              ) => Container(
-                                                color: Colors.grey[200],
-                                                child: Center(
-                                                  child: Icon(
-                                                    Icons.broken_image_outlined,
-                                                    size: 30,
-                                                    color: Colors.grey[500],
-                                                  ),
-                                                ),
-                                              ),
-                                        ),
-                                        if (obj.isTarget &&
-                                            obj.isFound) 
-                                          Container(
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              border: Border.all(
-                                                color: Colors.green,
-                                                width: 4,
-                                              ),
-                                              color: Colors.green.withOpacity(
-                                                0.2,
-                                              ),
-                                            ),
-                                          ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+      body: Background(
+        gender: 'laki-laki',
+        child: Column(
+          children: [
+            Header(title: "level 3"),
+            Text(
+              _currentFoundIds.length == _currentTargets.length &&
+                      _currentTargets.isNotEmpty
+                  ? "Semua Benda Ditemukan!"
+                  : "Temukanlah benda berikut ini!",
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF8B5A2B),
               ),
+            ),
+            SizedBox(height: 15),
+            if (_isLoadingGame &&
+                _currentTargets
+                    .isEmpty) // Tampilkan loading hanya jika target belum ada
+              CircularProgressIndicator()
+            else if (_currentTargets.isNotEmpty)
+              Wrap(
+                spacing: 10.0,
+                runSpacing: 8.0,
+                alignment: WrapAlignment.center,
+                children:
+                    _currentTargets.map((obj) {
+                      bool isActuallyFound = _currentFoundIds.contains(
+                        obj.id.toString(),
+                      );
+                      return Chip(
+                        label: Text(
+                          obj.name,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        backgroundColor: _getChipColor(
+                          obj.name,
+                          isActuallyFound,
+                        ),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 10,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                          side: BorderSide(color: Colors.white, width: 1.5),
+                        ),
+                      );
+                    }).toList(),
+              )
+            else if (!_isLoadingGame && _currentTargets.isEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20.0),
+                child: Text(
+                  "Tidak ada target untuk ditemukan.",
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
+            SizedBox(height: 20),
+            Expanded(
+              child: GameWidget(
+                game: _game, // Berikan instance game ke GameWidget
+                // InteractiveViewer bisa dipertimbangkan untuk ditambahkan sebagai parent dari GameWidget
+                // atau fungsionalitas zoom/pan diimplementasikan dalam Flame game jika diperlukan.
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -31,6 +31,9 @@ class PuzzleGame extends FlameGame with PanDetector, HasGameRef {
   PuzzleGame({this.onPuzzleSolved});
 
   @override
+  Color backgroundColor() => Colors.transparent;
+
+  @override
   Future<void> onLoad() async {
     await super.onLoad();
     gameSize = size;

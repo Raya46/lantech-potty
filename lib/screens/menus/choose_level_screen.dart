@@ -8,6 +8,8 @@ import 'package:toilet_training/screens/levels/level5_screen.dart';
 import 'package:toilet_training/widgets/background.dart';
 import "package:toilet_training/widgets/card_gender.dart";
 import "package:toilet_training/widgets/header.dart";
+import 'package:toilet_training/models/player.dart';
+import 'package:toilet_training/services/player_service.dart';
 
 class ChooseLevelScreen extends StatefulWidget {
   const ChooseLevelScreen({super.key});
@@ -17,12 +19,50 @@ class ChooseLevelScreen extends StatefulWidget {
 }
 
 class _ChooseLevelScreenState extends State<ChooseLevelScreen> {
+  Player? _player;
+  bool _isLoadingPlayer = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPlayerData();
+  }
+
+  Future<void> _loadPlayerData() async {
+    setState(() {
+      _isLoadingPlayer = true;
+    });
+    try {
+      _player = await getPlayer();
+      if (_player == null) {
+        print("Player data not found in ChooseLevelScreen! Creating default.");
+        _player = Player(null);
+        _player!.gender = 'perempuan'; // Default gender
+        _player!.isFocused = false; // Default focus state
+        await savePlayer(_player!);
+      }
+      _player!.gender ??= 'perempuan'; // Ensure gender is not null
+    } catch (e) {
+      print("Error loading player in ChooseLevelScreen: $e. Creating default.");
+      _player = Player(null);
+      _player!.gender = 'perempuan';
+      _player!.isFocused = false;
+      // await savePlayer(_player!); // Consider if saving here is appropriate
+    }
+    setState(() {
+      _isLoadingPlayer = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (_isLoadingPlayer) {
+      return Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
     return Scaffold(
-      backgroundColor: Colors.redAccent,
       body: Background(
-        gender: 'female',
+        gender: _player?.gender as String,
         child: Column(
           children: [
             Header(title: "Pilih level"),

@@ -1,716 +1,784 @@
 [
-    {
-      "id": 2,
-      "name": "membuka pintu",
-      "image": "assets/images/2.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 3,
-      "name": "masuk kamar mandi",
-      "image": "assets/images/3.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 4,
-      "name": "tutup pintu",
-      "image": "assets/images/4.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 5,
-      "name": "kunci pintu",
-      "image": "assets/images/5.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 6,
-      "name": "buka tutup closet",
-      "image": "assets/images/6.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 7,
-      "name": "buka celana",
-      "image": "assets/images/7.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 8,
-      "name": "bab",
-      "image": "assets/images/8.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 9,
-      "name": "cebok",
-      "image": "assets/images/9.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 10,
-      "name": "lap pakai tisu",
-      "image": "assets/images/10.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 11,
-      "name": "naikan celana",
-      "image": "assets/images/11.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 12,
-      "name": "flush/siram toilet",
-      "image": "assets/images/12.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 13,
-      "name": "tutup closet",
-      "image": "assets/images/13.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 14,
-      "name": "mencuci tangan",
-      "image": "assets/images/14.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 15,
-      "name": "buka kunci",
-      "image": "assets/images/15.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 16,
-      "name": "buka pintu",
-      "image": "assets/images/16.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 17,
-      "name": "keluar kamar mandi",
-      "image": "assets/images/17.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 18,
-      "name": "tutup pintu",
-      "image": "assets/images/18.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 20,
-      "name": "membuka pintu",
-      "image": "assets/images/20.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 21,
-      "name": "masuk kamar mandi",
-      "image": "assets/images/21.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 22,
-      "name": "tutup pintu",
-      "image": "assets/images/22.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 23,
-      "name": "kunci pintu",
-      "image": "assets/images/23.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 24,
-      "name": "buka tutup closet",
-      "image": "assets/images/24.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 25,
-      "name": "buka celana",
-      "image": "assets/images/25.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 26,
-      "name": "bab",
-      "image": "assets/images/26.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 27,
-      "name": "cebok",
-      "image": "assets/images/27.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 28,
-      "name": "lap pakai tisu",
-      "image": "assets/images/28.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 29,
-      "name": "naikan celana",
-      "image": "assets/images/29.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 30,
-      "name": "flush/siram toilet",
-      "image": "assets/images/30.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 31,
-      "name": "tutup closet",
-      "image": "assets/images/31.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 32,
-      "name": "mencuci tangan",
-      "image": "assets/images/32.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 33,
-      "name": "buka kunci",
-      "image": "assets/images/33.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 34,
-      "name": "buka pintu",
-      "image": "assets/images/34.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 35,
-      "name": "keluar kamar mandi",
-      "image": "assets/images/35.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 36,
-      "name": "tutup pintu",
-      "image": "assets/images/36.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 38,
-      "name": "membuka pintu",
-      "image": "assets/images/38.png",
-      "focus": false,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 39,
-      "name": "masuk kamar mandi",
-      "image": "assets/images/39.png",
-      "focus": false,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 40,
-      "name": "tutup pintu",
-      "image": "assets/images/40.png",
-      "focus": false,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 41,
-      "name": "kunci pintu",
-      "image": "assets/images/41.png",
-      "focus": false,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 42,
-      "name": "buka tutup closet",
-      "image": "assets/images/42.png",
-      "focus": false,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 43,
-      "name": "buka celana",
-      "image": "assets/images/43.png",
-      "focus": false,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 44,
-      "name": "bak",
-      "image": "assets/images/44.png",
-      "focus": false,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 45,
-      "name": "cebok",
-      "image": "assets/images/45.png",
-      "focus": false,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 46,
-      "name": "lap pakai tisu",
-      "image": "assets/images/46.png",
-      "focus": false,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 47,
-      "name": "naikan celana",
-      "image": "assets/images/47.png",
-      "focus": false,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 48,
-      "name": "flush/siram toilet",
-      "image": "assets/images/48.png",
-      "focus": false,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 49,
-      "name": "tutup closet",
-      "image": "assets/images/49.png",
-      "focus": false,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 50,
-      "name": "mencuci tangan",
-      "image": "assets/images/50.png",
-      "focus": false,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 51,
-      "name": "buka kunci",
-      "image": "assets/images/51.png",
-      "focus": false,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 52,
-      "name": "buka pintu",
-      "image": "assets/images/52.png",
-      "focus": false,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 53,
-      "name": "keluar kamar mandi",
-      "image": "assets/images/53.png",
-      "focus": false,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 54,
-      "name": "tutup pintu",
-      "image": "assets/images/54.png",
-      "focus": false,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 56,
-      "name": "membuka pintu",
-      "image": "assets/images/56.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 57,
-      "name": "masuk kamar mandi",
-      "image": "assets/images/57.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 58,
-      "name": "tutup pintu",
-      "image": "assets/images/58.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 59,
-      "name": "kunci pintu",
-      "image": "assets/images/59.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 60,
-      "name": "buka tutup closet",
-      "image": "assets/images/60.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 61,
-      "name": "buka celana",
-      "image": "assets/images/61.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 62,
-      "name": "bak",
-      "image": "assets/images/62.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 63,
-      "name": "cebok",
-      "image": "assets/images/63.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 64,
-      "name": "lap pakai tisu",
-      "image": "assets/images/64.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 65,
-      "name": "naikan celana",
-      "image": "assets/images/65.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 66,
-      "name": "flush/siram toilet",
-      "image": "assets/images/66.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 67,
-      "name": "tutup closet",
-      "image": "assets/images/67.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 68,
-      "name": "mencuci tangan",
-      "image": "assets/images/68.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 69,
-      "name": "buka kunci",
-      "image": "assets/images/69.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 70,
-      "name": "buka pintu",
-      "image": "assets/images/70.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 71,
-      "name": "keluar kamar mandi",
-      "image": "assets/images/71.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 72,
-      "name": "tutup pintu",
-      "image": "assets/images/72.png",
-      "focus": true,
-      "gender":"laki-laki"
-    },
-    {
-      "id": 74,
-      "name": "membuka pintu",
-      "image": "assets/images/74.png",
-      "focus": false,
-      "gender":"perempuan"
-    },
-    {
-      "id": 75,
-      "name": "masuk kamar mandi",
-      "image": "assets/images/75.png",
-      "focus": false,
-      "gender":"perempuan"
-    },
-    {
-      "id": 76,
-      "name": "tutup pintu",
-      "image": "assets/images/76.png",
-      "focus": false,
-      "gender":"perempuan"
-    },
-    {
-      "id": 77,
-      "name": "kunci pintu",
-      "image": "assets/images/77.png",
-      "focus": false,
-      "gender":"perempuan"
-    },
-    {
-      "id": 78,
-      "name": "buka tutup closet",
-      "image": "assets/images/78.png",
-      "focus": false,
-      "gender":"perempuan"
-    },
-    {
-      "id": 79,
-      "name": "buka celana",
-      "image": "assets/images/79.png",
-      "focus": false,
-      "gender":"perempuan"
-    },
-    {
-      "id": 80,
-      "name": "bab/bak",
-      "image": "assets/images/80.png",
-      "focus": false,
-      "gender":"perempuan"
-    },
-    {
-      "id": 81,
-      "name": "cebok",
-      "image": "assets/images/81.png",
-      "focus": false,
-      "gender":"perempuan"
-    },
-    {
-      "id": 82,
-      "name": "lap pakai tisu",
-      "image": "assets/images/82.png",
-      "focus": false,
-      "gender":"perempuan"
-    },
-    {
-      "id": 83,
-      "name": "naikan celana",
-      "image": "assets/images/83.png",
-      "focus": false,
-      "gender":"perempuan"
-    },
-    {
-      "id": 84,
-      "name": "flush/siram toilet",
-      "image": "assets/images/84.png",
-      "focus": false,
-      "gender":"perempuan"
-    },
-    {
-      "id": 85,
-      "name": "tutup closet",
-      "image": "assets/images/85.png",
-      "focus": false,
-      "gender":"perempuan"
-    },
-    {
-      "id": 86,
-      "name": "mencuci tangan",
-      "image": "assets/images/86.png",
-      "focus": false,
-      "gender":"perempuan"
-    },
-    {
-      "id": 87,
-      "name": "buka kunci",
-      "image": "assets/images/87.png",
-      "focus": false,
-      "gender":"perempuan"
-    },
-    {
-      "id": 88,
-      "name": "buka pintu",
-      "image": "assets/images/88.png",
-      "focus": false,
-      "gender":"perempuan"
-    },
-    {
-      "id": 89,
-      "name": "keluar kamar mandi",
-      "image": "assets/images/89.png",
-      "focus": false,
-      "gender":"perempuan"
-    },
-    {
-      "id": 90,
-      "name": "tutup pintu",
-      "image": "assets/images/90.png",
-      "focus": false,
-      "gender":"perempuan"
-    },
-    {
-      "id": 92,
-      "name": "membuka pintu",
-      "image": "assets/images/92.png",
-      "focus": true,
-      "gender":"perempuan"
-    },
-    {
-      "id": 93,
-      "name": "masuk kamar mandi",
-      "image": "assets/images/93.png",
-      "focus": true,
-      "gender":"perempuan"
-    },
-    {
-      "id": 94,
-      "name": "tutup pintu",
-      "image": "assets/images/94.png",
-      "focus": true,
-      "gender":"perempuan"
-    },
-    {
-      "id": 95,
-      "name": "kunci pintu",
-      "image": "assets/images/95.png",
-      "focus": true,
-      "gender":"perempuan"
-    },
-    {
-      "id": 96,
-      "name": "buka tutup closet",
-      "image": "assets/images/96.png",
-      "focus": true,
-      "gender":"perempuan"
-    },
-    {
-      "id": 97,
-      "name": "buka celana",
-      "image": "assets/images/97.png",
-      "focus": true,
-      "gender":"perempuan"
-    },
-    {
-      "id": 98,
-      "name": "bab/bak",
-      "image": "assets/images/98.png",
-      "focus": true,
-      "gender":"perempuan"
-    },
-    {
-      "id": 99,
-      "name": "cebok",
-      "image": "assets/images/99.png",
-      "focus": true,
-      "gender":"perempuan"
-    },
-    {
-      "id": 100,
-      "name": "lap pakai tisu",
-      "image": "assets/images/100.png",
-      "focus": true,
-      "gender":"perempuan"
-    },
-    {
-      "id": 101,
-      "name": "naikan celana",
-      "image": "assets/images/101.png",
-      "focus": true,
-      "gender":"perempuan"
-    },
-    {
-      "id": 102,
-      "name": "flush/siram toilet",
-      "image": "assets/images/102.png",
-      "focus": true,
-      "gender":"perempuan"
-    },
-    {
-      "id": 103,
-      "name": "tutup closet",
-      "image": "assets/images/103.png",
-      "focus": true,
-      "gender":"perempuan"
-    },
-    {
-      "id": 104,
-      "name": "mencuci tangan",
-      "image": "assets/images/104.png",
-      "focus": true,
-      "gender":"perempuan"
-    },
-    {
-      "id": 105,
-      "name": "buka kunci",
-      "image": "assets/images/105.png",
-      "focus": true,
-      "gender":"perempuan"
-    },
-    {
-      "id": 106,
-      "name": "buka pintu",
-      "image": "assets/images/106.png",
-      "focus": true,
-      "gender":"perempuan"
-    },
-    {
-      "id": 107,
-      "name": "keluar kamar mandi",
-      "image": "assets/images/107.png",
-      "focus": true,
-      "gender":"perempuan"
-    },
-    {
-      "id": 108,
-      "name": "tutup pintu",
-      "image": "assets/images/108.png",
-      "focus": true,
-      "gender":"perempuan"
-    }
-  ]
+  {
+    "id": 2,
+    "name": "membuka pintu",
+    "image": "assets/images/2.png",
+    "focus": false,
+    "gender": "laki-laki",
+    "type": "bab"
+  },
+  {
+    "id": 3,
+    "name": "masuk kamar mandi",
+    "image": "assets/images/3.png",
+    "focus": false,
+    "gender": "laki-laki",
+    "type": "bab"
+  },
+  {
+    "id": 4,
+    "name": "tutup pintu",
+    "image": "assets/images/4.png",
+    "focus": false,
+    "gender": "laki-laki",
+    "type": "bab"
+  },
+  {
+    "id": 5,
+    "name": "kunci pintu",
+    "image": "assets/images/5.png",
+    "focus": false,
+    "gender": "laki-laki",
+    "type": "bab"
+  },
+  {
+    "id": 6,
+    "name": "buka tutup closet",
+    "image": "assets/images/6.png",
+    "focus": false,
+    "gender": "laki-laki",
+    "type": "bab"
+  },
+  {
+    "id": 7,
+    "name": "buka celana",
+    "image": "assets/images/7.png",
+    "focus": false,
+    "gender": "laki-laki",
+    "type": "bab"
+  },
+  {
+    "id": 8,
+    "name": "bab",
+    "image": "assets/images/8.png",
+    "focus": false,
+    "gender": "laki-laki",
+    "type": "bab"
+  },
+  {
+    "id": 9,
+    "name": "cebok",
+    "image": "assets/images/9.png",
+    "focus": false,
+    "gender": "laki-laki",
+    "type": "bab"
+  },
+  {
+    "id": 10,
+    "name": "lap pakai tisu",
+    "image": "assets/images/10.png",
+    "focus": false,
+    "gender": "laki-laki",
+    "type": "bab"
+  },
+  {
+    "id": 11,
+    "name": "naikan celana",
+    "image": "assets/images/11.png",
+    "focus": false,
+    "gender": "laki-laki",
+    "type": "bab"
+  },
+  {
+    "id": 12,
+    "name": "flush/siram toilet",
+    "image": "assets/images/12.png",
+    "focus": false,
+    "gender": "laki-laki",
+    "type": "bab"
+  },
+  {
+    "id": 13,
+    "name": "tutup closet",
+    "image": "assets/images/13.png",
+    "focus": false,
+    "gender": "laki-laki",
+    "type": "bab"
+  },
+  {
+    "id": 14,
+    "name": "mencuci tangan",
+    "image": "assets/images/14.png",
+    "focus": false,
+    "gender": "laki-laki",
+    "type": "bab"
+  },
+  {
+    "id": 15,
+    "name": "buka kunci",
+    "image": "assets/images/15.png",
+    "focus": false,
+    "gender": "laki-laki",
+    "type": "bab"
+  },
+  {
+    "id": 16,
+    "name": "buka pintu",
+    "image": "assets/images/16.png",
+    "focus": false,
+    "gender": "laki-laki",
+    "type": "bab"
+  },
+  {
+    "id": 17,
+    "name": "keluar kamar mandi",
+    "image": "assets/images/17.png",
+    "focus": false,
+    "gender": "laki-laki",
+    "type": "bab"
+  },
+  {
+    "id": 18,
+    "name": "tutup pintu",
+    "image": "assets/images/18.png",
+    "focus": false,
+    "gender": "laki-laki",
+    "type": "bab"
+  },
+  {
+    "id": 20,
+    "name": "membuka pintu",
+    "image": "assets/images/20.png",
+    "focus": true,
+    "gender": "laki-laki",
+    "type": "bab"
+  },
+  {
+    "id": 21,
+    "name": "masuk kamar mandi",
+    "image": "assets/images/21.png",
+    "focus": true,
+    "gender": "laki-laki",
+    "type": "bab"
+  },
+  {
+    "id": 22,
+    "name": "tutup pintu",
+    "image": "assets/images/22.png",
+    "focus": true,
+    "gender": "laki-laki",
+    "type": "bab"
+  },
+  {
+    "id": 23,
+    "name": "kunci pintu",
+    "image": "assets/images/23.png",
+    "focus": true,
+    "gender": "laki-laki",
+    "type": "bab"
+  },
+  {
+    "id": 24,
+    "name": "buka tutup closet",
+    "image": "assets/images/24.png",
+    "focus": true,
+    "gender": "laki-laki",
+    "type": "bab"
+  },
+  {
+    "id": 25,
+    "name": "buka celana",
+    "image": "assets/images/25.png",
+    "focus": true,
+    "gender": "laki-laki",
+    "type": "bab"
+  },
+  {
+    "id": 26,
+    "name": "bab",
+    "image": "assets/images/26.png",
+    "focus": true,
+    "gender": "laki-laki",
+    "type": "bab"
+  },
+  {
+    "id": 27,
+    "name": "cebok",
+    "image": "assets/images/27.png",
+    "focus": true,
+    "gender": "laki-laki",
+    "type": "bab"
+  },
+  {
+    "id": 28,
+    "name": "lap pakai tisu",
+    "image": "assets/images/28.png",
+    "focus": true,
+    "gender": "laki-laki",
+    "type": "bab"
+  },
+  {
+    "id": 29,
+    "name": "naikan celana",
+    "image": "assets/images/29.png",
+    "focus": true,
+    "gender": "laki-laki",
+    "type": "bab"
+  },
+  {
+    "id": 30,
+    "name": "flush/siram toilet",
+    "image": "assets/images/30.png",
+    "focus": true,
+    "gender": "laki-laki",
+    "type": "bab"
+  },
+  {
+    "id": 31,
+    "name": "tutup closet",
+    "image": "assets/images/31.png",
+    "focus": true,
+    "gender": "laki-laki",
+    "type": "bab"
+  },
+  {
+    "id": 32,
+    "name": "mencuci tangan",
+    "image": "assets/images/32.png",
+    "focus": true,
+    "gender": "laki-laki",
+    "type": "bab"
+  },
+  {
+    "id": 33,
+    "name": "buka kunci",
+    "image": "assets/images/33.png",
+    "focus": true,
+    "gender": "laki-laki",
+    "type": "bab"
+  },
+  {
+    "id": 34,
+    "name": "buka pintu",
+    "image": "assets/images/34.png",
+    "focus": true,
+    "gender": "laki-laki",
+    "type": "bab"
+  },
+  {
+    "id": 35,
+    "name": "keluar kamar mandi",
+    "image": "assets/images/35.png",
+    "focus": true,
+    "gender": "laki-laki",
+    "type": "bab"
+  },
+  {
+    "id": 36,
+    "name": "tutup pintu",
+    "image": "assets/images/36.png",
+    "focus": true,
+    "gender": "laki-laki",
+    "type": "bab"
+  },
+  {
+    "id": 38,
+    "name": "membuka pintu",
+    "image": "assets/images/38.png",
+    "focus": false,
+    "gender": "laki-laki",
+    "type":"bak"
+  },
+  {
+    "id": 39,
+    "name": "masuk kamar mandi",
+    "image": "assets/images/39.png",
+    "focus": false,
+    "gender": "laki-laki",
+    "type":"bak"
+  },
+  {
+    "id": 40,
+    "name": "tutup pintu",
+    "image": "assets/images/40.png",
+    "focus": false,
+    "gender": "laki-laki",
+    "type":"bak"
+  },
+  {
+    "id": 41,
+    "name": "kunci pintu",
+    "image": "assets/images/41.png",
+    "focus": false,
+    "gender": "laki-laki",
+    "type":"bak"
+  },
+  {
+    "id": 42,
+    "name": "buka tutup closet",
+    "image": "assets/images/42.png",
+    "focus": false,
+    "gender": "laki-laki",
+    "type":"bak"
+  },
+  {
+    "id": 43,
+    "name": "buka celana",
+    "image": "assets/images/43.png",
+    "focus": false,
+    "gender": "laki-laki",
+    "type":"bak"
+  },
+  {
+    "id": 44,
+    "name": "bak",
+    "image": "assets/images/44.png",
+    "focus": false,
+    "gender": "laki-laki",
+    "type":"bak"
+  },
+  {
+    "id": 45,
+    "name": "cebok",
+    "image": "assets/images/45.png",
+    "focus": false,
+    "gender": "laki-laki",
+    "type":"bak"
+  },
+  {
+    "id": 46,
+    "name": "lap pakai tisu",
+    "image": "assets/images/46.png",
+    "focus": false,
+    "gender": "laki-laki",
+    "type":"bak"
+  },
+  {
+    "id": 47,
+    "name": "naikan celana",
+    "image": "assets/images/47.png",
+    "focus": false,
+    "gender": "laki-laki",
+    "type":"bak"
+  },
+  {
+    "id": 48,
+    "name": "flush/siram toilet",
+    "image": "assets/images/48.png",
+    "focus": false,
+    "gender": "laki-laki",
+    "type":"bak"
+  },
+  {
+    "id": 49,
+    "name": "tutup closet",
+    "image": "assets/images/49.png",
+    "focus": false,
+    "gender": "laki-laki",
+    "type":"bak"
+  },
+  {
+    "id": 50,
+    "name": "mencuci tangan",
+    "image": "assets/images/50.png",
+    "focus": false,
+    "gender": "laki-laki",
+    "type":"bak"
+  },
+  {
+    "id": 51,
+    "name": "buka kunci",
+    "image": "assets/images/51.png",
+    "focus": false,
+    "gender": "laki-laki",
+    "type":"bak"
+  },
+  {
+    "id": 52,
+    "name": "buka pintu",
+    "image": "assets/images/52.png",
+    "focus": false,
+    "gender": "laki-laki",
+    "type":"bak"
+  },
+  {
+    "id": 53,
+    "name": "keluar kamar mandi",
+    "image": "assets/images/53.png",
+    "focus": false,
+    "gender": "laki-laki",
+    "type":"bak"
+  },
+  {
+    "id": 54,
+    "name": "tutup pintu",
+    "image": "assets/images/54.png",
+    "focus": false,
+    "gender": "laki-laki",
+    "type":"bak"
+  },
+  {
+    "id": 56,
+    "name": "membuka pintu",
+    "image": "assets/images/56.png",
+    "focus": true,
+    "gender": "laki-laki",
+    "type":"bak"
+  },
+  {
+    "id": 57,
+    "name": "masuk kamar mandi",
+    "image": "assets/images/57.png",
+    "focus": true,
+    "gender": "laki-laki",
+    "type":"bak"
+  },
+  {
+    "id": 58,
+    "name": "tutup pintu",
+    "image": "assets/images/58.png",
+    "focus": true,
+    "gender": "laki-laki",
+    "type":"bak"
+  },
+  {
+    "id": 59,
+    "name": "kunci pintu",
+    "image": "assets/images/59.png",
+    "focus": true,
+    "gender": "laki-laki",
+    "type":"bak"
+  },
+  {
+    "id": 60,
+    "name": "buka tutup closet",
+    "image": "assets/images/60.png",
+    "focus": true,
+    "gender": "laki-laki",
+    "type":"bak"
+  },
+  {
+    "id": 61,
+    "name": "buka celana",
+    "image": "assets/images/61.png",
+    "focus": true,
+    "gender": "laki-laki",
+    "type":"bak"
+  },
+  {
+    "id": 62,
+    "name": "bak",
+    "image": "assets/images/62.png",
+    "focus": true,
+    "gender": "laki-laki",
+    "type":"bak"
+  },
+  {
+    "id": 63,
+    "name": "cebok",
+    "image": "assets/images/63.png",
+    "focus": true,
+    "gender": "laki-laki",
+    "type":"bak"
+  },
+  {
+    "id": 64,
+    "name": "lap pakai tisu",
+    "image": "assets/images/64.png",
+    "focus": true,
+    "gender": "laki-laki",
+    "type":"bak"
+  },
+  {
+    "id": 65,
+    "name": "naikan celana",
+    "image": "assets/images/65.png",
+    "focus": true,
+    "gender": "laki-laki",
+    "type":"bak"
+  },
+  {
+    "id": 66,
+    "name": "flush/siram toilet",
+    "image": "assets/images/66.png",
+    "focus": true,
+    "gender": "laki-laki",
+    "type":"bak"
+  },
+  {
+    "id": 67,
+    "name": "tutup closet",
+    "image": "assets/images/67.png",
+    "focus": true,
+    "gender": "laki-laki",
+    "type":"bak"
+  },
+  {
+    "id": 68,
+    "name": "mencuci tangan",
+    "image": "assets/images/68.png",
+    "focus": true,
+    "gender": "laki-laki",
+    "type":"bak"
+  },
+  {
+    "id": 69,
+    "name": "buka kunci",
+    "image": "assets/images/69.png",
+    "focus": true,
+    "gender": "laki-laki",
+    "type":"bak"
+  },
+  {
+    "id": 70,
+    "name": "buka pintu",
+    "image": "assets/images/70.png",
+    "focus": true,
+    "gender": "laki-laki",
+    "type":"bak"
+  },
+  {
+    "id": 71,
+    "name": "keluar kamar mandi",
+    "image": "assets/images/71.png",
+    "focus": true,
+    "gender": "laki-laki",
+    "type":"bak"
+  },
+  {
+    "id": 72,
+    "name": "tutup pintu",
+    "image": "assets/images/72.png",
+    "focus": true,
+    "gender": "laki-laki",
+    "type":"bak"
+  },
+  {
+    "id": 74,
+    "name": "membuka pintu",
+    "image": "assets/images/74.png",
+    "focus": false,
+    "gender": "perempuan"
+  },
+  {
+    "id": 75,
+    "name": "masuk kamar mandi",
+    "image": "assets/images/75.png",
+    "focus": false,
+    "gender": "perempuan"
+  },
+  {
+    "id": 76,
+    "name": "tutup pintu",
+    "image": "assets/images/76.png",
+    "focus": false,
+    "gender": "perempuan"
+  },
+  {
+    "id": 77,
+    "name": "kunci pintu",
+    "image": "assets/images/77.png",
+    "focus": false,
+    "gender": "perempuan"
+  },
+  {
+    "id": 78,
+    "name": "buka tutup closet",
+    "image": "assets/images/78.png",
+    "focus": false,
+    "gender": "perempuan"
+  },
+  {
+    "id": 79,
+    "name": "buka celana",
+    "image": "assets/images/79.png",
+    "focus": false,
+    "gender": "perempuan"
+  },
+  {
+    "id": 80,
+    "name": "bab/bak",
+    "image": "assets/images/80.png",
+    "focus": false,
+    "gender": "perempuan"
+  },
+  {
+    "id": 81,
+    "name": "cebok",
+    "image": "assets/images/81.png",
+    "focus": false,
+    "gender": "perempuan"
+  },
+  {
+    "id": 82,
+    "name": "lap pakai tisu",
+    "image": "assets/images/82.png",
+    "focus": false,
+    "gender": "perempuan"
+  },
+  {
+    "id": 83,
+    "name": "naikan celana",
+    "image": "assets/images/83.png",
+    "focus": false,
+    "gender": "perempuan"
+  },
+  {
+    "id": 84,
+    "name": "flush/siram toilet",
+    "image": "assets/images/84.png",
+    "focus": false,
+    "gender": "perempuan"
+  },
+  {
+    "id": 85,
+    "name": "tutup closet",
+    "image": "assets/images/85.png",
+    "focus": false,
+    "gender": "perempuan"
+  },
+  {
+    "id": 86,
+    "name": "mencuci tangan",
+    "image": "assets/images/86.png",
+    "focus": false,
+    "gender": "perempuan"
+  },
+  {
+    "id": 87,
+    "name": "buka kunci",
+    "image": "assets/images/87.png",
+    "focus": false,
+    "gender": "perempuan"
+  },
+  {
+    "id": 88,
+    "name": "buka pintu",
+    "image": "assets/images/88.png",
+    "focus": false,
+    "gender": "perempuan"
+  },
+  {
+    "id": 89,
+    "name": "keluar kamar mandi",
+    "image": "assets/images/89.png",
+    "focus": false,
+    "gender": "perempuan"
+  },
+  {
+    "id": 90,
+    "name": "tutup pintu",
+    "image": "assets/images/90.png",
+    "focus": false,
+    "gender": "perempuan"
+  },
+  {
+    "id": 92,
+    "name": "membuka pintu",
+    "image": "assets/images/92.png",
+    "focus": true,
+    "gender": "perempuan"
+  },
+  {
+    "id": 93,
+    "name": "masuk kamar mandi",
+    "image": "assets/images/93.png",
+    "focus": true,
+    "gender": "perempuan"
+  },
+  {
+    "id": 94,
+    "name": "tutup pintu",
+    "image": "assets/images/94.png",
+    "focus": true,
+    "gender": "perempuan"
+  },
+  {
+    "id": 95,
+    "name": "kunci pintu",
+    "image": "assets/images/95.png",
+    "focus": true,
+    "gender": "perempuan"
+  },
+  {
+    "id": 96,
+    "name": "buka tutup closet",
+    "image": "assets/images/96.png",
+    "focus": true,
+    "gender": "perempuan"
+  },
+  {
+    "id": 97,
+    "name": "buka celana",
+    "image": "assets/images/97.png",
+    "focus": true,
+    "gender": "perempuan"
+  },
+  {
+    "id": 98,
+    "name": "bab/bak",
+    "image": "assets/images/98.png",
+    "focus": true,
+    "gender": "perempuan"
+  },
+  {
+    "id": 99,
+    "name": "cebok",
+    "image": "assets/images/99.png",
+    "focus": true,
+    "gender": "perempuan"
+  },
+  {
+    "id": 100,
+    "name": "lap pakai tisu",
+    "image": "assets/images/100.png",
+    "focus": true,
+    "gender": "perempuan"
+  },
+  {
+    "id": 101,
+    "name": "naikan celana",
+    "image": "assets/images/101.png",
+    "focus": true,
+    "gender": "perempuan"
+  },
+  {
+    "id": 102,
+    "name": "flush/siram toilet",
+    "image": "assets/images/102.png",
+    "focus": true,
+    "gender": "perempuan"
+  },
+  {
+    "id": 103,
+    "name": "tutup closet",
+    "image": "assets/images/103.png",
+    "focus": true,
+    "gender": "perempuan"
+  },
+  {
+    "id": 104,
+    "name": "mencuci tangan",
+    "image": "assets/images/104.png",
+    "focus": true,
+    "gender": "perempuan"
+  },
+  {
+    "id": 105,
+    "name": "buka kunci",
+    "image": "assets/images/105.png",
+    "focus": true,
+    "gender": "perempuan"
+  },
+  {
+    "id": 106,
+    "name": "buka pintu",
+    "image": "assets/images/106.png",
+    "focus": true,
+    "gender": "perempuan"
+  },
+  {
+    "id": 107,
+    "name": "keluar kamar mandi",
+    "image": "assets/images/107.png",
+    "focus": true,
+    "gender": "perempuan"
+  },
+  {
+    "id": 108,
+    "name": "tutup pintu",
+    "image": "assets/images/108.png",
+    "focus": true,
+    "gender": "perempuan"
+  }
+]

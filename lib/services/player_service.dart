@@ -24,7 +24,7 @@ Future<void> savePlayer(Player newPlayer) async {
 
 Future<void> updatePlayer(Player newPlayer) async {
   final isar = await db;
-  isar.writeTxnSync(() async {
+  await isar.writeTxn(() async {
     await isar.players.put(newPlayer);
   });
 }
