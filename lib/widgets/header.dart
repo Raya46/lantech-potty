@@ -54,7 +54,7 @@ class Header extends StatelessWidget {
     const Color textOutlineColor = Color(0xFF808080);
 
     return Container(
-      height: 80.0,
+      height: 50.0,
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       color: Colors.transparent,
 

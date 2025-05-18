@@ -1,17 +1,21 @@
-import 'dart:math';
 import 'dart:convert';
+import 'dart:math';
+
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:toilet_training/models/player.dart';
+import 'package:toilet_training/models/step.dart';
+import 'package:toilet_training/screens/levels/level2_screen.dart';
+import 'package:toilet_training/services/player_service.dart';
 import 'package:toilet_training/widgets/background.dart';
 import 'package:toilet_training/widgets/header.dart';
-import 'package:toilet_training/models/player.dart';
-import 'package:toilet_training/services/player_service.dart';
 import 'package:toilet_training/widgets/modal_setting.dart';
-import 'package:flutter/services.dart';
-import 'package:toilet_training/models/step.dart';
+// Import untuk Level 2 jika diperlukan saat navigasi "Lanjut"
+// import 'package:toilet_training/screens/levels/level2_screen.dart';
 
 class LevelOneScreen extends StatefulWidget {
   const LevelOneScreen({super.key});
@@ -38,20 +42,19 @@ class _LevelOneScreenState extends State<LevelOneScreen> {
       _player = await getPlayer();
       if (_player == null) {
         print("Player data not found in LevelOneScreen! Creating default.");
-        _player = Player(null); // Assuming ID is nullable or auto-generated
-        _player!.gender = 'perempuan'; // Default gender
+        _player = Player(null);
+        _player!.gender = 'perempuan';
         _player!.isFocused = false;
         await savePlayer(_player!);
       }
-      // Ensure gender is not null, provide a default if necessary
       _player!.gender ??= 'perempuan';
+      _player!.isFocused ??= false; // Pastikan isFocused ada nilainya
     } catch (e) {
       print("Error loading player in LevelOneScreen: $e. Creating default.");
       _player = Player(null);
       _player!.gender = 'perempuan';
       _player!.isFocused = false;
-      // It's good practice to save the default player if one was created due to an error
-      // await savePlayer(_player!); // Consider if saving here is appropriate for all error types
+      // await savePlayer(_player!); // Pertimbangkan jika perlu disimpan saat error
     }
     setState(() {
       _isLoadingPlayer = false;
@@ -64,7 +67,6 @@ class _LevelOneScreenState extends State<LevelOneScreen> {
       return Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    // Determine image based on player's gender, default to male if null for image path
     final String characterImage =
         (_player?.gender == 'perempuan')
             ? 'assets/images/female-goto-toilet.png'
@@ -72,131 +74,137 @@ class _LevelOneScreenState extends State<LevelOneScreen> {
 
     return Scaffold(
       body: Background(
-        gender:
-            _player?.gender ??
-            'perempuan', // Use loaded gender, default if null
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
+        gender: _player?.gender ?? 'perempuan',
+        child: Column(
           children: [
-            Expanded(
-              flex: 3,
-              child: Container(
-                padding: const EdgeInsets.only(bottom: 0),
-                child: Image.asset(characterImage, fit: BoxFit.contain),
-              ),
-            ),
-
-            Expanded(
-              flex: 3,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24.0,
-                  vertical: 16.0,
+            Header(title: ""), // Title bisa disesuaikan
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: Container(
+                    height: 300, // Sesuaikan ukuran jika perlu
+                    padding: const EdgeInsets.only(bottom: 0),
+                    child: Image.asset(characterImage, fit: BoxFit.contain),
+                  ),
                 ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Stack(
-                      children: [
-                        Text(
-                          "Ayo Belajar Tahapan",
-                          style: TextStyle(
-                            fontSize: 34,
-                            fontWeight: FontWeight.bold,
-                            foreground:
-                                Paint()
-                                  ..style = PaintingStyle.stroke
-                                  ..strokeWidth = 1.5
-                                  ..color = const Color(0xFF4A2C2A),
+                Expanded(
+                  flex: 3,
+                  child: Column(
+                    children: [
+                      Stack(
+                        children: [
+                          Text(
+                            "Ayo Belajar Tahapan",
+                            style: TextStyle(
+                              fontSize: 34,
+                              fontWeight: FontWeight.bold,
+                              foreground:
+                                  Paint()
+                                    ..style = PaintingStyle.stroke
+                                    ..strokeWidth = 1.5
+                                    ..color = const Color(0xFF4A2C2A),
+                            ),
                           ),
-                        ),
-                        Text(
-                          "Ayo Belajar Tahapan",
-                          style: const TextStyle(
-                            fontSize: 34,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFFFFA07A),
+                          Text(
+                            "Ayo Belajar Tahapan",
+                            style: const TextStyle(
+                              fontSize: 34,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFFFFA07A),
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Stack(
-                      children: [
-                        Text(
-                          "Buang Air Besar dan",
-                          style: TextStyle(
-                            fontSize: 34,
-                            fontWeight: FontWeight.bold,
-                            foreground:
-                                Paint()
-                                  ..style = PaintingStyle.stroke
-                                  ..strokeWidth = 1.5
-                                  ..color = const Color(0xFF4A2C2A),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Stack(
+                        children: [
+                          Text(
+                            "Buang Air Besar dan",
+                            style: TextStyle(
+                              fontSize: 34,
+                              fontWeight: FontWeight.bold,
+                              foreground:
+                                  Paint()
+                                    ..style = PaintingStyle.stroke
+                                    ..strokeWidth = 1.5
+                                    ..color = const Color(0xFF4A2C2A),
+                            ),
                           ),
-                        ),
-                        Text(
-                          "Buang Air Besar dan",
-                          style: const TextStyle(
-                            fontSize: 34,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF00FFFF),
+                          Text(
+                            "Buang Air Besar dan",
+                            style: const TextStyle(
+                              fontSize: 34,
+                              fontWeight: FontWeight.bold,
+                              color: Color(
+                                0xFF00FFFF,
+                              ), // Warna bisa disesuaikan
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    Stack(
-                      children: [
-                        Text(
-                          "Buang Air Kecil",
-                          style: TextStyle(
-                            fontSize: 34,
-                            fontWeight: FontWeight.bold,
-                            foreground:
-                                Paint()
-                                  ..style = PaintingStyle.stroke
-                                  ..strokeWidth = 1.5
-                                  ..color = const Color(0xFF4A2C2A),
+                        ],
+                      ),
+                      Stack(
+                        children: [
+                          Text(
+                            "Buang Air Kecil",
+                            style: TextStyle(
+                              fontSize: 34,
+                              fontWeight: FontWeight.bold,
+                              foreground:
+                                  Paint()
+                                    ..style = PaintingStyle.stroke
+                                    ..strokeWidth = 1.5
+                                    ..color = const Color(0xFF4A2C2A),
+                            ),
                           ),
-                        ),
-                        Text(
-                          "Buang Air Kecil",
-                          style: const TextStyle(
-                            fontSize: 34,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF00FFFF),
+                          Text(
+                            "Buang Air Kecil",
+                            style: const TextStyle(
+                              fontSize: 34,
+                              fontWeight: FontWeight.bold,
+                              color: Color(
+                                0xFF00FFFF,
+                              ), // Warna bisa disesuaikan
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 100.0),
-                      child: Center(
-                        child: GestureDetector(
-                          onTap: () {
-                            Get.to(
-                              () => const LevelOneFocusScreen(),
-                              transition: Transition.circularReveal,
-                              duration: Duration(milliseconds: 1500),
-                            );
-                          },
-                          child: CircleAvatar(
-                            radius: 35,
-                            backgroundColor: const Color(0xFF52AACA),
-                            child: const Icon(
-                              Icons.play_arrow,
-                              size: 45,
-                              color: Colors.white,
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 100.0),
+                        child: Center(
+                          child: GestureDetector(
+                            onTap: () {
+                              if (_player != null) {
+                                Get.to(
+                                  () =>
+                                      LevelOneFocusScreen(), // Navigasi ke LevelOneFocusScreen
+                                );
+                              } else {
+                                // Handle jika _player masih null
+                                print(
+                                  "Player data is not loaded yet for LevelOneFocusScreen navigation.",
+                                );
+                              }
+                            },
+                            child: CircleAvatar(
+                              radius: 35,
+                              backgroundColor: const Color(0xFF52AACA),
+                              child: const Icon(
+                                Icons.play_arrow,
+                                size: 45,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 40),
+                    ],
+                  ),
                 ),
-              ),
+              ],
             ),
           ],
         ),
@@ -229,30 +237,35 @@ class _LevelOneFocusScreenState extends State<LevelOneFocusScreen> {
     });
     try {
       _player = await getPlayer();
-      if (_player == null) {
-        print("Player data not found in LevelOneFocus! Creating default.");
-        _player = Player(null);
-        _player!.gender = 'perempuan';
-        _player!.isFocused = false;
-        await savePlayer(_player!);
-      }
       _player!.gender ??= 'perempuan';
       _player!.isFocused ??= false;
     } catch (e) {
-      print("Error loading player in LevelOneFocus: $e. Creating default.");
-      _player = Player(null);
-      _player!.gender = 'perempuan';
-      _player!.isFocused = false;
-      await savePlayer(_player!);
+      print("Error loading player in LevelOneFocus: $e. Using default player.");
+      _player =
+          Player(null)
+            ..gender = 'perempuan'
+            ..isFocused = false;
+      // await savePlayer(_player!); // Simpan jika player baru dibuat karena error
     }
-    await _determineImagePaths();
-    setState(() {
-      _isLoadingPlayer = false;
-    });
+    await _determineImagePaths(); // Ini juga akan memanggil setState
+    if (mounted) {
+      setState(() {
+        _isLoadingPlayer = false;
+      });
+    }
   }
 
   Future<void> _determineImagePaths() async {
     List<String> paths = [];
+    if (_player == null) {
+      print("Player is null in _determineImagePaths. Cannot load images.");
+      if (mounted) {
+        setState(() {
+          _imagePaths = [];
+        });
+      }
+      return;
+    }
     try {
       final String response = await rootBundle.loadString(
         'lib/models/static/step-static.json',
@@ -260,35 +273,32 @@ class _LevelOneFocusScreenState extends State<LevelOneFocusScreen> {
       final List<dynamic> data = json.decode(response);
       List<ToiletStep> steps =
           data.map((e) => ToiletStep.fromJson(e)).where((step) {
-            return step.gender == _player?.gender &&
-                step.focus == _player?.isFocused;
+            return step.gender == _player!.gender &&
+                step.focus == _player!.isFocused;
           }).toList();
       steps.sort((a, b) => a.id.compareTo(b.id));
       paths = steps.map((step) => step.image).toList();
 
       if (paths.isEmpty) {
         print(
-          "No images found in JSON for Gender: ${_player?.gender}, Focused: ${_player?.isFocused}",
+          "No images found in JSON for Gender: ${_player!.gender}, Focused: ${_player!.isFocused}",
         );
       }
     } catch (e) {
       print("Error loading steps from JSON for Level 1: $e");
       paths = [];
     }
-
-    setState(() {
-      _imagePaths = paths;
-    });
-
-    print(
-      "Player Gender: ${_player?.gender}, Is Focused: ${_player?.isFocused}",
-    );
-    print("Displaying images in FocusScreen: ${_imagePaths.join(', ')}");
+    if (mounted) {
+      setState(() {
+        _imagePaths = paths;
+      });
+    }
   }
 
   Future<void> _showSettingsModal(BuildContext context) async {
+    final currentContext = context; // Simpan context sebelum async gap
     await showDialog(
-      context: context,
+      context: currentContext,
       barrierDismissible: true,
       builder: (BuildContext dialogContext) {
         return Dialog(
@@ -302,7 +312,9 @@ class _LevelOneFocusScreenState extends State<LevelOneFocusScreen> {
         );
       },
     );
-    _loadPlayerDataAndSetupImages();
+    // Setelah modal ditutup, muat ulang data pemain dan gambar
+    // Pastikan _player diperbarui sebelum _determineImagePaths
+    await _loadPlayerDataAndSetupImages();
   }
 
   @override
@@ -310,17 +322,16 @@ class _LevelOneFocusScreenState extends State<LevelOneFocusScreen> {
     if (_isLoadingPlayer || _player == null) {
       return Scaffold(
         body: Background(
-          gender: _player?.gender ?? 'perempuan',
+          gender:
+              _player?.gender ?? 'perempuan', // Default jika _player masih null
           child: const Center(child: CircularProgressIndicator()),
         ),
       );
     }
 
-    final List<String> currentImagePaths = _imagePaths ?? [];
-
     return Scaffold(
       body: Background(
-        gender: _player?.gender ?? 'perempuan',
+        gender: _player!.gender!, // _player dijamin tidak null di sini
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -328,12 +339,12 @@ class _LevelOneFocusScreenState extends State<LevelOneFocusScreen> {
               title: "Latih Fokusmu !",
               onTapSettings: () => _showSettingsModal(context),
             ),
-            if (currentImagePaths.isEmpty && !_isLoadingPlayer)
+            if (_imagePaths.isEmpty && !_isLoadingPlayer)
               Expanded(
                 child: Center(
                   child: Text(
                     _player!.isFocused == true
-                        ? "Tidak ada gambar fokus yang ditemukan di JSON untuk gender ini."
+                        ? "Tidak ada gambar fokus yang ditemukan untuk gender ini."
                         : "Tidak ada gambar non-fokus yang dikonfigurasi untuk gender ini.",
                     style: TextStyle(
                       color: Colors.orange[700],
@@ -344,62 +355,75 @@ class _LevelOneFocusScreenState extends State<LevelOneFocusScreen> {
                   ),
                 ),
               )
-            else if (currentImagePaths.isNotEmpty)
+            else if (_imagePaths.isNotEmpty)
               SingleChildScrollView(
+                // Mungkin perlu Expanded di sini jika konten bisa besar
                 scrollDirection: Axis.horizontal,
-                child: Row(
-                  children:
-                      currentImagePaths
-                          .map(
-                            (path) => Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8.0,
-                              ),
-                              child: Image.asset(
-                                path,
-                                width: 150.0,
-                                height: 200.0,
-                                fit: BoxFit.fill,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Container(
-                                    width: 150,
-                                    height: 200,
-                                    color: Colors.grey[300],
-                                    child: Center(
-                                      child: Icon(
-                                        Icons.broken_image,
-                                        color: Colors.grey[600],
-                                        size: 50,
+                child: Padding(
+                  // Tambahkan padding di sekitar Row
+                  padding: const EdgeInsets.symmetric(vertical: 20.0),
+                  child: Row(
+                    mainAxisAlignment:
+                        MainAxisAlignment
+                            .center, // Pusatkan gambar jika sedikit
+                    children:
+                        _imagePaths
+                            .map(
+                              (path) => Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8.0,
+                                ),
+                                child: Image.asset(
+                                  path,
+                                  width: 150.0,
+                                  height: 200.0,
+                                  fit:
+                                      BoxFit
+                                          .contain, // Ubah ke contain agar rasio aspek terjaga
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      width: 150,
+                                      height: 200,
+                                      color: Colors.grey[300],
+                                      child: Center(
+                                        child: Icon(
+                                          Icons.broken_image,
+                                          color: Colors.grey[600],
+                                          size: 50,
+                                        ),
                                       ),
-                                    ),
-                                  );
-                                },
+                                    );
+                                  },
+                                ),
                               ),
-                            ),
-                          )
-                          .toList(),
+                            )
+                            .toList(),
+                  ),
                 ),
               ),
-            Align(
-              alignment: Alignment.bottomRight,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
+            Padding(
+              // Pindahkan tombol ke dalam Column dan gunakan Padding
+              padding: const EdgeInsets.all(16.0),
+              child: Align(
+                alignment: Alignment.bottomRight,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFC2E0FF),
-                    foregroundColor: Color(0xFF52AACA),
+                    backgroundColor: const Color(0xFFC2E0FF),
+                    foregroundColor: const Color(0xFF52AACA),
                   ),
                   onPressed:
-                      _isLoadingPlayer || currentImagePaths.isEmpty
+                      _isLoadingPlayer || _imagePaths.isEmpty
                           ? null
                           : () {
-                            Get.to(
-                              () => LevelOnePlayScreen(
-                                gender: _player!.gender!,
-                                isFocused: _player!.isFocused!,
-                                imagePathsForGame: currentImagePaths,
-                              ),
-                            );
+                            if (_player != null) {
+                              Get.to(
+                                () => LevelOnePlayScreen(
+                                  gender: _player!.gender!,
+                                  isFocused: _player!.isFocused!,
+                                  imagePathsForGame: _imagePaths,
+                                ),
+                              );
+                            }
                           },
                   child: const Text("Selanjutnya"),
                 ),
@@ -431,7 +455,8 @@ class LevelOnePlayScreen extends StatefulWidget {
 class _LevelOnePlayScreenState extends State<LevelOnePlayScreen> {
   late bool _currentIsFocused;
   late List<String> _currentImagePathsForGame;
-  Player? _player;
+  Player?
+  _playerObject; // Ubah nama untuk menghindari kebingungan dengan variabel player lain
   bool _isLoading = true;
   UniqueKey _gameKey = UniqueKey();
 
@@ -448,11 +473,10 @@ class _LevelOnePlayScreenState extends State<LevelOnePlayScreen> {
       _isLoading = true;
     });
     try {
-      _player = await getPlayer();
-      if (_player != null) {
-        _currentIsFocused = _player!.isFocused ?? widget.isFocused;
+      _playerObject = await getPlayer();
+      if (_playerObject != null) {
+        _currentIsFocused = _playerObject!.isFocused ?? widget.isFocused;
 
-        // Memuat ulang dan memfilter imagePathsForGame berdasarkan _currentIsFocused yang baru
         final String response = await rootBundle.loadString(
           'lib/models/static/step-static.json',
         );
@@ -467,36 +491,38 @@ class _LevelOnePlayScreenState extends State<LevelOnePlayScreen> {
 
         if (_currentImagePathsForGame.isEmpty) {
           print(
-            "No images found for game after settings update. Gender: ${widget.gender}, Focused: $_currentIsFocused",
+            "No images for game after settings update. Gender: ${widget.gender}, Focused: $_currentIsFocused",
           );
         }
-        print(
-          "Updated _currentImagePathsForGame for game: ${_currentImagePathsForGame.join(', ')}",
-        );
       } else {
+        // Jika _playerObject null setelah getPlayer(), gunakan data widget awal
         _currentIsFocused = widget.isFocused;
-        // Jika player tidak ada, _currentImagePathsForGame tetap menggunakan nilai dari widget.
-        // Atau, Anda bisa memutuskan untuk mengosongkannya atau memuat default.
         _currentImagePathsForGame = List.from(widget.imagePathsForGame);
+        print(
+          "Player object is null after getPlayer(). Using initial widget data for game.",
+        );
       }
     } catch (e) {
       print(
         "Error loading player/steps in LevelOnePlayScreen: $e. Using initial focus and paths.",
       );
-      _currentIsFocused = widget.isFocused;
-      _currentImagePathsForGame = List.from(widget.imagePathsForGame);
+      _currentIsFocused = widget.isFocused; // Fallback ke widget.isFocused
+      _currentImagePathsForGame = List.from(
+        widget.imagePathsForGame,
+      ); // Fallback
     }
-
-    setState(() {
-      _isLoading = false;
-      _gameKey =
-          UniqueKey(); // Ganti key untuk memaksa GameWidget membuat ulang game
-    });
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+        _gameKey = UniqueKey();
+      });
+    }
   }
 
   Future<void> _showSettingsModal() async {
+    final currentContext = context;
     await showDialog(
-      context: context,
+      context: currentContext,
       barrierDismissible: true,
       builder: (BuildContext dialogContext) {
         return Dialog(
@@ -510,7 +536,6 @@ class _LevelOnePlayScreenState extends State<LevelOnePlayScreen> {
         );
       },
     );
-    // Setelah modal ditutup, muat ulang status pemain dan perbarui game
     await _loadPlayerStatusAndUpdateGame();
   }
 
@@ -525,40 +550,69 @@ class _LevelOnePlayScreenState extends State<LevelOnePlayScreen> {
       );
     }
 
+    if (_currentImagePathsForGame.isEmpty && !_isLoading) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text("Susun Langkah Toilet"),
+        ), // Placeholder AppBar
+        body: Background(
+          gender: widget.gender,
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "Tidak ada gambar yang dapat dimuat untuk game saat ini.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 18, color: Colors.red.shade800),
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () => Get.back(), // Kembali ke layar sebelumnya
+                  child: Text("Kembali"),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       body: Background(
-        gender:
-            widget.gender, // Gender tetap dari widget, tidak berubah di sini
+        gender: widget.gender,
         child: Column(
           children: [
             Header(
               title: "Susun Langkah Toilet",
-              onTapSettings:
-                  _showSettingsModal, // Panggil method untuk menampilkan modal & update
+              onTapSettings: _showSettingsModal,
             ),
             Expanded(
               child: GameWidget(
-                key: _gameKey, // Gunakan UniqueKey di sini
+                key: _gameKey,
                 game: ToiletSortGame(
-                  context: context,
+                  context:
+                      context, // Berikan BuildContext dari LevelOnePlayScreen
                   gender: widget.gender,
-                  isFocused:
-                      _currentIsFocused, // Gunakan status fokus yang terbaru
+                  isFocused: _currentIsFocused,
                   imagePaths: List.from(_currentImagePathsForGame),
                 ),
                 overlayBuilderMap: {
-                  'checkButton': (context, game) {
+                  'checkButton': (ctx, game) {
                     final toiletGame = game as ToiletSortGame;
                     return Align(
                       alignment: Alignment.bottomCenter,
                       child: Padding(
                         padding: const EdgeInsets.only(bottom: 30.0),
                         child: ElevatedButton(
-                          onPressed: toiletGame.checkOrder,
+                          onPressed:
+                              toiletGame.isLoading
+                                  ? null
+                                  : toiletGame
+                                      .checkOrder, // Nonaktifkan jika game sedang loading
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
-                                widget.gender ==
-                                        'laki-laki' // Gunakan widget.gender untuk style
+                                widget.gender == 'laki-laki'
                                     ? const Color(0xFFC2E0FF)
                                     : const Color(0xFFFFDDD2),
                             padding: const EdgeInsets.symmetric(
@@ -570,10 +624,9 @@ class _LevelOnePlayScreenState extends State<LevelOnePlayScreen> {
                               fontWeight: FontWeight.bold,
                             ),
                             foregroundColor:
-                                widget.gender ==
-                                        'laki-laki' // Gunakan widget.gender untuk style
-                                    ? Color(0xFF52AACA)
-                                    : Color(0xFFFC9D99),
+                                widget.gender == 'laki-laki'
+                                    ? const Color(0xFF52AACA)
+                                    : const Color(0xFFFC9D99),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30.0),
                             ),
@@ -600,9 +653,8 @@ class ToiletSortGame extends FlameGame {
   List<ImageSprite> currentImageSprites = [];
   bool isLoading = true;
 
-  int minImageNum = 0;
-  int maxImageNum = 0;
-  int sequenceLength = 3;
+  int sequenceLength =
+      3; // Harus lebih kecil atau sama dengan jumlah gambar yang tersedia
   final double imageSize = 160.0;
   final double placeholderPadding = 5.0;
   final double placeholderSize = 160.0 + 2 * 5.0;
@@ -612,11 +664,13 @@ class ToiletSortGame extends FlameGame {
   List<PlaceholderSlot> placeholderSlots = [];
   final String gender;
   final bool isFocused;
-  final List<String> imagePaths;
+  final List<String>
+  imagePaths; // Daftar path gambar yang sudah difilter untuk game
   Map<String, int> imagePathToIdMap = {};
+  int _wrongAttempts = 0;
 
   ToiletSortGame({
-    required this.context,
+    required this.context, // Terima context dari Flutter
     required this.gender,
     required this.isFocused,
     required this.imagePaths,
@@ -626,106 +680,129 @@ class ToiletSortGame extends FlameGame {
   Future<void> onLoad() async {
     await super.onLoad();
     camera.backdrop = Component();
-
     overlays.add('checkButton');
     await _initializeGame();
   }
 
   Future<void> _initializeGame() async {
-    isLoading = true;
-    for (var sprite in currentImageSprites) {
-      remove(sprite);
-    }
-    currentImageSprites.clear();
-    for (var slot in placeholderSlots) {
-      remove(slot);
-    }
-    placeholderSlots.clear();
-    imagePathToIdMap.clear();
-    correctSequenceIds.clear();
-    correctImagePathSequence.clear();
+    setStateQuietly(() {
+      // Gunakan untuk update internal Flame tanpa memicu rebuild besar
+      isLoading = true;
+      _wrongAttempts = 0;
+      currentImageSprites.forEach(remove);
+      currentImageSprites.clear();
+      placeholderSlots.forEach(remove);
+      placeholderSlots.clear();
+      imagePathToIdMap.clear();
+      correctSequenceIds.clear();
+      correctImagePathSequence.clear();
+    });
 
-    List<String> gameImagePaths = [];
-
-    if (imagePaths.length < sequenceLength) {
+    if (imagePaths.isEmpty) {
       print(
-        "Error: Tidak cukup gambar yang di-pass (${imagePaths.length}) untuk sequence length ($sequenceLength) | Gender: $gender, Fokus: $isFocused",
+        "Error: imagePaths is empty for ToiletSortGame. Cannot initialize.",
       );
-      isLoading = false;
+      setStateQuietly(() {
+        isLoading = false;
+      });
+      // Mungkin tampilkan pesan error ke pengguna melalui Flutter widget
+      // atau handle dengan cara lain agar game tidak crash.
       return;
     }
 
-    final String response = await rootBundle.loadString(
+    // Memuat data ID dari JSON berdasarkan gender dan focus (seperti di LevelOneFocusScreen)
+    // Ini penting agar kita punya pemetaan imagePath ke ID yang benar
+    final String jsonResponse = await rootBundle.loadString(
       'lib/models/static/step-static.json',
     );
-    final List<dynamic> jsonData = json.decode(response);
-    List<ToiletStep> allRelevantStepsForGame =
-        jsonData.map((e) => ToiletStep.fromJson(e)).where((step) {
-          return step.gender == this.gender && step.focus == this.isFocused;
-        }).toList();
-    allRelevantStepsForGame.sort((a, b) => a.id.compareTo(b.id));
+    final List<dynamic> jsonData = json.decode(jsonResponse);
+    List<ToiletStep> allStepsForContext =
+        jsonData
+            .map((e) => ToiletStep.fromJson(e))
+            .where(
+              (step) =>
+                  step.gender == this.gender && step.focus == this.isFocused,
+            )
+            .toList();
+    allStepsForContext.sort((a, b) => a.id.compareTo(b.id));
 
-    for (var step in allRelevantStepsForGame) {
+    for (var step in allStepsForContext) {
       imagePathToIdMap[step.image] = step.id;
     }
 
-    List<ToiletStep> stepsForSequenceSelection =
-        allRelevantStepsForGame
-            .where((step) => this.imagePaths.contains(step.image))
-            .toList();
+    // Filter imagePaths yang diterima dari widget agar hanya mengandung yang ada di allStepsForContext
+    // dan memiliki ID di imagePathToIdMap
+    // List<String> validGameImagePaths =
+    //     imagePaths.where((path) => imagePathToIdMap.containsKey(path)).toList();
 
-    if (stepsForSequenceSelection.length >= sequenceLength) {
-      final random = Random();
-      int startIndex = 0;
-      if (stepsForSequenceSelection.length - sequenceLength > 0) {
-        startIndex = random.nextInt(
-          stepsForSequenceSelection.length - sequenceLength + 1,
-        );
-      }
-      for (int i = 0; i < sequenceLength; i++) {
-        if (startIndex + i < stepsForSequenceSelection.length) {
-          ToiletStep step = stepsForSequenceSelection[startIndex + i];
-          correctSequenceIds.add(step.id);
-          correctImagePathSequence.add(step.image);
-        } else {
-          print(
-            "Warning: StartIndex + i out of bounds in game initialization.",
-          );
-          break;
-        }
-      }
-      if (correctImagePathSequence.length == sequenceLength) {
-        gameImagePaths.addAll(correctImagePathSequence);
-        List<String> tempShuffledPaths = List.from(correctImagePathSequence);
-        bool areEqual;
-        int safetyBreak = 0;
-        do {
-          tempShuffledPaths.shuffle(random);
-          areEqual = _arePathListsEqual(
-            tempShuffledPaths,
-            correctImagePathSequence,
-          );
-          safetyBreak++;
-        } while (areEqual && tempShuffledPaths.length > 1 && safetyBreak < 20);
-        gameImagePaths = tempShuffledPaths;
-      } else {
-        print("Tidak dapat membentuk sequence lengkap dari step yang relevan.");
-        isLoading = false;
-        return;
-      }
-    } else {
+    if (allStepsForContext.length < sequenceLength) {
       print(
-        "Tidak cukup step (${stepsForSequenceSelection.length}) yang cocok dengan imagePaths dari JSON untuk membentuk sequence ($sequenceLength).",
+        "Error: Not enough steps (${allStepsForContext.length}) in allStepsForContext for sequence length ($sequenceLength) | Gender: $gender, Fokus: $isFocused",
       );
-      isLoading = false;
+      // Optional: Sesuaikan sequenceLength jika memungkinkan atau tampilkan pesan ke pengguna
+      // if (allStepsForContext.isNotEmpty) {
+      //   sequenceLength = allStepsForContext.length;
+      // } else {
+      //   setStateQuietly(() {
+      //     isLoading = false;
+      //   });
+      //   // Tampilkan pesan error di UI melalui Flutter widget
+      //   // Misalnya, dengan memanggil callback atau mengubah state yang diamati oleh widget
+      //   // ScaffoldMessenger.of(context).showSnackBar(
+      //   //   SnackBar(content: Text("Tidak cukup langkah untuk memulai permainan.")),
+      //   // );
+      //   return;
+      // }
+      setStateQuietly(() {
+        isLoading = false;
+      });
+      // Penting: Beritahu pengguna melalui UI jika game tidak bisa dimulai.
+      // Ini bisa dilakukan dengan mengubah state yang diobservasi oleh LevelOnePlayScreen
+      // atau memanggil callback yang menampilkan dialog/snackbar.
+      // Untuk sekarang, kita return agar tidak crash, tapi idealnya ada feedback ke user.
+      // Contoh pemberitahuan (perlu disesuaikan dengan arsitektur):
+      // if (context.mounted) { // Pastikan context masih valid
+      //   WidgetsBinding.instance.addPostFrameCallback((_) {
+      //     ScaffoldMessenger.of(context).showSnackBar(
+      //       SnackBar(content: Text("Tidak cukup langkah untuk game ini (min: $sequenceLength). Coba ubah pengaturan.")),
+      //     );
+      //   });
+      // }
       return;
     }
 
-    if (gameImagePaths.length < sequenceLength) {
-      print("Tidak cukup gambar untuk memulai game setelah pemrosesan.");
-      isLoading = false;
-      return;
+    // Pilih sequence secara acak dari allStepsForContext yang sudah berurutan
+    final random = Random();
+    int maxStartIndex = allStepsForContext.length - sequenceLength;
+    int startIndex = 0;
+    if (maxStartIndex > 0) {
+      startIndex = random.nextInt(maxStartIndex + 1);
+    } else {
+      // Jika maxStartIndex adalah 0 atau negatif (misalnya allStepsForContext.length == sequenceLength)
+      // maka startIndex harus 0.
+      startIndex = 0;
     }
+
+    List<ToiletStep> selectedSteps = allStepsForContext.sublist(
+      startIndex,
+      startIndex + sequenceLength,
+    );
+
+    correctImagePathSequence = selectedSteps.map((step) => step.image).toList();
+    correctSequenceIds = selectedSteps.map((step) => step.id).toList();
+
+    // Acak urutan untuk ditampilkan ke player
+    List<String> displayImagePaths = List.from(correctImagePathSequence);
+    bool areEqual;
+    int safetyBreak = 0;
+    do {
+      displayImagePaths.shuffle(random);
+      areEqual = _arePathListsEqual(
+        displayImagePaths,
+        correctImagePathSequence,
+      );
+      safetyBreak++;
+    } while (areEqual && displayImagePaths.length > 1 && safetyBreak < 20);
 
     double totalWidthOfPlaceholders =
         (placeholderSize * sequenceLength) + (spacing * (sequenceLength - 1));
@@ -741,47 +818,53 @@ class ToiletSortGame extends FlameGame {
         ),
         size: Vector2(placeholderSize, placeholderSize),
       );
+      add(placeholder); // Tambahkan slot ke game
       placeholderSlots.add(placeholder);
-      add(placeholder);
     }
 
-    List<String> imagesToDisplayInGame = List.from(gameImagePaths);
-
-    for (int i = 0; i < imagesToDisplayInGame.length; i++) {
-      final path = imagesToDisplayInGame[i];
-      final placeholderForThisImage = placeholderSlots[i];
+    for (int i = 0; i < displayImagePaths.length; i++) {
+      final path = displayImagePaths[i];
+      final placeholderForThisImage =
+          placeholderSlots[i]; // Asumsi urutan placeholder sesuai
 
       String spritePath = path;
       if (path.startsWith('assets/images/')) {
         spritePath = path.substring('assets/images/'.length);
       }
-      final sprite = await Sprite.load(spritePath);
 
-      int imageIdentifier = imagePathToIdMap[path] ?? 0;
-      if (imageIdentifier == 0 && path.isNotEmpty) {
-        print(
-          "Warning: ID tidak ditemukan untuk path gambar '$path' saat membuat ImageSprite.",
+      try {
+        final sprite = await Sprite.load(spritePath);
+        final imageId =
+            imagePathToIdMap[path]!; // Kita sudah pastikan path valid
+
+        final imageComponent = ImageSprite(
+          sprite: sprite,
+          imagePath: path,
+          imageIdentifier: imageId,
+          initialPosition: Vector2(
+            placeholderForThisImage.position.x +
+                (placeholderSize - imageSize) / 2,
+            placeholderForThisImage.position.y +
+                (placeholderSize - imageSize) / 2,
+          ),
+          size: Vector2(imageSize, imageSize),
+          gameRef: this,
         );
+        imageComponent.priority = 1;
+        add(imageComponent); // Tambahkan sprite ke game
+        currentImageSprites.add(imageComponent);
+      } catch (e) {
+        print("Error loading sprite $spritePath in _initializeGame: $e");
+        // Handle error, misal dengan skip atau placeholder
       }
-
-      final imageComponent = ImageSprite(
-        sprite: sprite,
-        imagePath: path,
-        imageIdentifier: imageIdentifier,
-        initialPosition: Vector2(
-          placeholderForThisImage.position.x +
-              (placeholderSize - imageSize) / 2,
-          placeholderForThisImage.position.y +
-              (placeholderSize - imageSize) / 2,
-        ),
-        size: Vector2(imageSize, imageSize),
-        gameRef: this,
-      );
-      imageComponent.priority = 1;
-      currentImageSprites.add(imageComponent);
-      add(imageComponent);
     }
-    isLoading = false;
+    setStateQuietly(() {
+      isLoading = false;
+    });
+  }
+
+  void setStateQuietly(VoidCallback fn) {
+    fn();
   }
 
   bool _areListsEqual(List<int> a, List<int> b) {
@@ -805,16 +888,60 @@ class ToiletSortGame extends FlameGame {
     return currentImageSprites.map((sprite) => sprite.imageIdentifier).toList();
   }
 
+  int _calculateStars(int wrongAttempts) {
+    if (wrongAttempts == 0) return 3;
+    if (wrongAttempts <= 2) return 2; // Contoh: 1 atau 2 kesalahan = 2 bintang
+    return 1; // Lebih dari 2 kesalahan = 1 bintang
+  }
+
+  Future<void> _saveScore(int stars) async {
+    try {
+      Player player = await getPlayer();
+      player.level1Score = stars;
+      await updatePlayer(player);
+      print("Level 1 score saved: $stars stars");
+    } catch (e) {
+      print("Error saving score for Level 1: $e");
+    }
+  }
+
   void checkOrder() {
     if (isLoading) return;
 
     List<int> displayedOrderIds = getCurrentOrderIds();
     bool isCorrect = _areListsEqual(displayedOrderIds, correctSequenceIds);
 
+    String dialogTitle;
+    String dialogContentText;
+    int starsEarned = 0;
+
+    if (isCorrect) {
+      starsEarned = _calculateStars(_wrongAttempts);
+      dialogTitle = "Benar Sekali!";
+      dialogContentText = "Kamu berhasil menyusunnya dengan benar.";
+      _saveScore(starsEarned);
+    } else {
+      _wrongAttempts++;
+      dialogTitle = "Oops, Coba Lagi! ${correctSequenceIds}";
+      dialogContentText =
+          "Susunannya belum tepat. Ayo coba lagi! ${correctSequenceIds}";
+    }
+
+    Widget starDisplay = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(3, (index) {
+        return Icon(
+          index < starsEarned ? Icons.star : Icons.star_border,
+          color: Colors.amber,
+          size: 30,
+        );
+      }),
+    );
+
     Get.dialog(
       AlertDialog(
         title: Text(
-          isCorrect ? "Benar Sekali!" : "Oops, Coba Lagi!",
+          dialogTitle,
           style: TextStyle(
             color: isCorrect ? Colors.green : Colors.red,
             fontWeight: FontWeight.bold,
@@ -822,25 +949,37 @@ class ToiletSortGame extends FlameGame {
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(
-              isCorrect
-                  ? "Kamu berhasil menyusunnya dengan benar."
-                  : "Susunannya belum tepat. Ayo coba lagi!",
-            ),
+            Text(dialogContentText),
+            if (isCorrect) ...[
+              const SizedBox(height: 10),
+              starDisplay,
+              const SizedBox(height: 5),
+              Text(
+                "Kamu mendapatkan $starsEarned bintang!",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              ),
+            ],
           ],
         ),
         actions: [
           TextButton(
-            child: const Text("OK", style: TextStyle(color: Color(0xFF52AACA))),
+            child: const Text("OK"),
             onPressed: () {
               Get.back();
               if (isCorrect) {
-                _initializeGame();
+                _initializeGame(); // Main lagi
               }
             },
           ),
+          if (isCorrect)
+            TextButton(
+              child: const Text("Lanjut Level"),
+              onPressed: () {
+                Get.off(() => const LevelTwoScreen());
+              },
+            ),
         ],
       ),
       barrierDismissible: false,
@@ -849,7 +988,6 @@ class ToiletSortGame extends FlameGame {
 
   void onImageDrop(ImageSprite droppedSprite, Vector2 dropPosition) {
     currentImageSprites.sort((a, b) => a.position.x.compareTo(b.position.x));
-
     for (int i = 0; i < currentImageSprites.length; i++) {
       final targetPlaceholder = placeholderSlots[i];
       currentImageSprites[i].position = Vector2(
@@ -870,7 +1008,6 @@ class PlaceholderSlot extends PositionComponent {
       Paint()
         ..color = Colors.blueGrey.withOpacity(0.2)
         ..style = PaintingStyle.fill;
-
   final Paint _borderPaint =
       Paint()
         ..color = Colors.blueGrey.withOpacity(0.5)
@@ -893,7 +1030,6 @@ class ImageSprite extends SpriteComponent with DragCallbacks {
   final String imagePath;
   final int imageIdentifier;
   Vector2 initialPosition;
-  Vector2 dragOffset = Vector2.zero();
   final ToiletSortGame gameRef;
 
   ImageSprite({

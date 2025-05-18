@@ -1,11 +1,12 @@
-import 'package:flutter/material.dart';
-import 'package:toilet_training/models/step.dart';
-import 'package:toilet_training/widgets/header.dart';
-import 'package:toilet_training/widgets/background.dart';
 import 'dart:convert';
+
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:toilet_training/models/player.dart';
+import 'package:toilet_training/models/step.dart';
 import 'package:toilet_training/services/player_service.dart';
+import 'package:toilet_training/widgets/background.dart';
+import 'package:toilet_training/widgets/header.dart';
 import 'package:toilet_training/widgets/modal_setting.dart';
 
 class LevelFourScreen extends StatefulWidget {
@@ -19,12 +20,13 @@ class _LevelFourScreenState extends State<LevelFourScreen> {
   List<ToiletStep> _steps = [];
   int currentStepIndex = 0;
   ToiletStep? _droppedStepOnTarget;
+  int _wrongAttempts = 0; // Variabel untuk melacak kesalahan
 
   Player? _player;
   bool _isLoadingPlayer = true;
-  String? _selectedTypeForMale; // 'bab' atau 'bak'
+  String? _selectedTypeForMale;
   bool _hasSelectedTypeForMale = false;
-  bool _isChoosingMaleType = false; // Untuk menampilkan UI pemilihan tipe
+  bool _isChoosingMaleType = false;
 
   @override
   void initState() {
@@ -34,43 +36,42 @@ class _LevelFourScreenState extends State<LevelFourScreen> {
 
   Future<void> _initializeScreen() async {
     await _loadPlayerData();
-    if (_player?.gender == 'laki-laki' && !_hasSelectedTypeForMale) {
-      setState(() {
-        _isChoosingMaleType = true; // Tampilkan UI pemilihan tipe
-      });
-      // loadSteps akan dipanggil setelah tipe dipilih
+    if (_player == null) {
+      print("Player gagal dimuat di initializeScreen Level 4");
+      if (mounted) setState(() => _isLoadingPlayer = false);
+      return;
+    }
+    _wrongAttempts = 0; // Reset kesalahan
+    _player!.level4Score ??= 0; // Inisialisasi skor jika null
+
+    if (_player!.gender == 'laki-laki' && !_hasSelectedTypeForMale) {
+      if (mounted) {
+        setState(() {
+          _isChoosingMaleType = true;
+        });
+      }
     } else {
       await loadSteps();
     }
   }
 
   Future<void> _loadPlayerData() async {
-    setState(() {
-      _isLoadingPlayer = true;
-    });
+    if (mounted) setState(() => _isLoadingPlayer = true);
     try {
       _player = await getPlayer();
-      // Jika gender null (misalnya dari player lama sebelum ada field gender),
-      // set default atau arahkan kembali ke pemilihan gender.
-      // Untuk sekarang, asumsikan gender sudah ada jika player ada.
-      if (_player?.gender == null) {
-        // Sebaiknya ada penanganan lebih baik, misal kembali ke choose gender screen
-        print("Player gender is null, defaulting to laki-laki for now.");
-        _player!.gender = 'laki-laki';
-      }
-      if (_player?.isFocused == null) {
-        _player!.isFocused = false;
-      }
+      _player!.gender ??= 'laki-laki';
+      _player!.isFocused ??= false;
+      _player!.level4Score ??= 0; // Inisialisasi skor level 4 jika null
     } catch (e) {
       print("Error loading player for Level 4: $e. Creating new player.");
-      _player = Player(null);
-      _player!.gender = 'laki-laki'; // Default
-      _player!.isFocused = false;
+      _player =
+          Player(null)
+            ..gender = 'laki-laki'
+            ..isFocused = false
+            ..level4Score = 0; // Set skor default
       await savePlayer(_player!);
     }
-    setState(() {
-      _isLoadingPlayer = false;
-    });
+    if (mounted) setState(() => _isLoadingPlayer = false);
   }
 
   Future<void> loadSteps() async {
@@ -82,8 +83,10 @@ class _LevelFourScreenState extends State<LevelFourScreen> {
       print(
         "Male gender selected, but type (BAB/BAK) not chosen. Cannot load steps.",
       );
+      if (mounted) setState(() => _isChoosingMaleType = true);
       return;
     }
+    _wrongAttempts = 0; // Reset kesalahan setiap kali langkah baru dimuat
 
     final String response = await rootBundle.loadString(
       'lib/models/static/step-static.json',
@@ -101,21 +104,18 @@ class _LevelFourScreenState extends State<LevelFourScreen> {
             return genderMatch && focusMatch && typeMatch;
           }).toList();
 
-      // Urutkan berdasarkan ID untuk memastikan urutan yang benar
       filteredSteps.sort((a, b) => a.id.compareTo(b.id));
 
       setState(() {
         _steps = filteredSteps;
         currentStepIndex = 0;
         _droppedStepOnTarget = null;
-        _isLoadingPlayer =
-            false; // Pastikan loading selesai setelah steps dimuat
-        _isChoosingMaleType = false; // Sembunyikan UI pemilihan tipe
-        if (_player?.gender == 'laki-laki') {
+        _isLoadingPlayer = false;
+        _isChoosingMaleType = false;
+        if (_player!.gender == 'laki-laki') {
           _hasSelectedTypeForMale = _selectedTypeForMale != null;
         } else {
-          _hasSelectedTypeForMale =
-              true; // Untuk perempuan, anggap tipe sudah "terpilih"
+          _hasSelectedTypeForMale = true;
         }
       });
 
@@ -123,18 +123,20 @@ class _LevelFourScreenState extends State<LevelFourScreen> {
         print(
           "No steps found for gender: ${_player!.gender}, focus: ${_player!.isFocused}, type: ${_selectedTypeForMale}",
         );
-        // Tampilkan pesan ke pengguna bahwa tidak ada langkah yang sesuai
       }
     }
   }
 
   void _onMaleTypeSelected(String type) {
-    setState(() {
-      _selectedTypeForMale = type;
-      _isChoosingMaleType = false;
-      _hasSelectedTypeForMale = true;
-      _isLoadingPlayer = true; // Set loading true sementara loadSteps berjalan
-    });
+    if (mounted) {
+      setState(() {
+        _selectedTypeForMale = type;
+        _isChoosingMaleType = false;
+        _hasSelectedTypeForMale = true;
+        _isLoadingPlayer = true;
+        _wrongAttempts = 0; // Reset kesalahan saat tipe baru dipilih
+      });
+    }
     loadSteps();
   }
 
@@ -185,9 +187,34 @@ class _LevelFourScreenState extends State<LevelFourScreen> {
     );
   }
 
+  // Fungsi untuk menghitung bintang
+  int _calculateStars(int wrongAttempts) {
+    if (wrongAttempts == 0) {
+      return 3; // Sempurna
+    } else if (wrongAttempts <= 2) {
+      // Misal, 1-2 kesalahan
+      return 2;
+    } else {
+      // Lebih dari 2 kesalahan
+      return 1;
+    }
+  }
+
+  // Fungsi untuk menyimpan skor
+  Future<void> _saveScore(int stars) async {
+    if (_player == null) return;
+    try {
+      _player!.level4Score = stars; // Simpan skor untuk Level 4
+      await updatePlayer(_player!);
+      print("Level 4 score saved: $stars stars");
+    } catch (e) {
+      print("Error saving score for Level 4: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (_isLoadingPlayer) {
+    if (_isLoadingPlayer || _player == null) {
       return Scaffold(
         body: Background(
           gender: _player?.gender ?? 'laki-laki',
@@ -205,11 +232,11 @@ class _LevelFourScreenState extends State<LevelFourScreen> {
       );
     }
 
-    if (_steps.isEmpty && _hasSelectedTypeForMale) {
-      // Jika sudah memilih tipe (atau bukan gender laki-laki) dan steps masih kosong
+    if (_steps.isEmpty &&
+        (_hasSelectedTypeForMale || _player!.gender != 'laki-laki')) {
       return Scaffold(
         body: Background(
-          gender: _player?.gender ?? 'laki-laki',
+          gender: _player!.gender!,
           child: Column(
             children: [
               Header(
@@ -222,31 +249,31 @@ class _LevelFourScreenState extends State<LevelFourScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "Tidak ada langkah yang sesuai dengan:",
+                        "Tidak ada langkah yang sesuai dengan pilihanmu.",
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 18,
                           color: Color(0xFF8B5A2B),
                         ),
-                        textAlign: TextAlign.center,
                       ),
                       SizedBox(height: 10),
                       Text(
-                        "Gender: ${_player?.gender}",
+                        "Gender: ${_player!.gender}",
                         style: TextStyle(
                           fontSize: 16,
                           color: Color(0xFF8B5A2B),
                         ),
                       ),
                       Text(
-                        "Mode Fokus: ${_player?.isFocused == true ? 'Aktif' : 'Nonaktif'}",
+                        "Mode Fokus: ${_player!.isFocused == true ? 'Aktif' : 'Nonaktif'}",
                         style: TextStyle(
                           fontSize: 16,
                           color: Color(0xFF8B5A2B),
                         ),
                       ),
-                      if (_player?.gender == 'laki-laki')
+                      if (_player!.gender == 'laki-laki')
                         Text(
-                          "Tipe: ${_selectedTypeForMale?.toUpperCase() ?? 'Belum Dipilih'}",
+                          "Tipe: ${_selectedTypeForMale?.toUpperCase() ?? 'N/A'}",
                           style: TextStyle(
                             fontSize: 16,
                             color: Color(0xFF8B5A2B),
@@ -255,12 +282,15 @@ class _LevelFourScreenState extends State<LevelFourScreen> {
                       SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: () {
-                          // Reset dan coba lagi atau kembali
-                          setState(() {
-                            _isLoadingPlayer = true;
-                            _hasSelectedTypeForMale = false;
-                            _selectedTypeForMale = null; // Reset pilihan tipe
-                          });
+                          if (mounted) {
+                            setState(() {
+                              _isLoadingPlayer = true;
+                              _hasSelectedTypeForMale = false;
+                              _selectedTypeForMale = null;
+                              _steps.clear();
+                              _wrongAttempts = 0;
+                            });
+                          }
                           _initializeScreen();
                         },
                         child: Text("Coba Lagi / Ganti Pengaturan"),
@@ -274,15 +304,11 @@ class _LevelFourScreenState extends State<LevelFourScreen> {
         ),
       );
     }
-
-    if (_steps.isEmpty &&
-        !_hasSelectedTypeForMale &&
-        _player?.gender != 'laki-laki') {
-      // Kondisi khusus jika _steps kosong, bukan karena filter tidak menemukan,
-      // tapi karena loadSteps belum terpanggil dengan benar (misal untuk perempuan pertama kali load)
+    if (_steps.isEmpty && !_isLoadingPlayer) {
+      // Jika steps masih kosong setelah loading selesai
       return Scaffold(
         body: Background(
-          gender: _player?.gender ?? 'perempuan',
+          gender: _player!.gender!,
           child: Center(
             child: CircularProgressIndicator(
               semanticsLabel: "Memuat langkah...",
@@ -307,6 +333,7 @@ class _LevelFourScreenState extends State<LevelFourScreen> {
               .toList();
       others.shuffle();
       options.addAll(others.take(2));
+      while (options.length > 3) options.removeLast();
       options.shuffle();
     }
 
@@ -384,23 +411,51 @@ class _LevelFourScreenState extends State<LevelFourScreen> {
                           onAccept: (droppedStep) {
                             if (nextStep != null &&
                                 droppedStep.id == nextStep.id) {
+                              // Correct drop
                               setState(() {
-                                _droppedStepOnTarget = droppedStep;
+                                _droppedStepOnTarget =
+                                    droppedStep; // Show the dropped step in the target
                               });
-                              Future.delayed(Duration(seconds: 1), () {
-                                if (mounted) {
-                                  if (currentStepIndex + 1 < _steps.length) {
+
+                              // Check if the step just dropped was the very last step of the sequence
+                              // currentStepIndex points to the item on the left.
+                              // nextStep (which is droppedStep) is _steps[currentStepIndex + 1].
+                              // So, if _steps[currentStepIndex + 1] is the last item, its index is _steps.length - 1.
+                              // This means currentStepIndex + 1 == _steps.length - 1.
+                              bool isFinalStepInSequenceDropped =
+                                  (currentStepIndex + 1 == _steps.length - 1);
+
+                              if (isFinalStepInSequenceDropped) {
+                                Future.delayed(Duration(seconds: 1), () {
+                                  if (mounted) {
                                     setState(() {
-                                      currentStepIndex++;
-                                      _droppedStepOnTarget = null;
+                                      // Advance currentStepIndex to the last item, so the left card updates.
+                                      currentStepIndex++; // Now currentStepIndex == _steps.length - 1
+                                      // _droppedStepOnTarget remains showing the correctly dropped final item.
                                     });
-                                  } else {
+                                    _saveScore(_calculateStars(_wrongAttempts));
                                     _showCompletionDialog("Level 4 Selesai!");
                                   }
-                                }
-                              });
+                                });
+                              } else {
+                                // Not the final step, so advance to display the next pair.
+                                Future.delayed(Duration(seconds: 1), () {
+                                  if (mounted) {
+                                    setState(() {
+                                      currentStepIndex++;
+                                      _droppedStepOnTarget =
+                                          null; // Clear the target for the next interaction
+                                    });
+                                  }
+                                });
+                              }
                             } else {
-                              // Feedback salah
+                              // Incorrect drop
+                              if (mounted) {
+                                setState(() {
+                                  _wrongAttempts++;
+                                });
+                              }
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
@@ -462,20 +517,23 @@ class _LevelFourScreenState extends State<LevelFourScreen> {
     showDialog(
       context: context,
       barrierDismissible: true,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {
         return Dialog(
           backgroundColor: Colors.transparent,
           elevation: 0,
           child: SettingsModalContent(
-            onClose: () {
-              Navigator.of(context).pop();
-              // Reload data player dan steps jika ada perubahan di modal
+            onClose: () async {
+              Navigator.of(dialogContext).pop();
+
+              await Future.delayed(const Duration(milliseconds: 300));
+
+              if (!mounted) return;
+
               setState(() {
                 _isLoadingPlayer = true;
               });
               _initializeScreen();
             },
-            // onTapSound dan onTapMusic bisa ditambahkan jika ada state management untuknya
           ),
         );
       },
@@ -486,76 +544,105 @@ class _LevelFourScreenState extends State<LevelFourScreen> {
     showDialog(
       context: context,
       barrierDismissible: false, // User harus menekan tombol
-      builder:
-          (ctx) => AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            backgroundColor: const Color(0xFFFFF0E1),
-            title: Center(
-              child: Text(
-                "Selamat!",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFFD98555),
-                  fontSize: 22,
-                ),
+      builder: (ctx) {
+        int starsEarned = _calculateStars(_wrongAttempts);
+        Widget starDisplay = Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(3, (index) {
+            return Icon(
+              index < starsEarned ? Icons.star : Icons.star_border,
+              color: Colors.amber,
+              size: 30, // Ukuran bintang bisa disesuaikan
+            );
+          }),
+        );
+
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          backgroundColor: const Color(0xFFFFF0E1),
+          title: Center(
+            child: Text(
+              "Selamat!",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Color(0xFFD98555),
+                fontSize: 22,
               ),
             ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  message,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 18, color: Color(0xFFD98555)),
-                ),
-                SizedBox(height: 20),
-                Text(
-                  "Kamu hebat! Semua langkah sudah benar.",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 16, color: Color(0xFF8B5A2B)),
-                ),
-              ],
-            ),
-            actions: <Widget>[
-              Center(
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF5C9A4A),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    padding: EdgeInsets.symmetric(horizontal: 25, vertical: 12),
-                  ),
-                  child: Text(
-                    "OK",
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
-                  onPressed: () {
-                    Navigator.of(ctx).pop();
-                    // Kembali ke pemilihan level atau reset level ini dengan tipe lain jika laki-laki
-                    if (_player?.gender == 'laki-laki') {
-                      setState(() {
-                        _isLoadingPlayer = true; // Untuk memicu loading
-                        _hasSelectedTypeForMale =
-                            false; // Kembali ke pemilihan tipe BAB/BAK
-                        _selectedTypeForMale = null;
-                        _steps.clear();
-                        currentStepIndex = 0;
-                        _droppedStepOnTarget = null;
-                      });
-                      _initializeScreen(); // Mulai lagi dari pemilihan tipe
-                    } else {
-                      Navigator.of(
-                        context,
-                      ).pop(); // Kembali ke layar sebelumnya (ChooseLevelScreen)
-                    }
-                  },
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                message, // "Level 4 Selesai!"
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 18, color: Color(0xFFD98555)),
+              ),
+              SizedBox(height: 15),
+              Text(
+                // Tambahkan informasi kesalahan jika ada, atau pesan umum jika tidak ada kesalahan
+                _wrongAttempts > 0
+                    ? "Kamu menyelesaikan dengan $_wrongAttempts kesalahan."
+                    : "Kamu hebat! Semua langkah sudah benar.",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16, color: Color(0xFF8B5A2B)),
+              ),
+              SizedBox(height: 10),
+              starDisplay, // Tampilkan bintang
+              SizedBox(height: 5),
+              Text(
+                "Kamu mendapatkan $starsEarned bintang!",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF8B5A2B),
                 ),
               ),
             ],
           ),
+          actions: <Widget>[
+            Center(
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFF5C9A4A),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 25, vertical: 12),
+                ),
+                child: Text(
+                  "OK",
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
+                onPressed: () {
+                  Navigator.of(ctx).pop();
+                  // Kembali ke pemilihan level atau reset level ini dengan tipe lain jika laki-laki
+                  if (_player?.gender == 'laki-laki') {
+                    setState(() {
+                      _isLoadingPlayer = true; // Untuk memicu loading
+                      _hasSelectedTypeForMale =
+                          false; // Kembali ke pemilihan tipe BAB/BAK
+                      _selectedTypeForMale = null;
+                      _steps.clear();
+                      currentStepIndex = 0;
+                      _droppedStepOnTarget = null;
+                    });
+                    _initializeScreen(); // Mulai lagi dari pemilihan tipe
+                  } else {
+                    Navigator.of(
+                      context,
+                    ).pop(); // Kembali ke layar sebelumnya (ChooseLevelScreen)
+                  }
+                },
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -564,11 +651,9 @@ class _LevelFourScreenState extends State<LevelFourScreen> {
       child: SizedBox(
         width: 100,
         height: 140,
-        child: Expanded(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Image.asset(step.image, fit: BoxFit.contain),
-          ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Image.asset(step.image, fit: BoxFit.contain),
         ),
       ),
     );
@@ -580,11 +665,9 @@ class _LevelFourScreenState extends State<LevelFourScreen> {
       child: SizedBox(
         width: 100,
         height: 140,
-        child: Expanded(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Image.asset(step.image, fit: BoxFit.contain),
-          ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Image.asset(step.image, fit: BoxFit.contain),
         ),
       ),
     );
@@ -598,11 +681,9 @@ class _LevelFourScreenState extends State<LevelFourScreen> {
       child: SizedBox(
         width: 100,
         height: 140,
-        child: Expanded(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Image.asset(step.image, fit: BoxFit.contain),
-          ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Image.asset(step.image, fit: BoxFit.contain),
         ),
       ),
     );

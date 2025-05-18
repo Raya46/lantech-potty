@@ -1,8 +1,12 @@
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart'; // Import Get
 import 'package:toilet_training/games/hidden_object_game.dart';
+import 'package:toilet_training/models/player.dart'; // Import Player
+import 'package:toilet_training/services/player_service.dart'; // Import PlayerService
 import 'package:toilet_training/widgets/background.dart';
-import 'package:toilet_training/widgets/header.dart'; // Import game Flame baru
+import 'package:toilet_training/widgets/header.dart';
+import 'package:toilet_training/screens/levels/level4_screen.dart'; // Untuk navigasi Lanjut
 
 class SceneObject {
   final dynamic id;
@@ -49,35 +53,55 @@ class _LevelThreeScreenState extends State<LevelThreeScreen> {
   late HiddenObjectGame _game;
   List<SceneObjectData> _currentTargets = [];
   Set<String> _currentFoundIds = {};
-  bool _isLoadingGame = true; // Awalnya true sampai game selesai load
-
-  final double sceneWidth = 800;
-  final double sceneHeight = 500;
-  final int numberOfTargets = 3;
+  bool _isLoadingGame = true;
+  Player? _player; // Tambahkan variabel player
+  bool _isLoadingPlayer = true;
 
   @override
   void initState() {
     super.initState();
-    _initializeGame();
+    _loadPlayerDataAndInitializeGame();
+  }
+
+  Future<void> _loadPlayerDataAndInitializeGame() async {
+    setState(() {
+      _isLoadingPlayer = true;
+      _isLoadingGame = true;
+    });
+    try {
+      _player = await getPlayer();
+      _player?.level3Score ??= 0; // Inisialisasi skor jika null
+    } catch (e) {
+      print("Error loading player in LevelThreeScreen: $e");
+      _player = Player(null)..level3Score = 0;
+      // await savePlayer(_player!); // Simpan jika player baru dibuat karena error
+    }
+    _initializeGame(); // Panggil setelah _player dimuat
+    if (mounted) {
+      setState(() {
+        _isLoadingPlayer = false;
+        // _isLoadingGame akan diatur oleh callback dari game
+      });
+    }
   }
 
   void _initializeGame() {
     _game = HiddenObjectGame(
       onTargetsUpdated: (targets, foundIds) {
-        // Dipanggil oleh game ketika daftar target atau yang ditemukan berubah
         if (mounted) {
-          // Pastikan widget masih ada di tree
           setState(() {
             _currentTargets = List.from(targets);
             _currentFoundIds = Set.from(foundIds);
-            if (_isLoadingGame) _isLoadingGame = false; // Game sudah load
+            if (_isLoadingGame) _isLoadingGame = false;
           });
         }
       },
-      onAllTargetsFound: () {
-        // Dipanggil oleh game ketika semua target ditemukan
+      onAllTargetsFound: (int wrongTaps) {
+        // Terima wrongTaps
         if (mounted) {
-          _showSuccessDialog();
+          int stars = _calculateStars(wrongTaps);
+          _saveScore(stars);
+          _showSuccessDialog(starsEarned: stars, wrongAttempts: wrongTaps);
         }
       },
       onShowFeedback: (message) {
@@ -92,27 +116,58 @@ class _LevelThreeScreenState extends State<LevelThreeScreen> {
         }
       },
     );
-    // Tidak perlu setState di sini karena GameWidget akan dibangun dengan _game ini
-    // dan callback onTargetsUpdated akan menangani update UI awal.
+    // Tidak perlu setState di sini, _isLoadingGame dihandle oleh onTargetsUpdated
+  }
+
+  int _calculateStars(int wrongAttempts) {
+    if (wrongAttempts == 0) return 3;
+    if (wrongAttempts <= 3) return 2; // Misal 1-3 kesalahan untuk bintang 2
+    return 1;
+  }
+
+  Future<void> _saveScore(int stars) async {
+    if (_player == null) return;
+    try {
+      _player!.level3Score = stars;
+      await updatePlayer(_player!);
+      print("Level 3 score saved: $stars stars");
+    } catch (e) {
+      print("Error saving score for Level 3: $e");
+    }
   }
 
   void _resetLevel() {
     setState(() {
-      _isLoadingGame = true; // Tampilkan loading saat game direset
+      _isLoadingGame = true;
       _currentTargets.clear();
       _currentFoundIds.clear();
     });
+    // _initializeGame(); // Seharusnya memanggil reset di game, bukan re-initialize UI state saja
     _game.resetGame().then((_) {
-      // Game akan memanggil onTargetsUpdated setelah reset selesai,
-      // yang akan mengatur _isLoadingGame = false dan update UI.
+      // onTargetsUpdated akan dipanggil oleh game setelah reset
     });
   }
 
-  void _showSuccessDialog() {
+  void _showSuccessDialog({
+    required int starsEarned,
+    required int wrongAttempts,
+  }) {
+    Widget starDisplay = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(3, (index) {
+        return Icon(
+          index < starsEarned ? Icons.star : Icons.star_border,
+          color: Colors.amber,
+          size: 30, // Ukuran bintang bisa disesuaikan
+        );
+      }),
+    );
+
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {
+        // Ganti nama context agar tidak bentrok
         return AlertDialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
@@ -120,7 +175,7 @@ class _LevelThreeScreenState extends State<LevelThreeScreen> {
           backgroundColor: const Color(0xFFFFF0E1),
           title: Center(
             child: Text(
-              "Yeayy!!! Kamu berhasil menemukannya",
+              "Yeayy!!! Kamu berhasil!", // Judul lebih umum
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Color(0xFFD98555),
@@ -132,11 +187,21 @@ class _LevelThreeScreenState extends State<LevelThreeScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                "Selamat! kamu mendapatkan ${_currentTargets.length} ⭐",
+                "Kamu menemukan semua benda dengan $wrongAttempts kesalahan.",
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 18, color: Color(0xFFD98555)),
+                style: TextStyle(fontSize: 16, color: Color(0xFF8B5A2B)),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 15),
+              starDisplay,
+              SizedBox(height: 5),
+              Text(
+                "Kamu mendapatkan $starsEarned bintang!",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF8B5A2B),
+                ),
+              ),
               Wrap(
                 spacing: 8.0,
                 runSpacing: 4.0,
@@ -149,10 +214,7 @@ class _LevelThreeScreenState extends State<LevelThreeScreen> {
                               obj.name,
                               style: TextStyle(color: Colors.white),
                             ),
-                            backgroundColor: _getChipColor(
-                              obj.name,
-                              true,
-                            ), // Semua pasti sudah found
+                            backgroundColor: _getChipColor(obj.name, true),
                             padding: EdgeInsets.symmetric(
                               horizontal: 12,
                               vertical: 8,
@@ -163,30 +225,46 @@ class _LevelThreeScreenState extends State<LevelThreeScreen> {
               ),
             ],
           ),
+          actionsAlignment: MainAxisAlignment.center, // Pusatkan tombol aksi
           actions: <Widget>[
-            Center(
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF5C9A4A),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFFF0AD4E),
+              ), // Warna oranye untuk coba lagi
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 15.0,
+                  vertical: 10.0,
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20.0,
-                    vertical: 10.0,
-                  ),
-                  child: Text(
-                    "Lanjut!",
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
+                child: Text(
+                  "Main Lagi",
+                  style: TextStyle(fontSize: 16, color: Colors.white),
                 ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  _resetLevel(); // Reset game untuk level berikutnya atau attempt baru
-                },
               ),
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                _resetLevel();
+              },
+            ),
+            SizedBox(width: 10), // Jarak antar tombol
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFF5C9A4A),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 15.0,
+                  vertical: 10.0,
+                ),
+                child: Text(
+                  "Lanjut Level 4",
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                Get.off(() => const LevelFourScreen()); // Navigasi ke Level 4
+              },
             ),
           ],
         );
@@ -209,32 +287,47 @@ class _LevelThreeScreenState extends State<LevelThreeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoadingPlayer || _player == null) {
+      return Scaffold(
+        body: Background(
+          gender: _player?.gender ?? 'laki-laki',
+          child: Center(child: CircularProgressIndicator()),
+        ),
+      );
+    }
+
     return Scaffold(
       body: Background(
-        gender: 'laki-laki',
+        gender: _player!.gender!, // Player dijamin tidak null di sini
         child: Column(
           children: [
-            Header(title: "level 3"),
-            Text(
-              _currentFoundIds.length == _currentTargets.length &&
-                      _currentTargets.isNotEmpty
-                  ? "Semua Benda Ditemukan!"
-                  : "Temukanlah benda berikut ini!",
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF8B5A2B),
+            Header(
+              title: "Level 3: Cari Benda",
+            ), // Judul header lebih deskriptif
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Text(
+                _currentFoundIds.length == _currentTargets.length &&
+                        _currentTargets.isNotEmpty
+                    ? "Semua Benda Ditemukan!"
+                    : "Temukanlah benda berikut ini:",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF8B5A2B),
+                ),
+                textAlign: TextAlign.center,
               ),
             ),
-            SizedBox(height: 15),
-            if (_isLoadingGame &&
-                _currentTargets
-                    .isEmpty) // Tampilkan loading hanya jika target belum ada
-              CircularProgressIndicator()
+            if (_isLoadingGame && _currentTargets.isEmpty)
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: CircularProgressIndicator(),
+              )
             else if (_currentTargets.isNotEmpty)
               Wrap(
-                spacing: 10.0,
-                runSpacing: 8.0,
+                spacing: 8.0, // Mengurangi spacing sedikit
+                runSpacing: 6.0,
                 alignment: WrapAlignment.center,
                 children:
                     _currentTargets.map((obj) {
@@ -254,12 +347,17 @@ class _LevelThreeScreenState extends State<LevelThreeScreen> {
                           isActuallyFound,
                         ),
                         padding: EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 10,
-                        ),
+                          horizontal: 12,
+                          vertical: 8,
+                        ), // Adjust padding
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                          side: BorderSide(color: Colors.white, width: 1.5),
+                          borderRadius: BorderRadius.circular(
+                            16,
+                          ), // Adjust border radius
+                          side: BorderSide(
+                            color: Colors.white.withOpacity(0.8),
+                            width: 1,
+                          ),
                         ),
                       );
                     }).toList(),
@@ -269,17 +367,23 @@ class _LevelThreeScreenState extends State<LevelThreeScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 20.0),
                 child: Text(
                   "Tidak ada target untuk ditemukan.",
-                  style: TextStyle(color: Colors.grey),
+                  style: TextStyle(color: Colors.grey[600], fontSize: 16),
                 ),
               ),
-            SizedBox(height: 20),
+            SizedBox(height: 15), // Memberi jarak sebelum GameWidget
             Expanded(
-              child: GameWidget(
-                game: _game, // Berikan instance game ke GameWidget
-                // InteractiveViewer bisa dipertimbangkan untuk ditambahkan sebagai parent dari GameWidget
-                // atau fungsionalitas zoom/pan diimplementasikan dalam Flame game jika diperlukan.
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8.0,
+                ), // Padding untuk GameWidget
+                child: ClipRRect(
+                  // Memberi border radius pada area game
+                  borderRadius: BorderRadius.circular(12.0),
+                  child: GameWidget(game: _game),
+                ),
               ),
             ),
+            SizedBox(height: 10), // Sedikit ruang di bawah game
           ],
         ),
       ),
