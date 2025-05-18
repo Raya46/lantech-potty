@@ -12,7 +12,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:toilet_training/models/puzzle_item.dart';
 import 'package:toilet_training/games/puzzle/piece_shape.dart';
 
-class PuzzleGame extends FlameGame with PanDetector, HasGameRef {
+class PuzzleGame extends FlameGame with PanDetector, HasGameReference {
   late List<PuzzleItem> _puzzleItems;
   PuzzleItem? _selectedItem;
   List<PuzzlePieceComponent> _pieces = [];

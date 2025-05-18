@@ -66,6 +66,7 @@ class SettingsModalContent extends StatefulWidget {
 class _SettingsModalContentState extends State<SettingsModalContent> {
   Player? _player;
   bool _isLoadingPlayer = true;
+  bool _isUpdatingFocus = false;
 
   @override
   void initState() {
@@ -79,38 +80,59 @@ class _SettingsModalContentState extends State<SettingsModalContent> {
     });
     try {
       Player p = await getPlayer();
-      setState(() {
-        _player = p;
-        _isLoadingPlayer = false;
-      });
+      if (mounted) {
+        setState(() {
+          _player = p;
+          _isLoadingPlayer = false;
+        });
+      }
     } catch (e) {
       print("Error loading player in modal: $e. Creating new player.");
       Player newPlayer = Player(null);
       newPlayer.isFocused = false;
       await savePlayer(newPlayer);
-      setState(() {
-        _player = newPlayer;
-        _isLoadingPlayer = false;
-      });
+      if (mounted) {
+        setState(() {
+          _player = newPlayer;
+          _isLoadingPlayer = false;
+        });
+      }
     }
   }
 
   Future<void> _toggleFocusMode() async {
+    if (_isUpdatingFocus) return;
+
     if (_player != null) {
+      final bool originalFocusValue = _player!.isFocused ?? false;
+
       setState(() {
-        _player!.isFocused = !(_player!.isFocused ?? false);
+        _isUpdatingFocus = true;
+        _player!.isFocused = !originalFocusValue;
       });
-      await updatePlayer(_player!);
-      print("Focus mode updated to: ${_player!.isFocused}");
-    } else {
-      print("Player data not available to toggle focus mode.");
-      await _loadPlayerData();
-      if (_player != null) {
-        setState(() {
-          _player!.isFocused = !(_player!.isFocused ?? false);
-        });
+
+      try {
         await updatePlayer(_player!);
+        print("Focus mode updated to: ${_player!.isFocused} (persisted)");
+      } catch (e) {
+        print("Error updating player focus mode: $e");
+        if (mounted) {
+          setState(() {
+            _player!.isFocused = originalFocusValue;
+          });
+        }
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isUpdatingFocus = false;
+          });
+        }
       }
+    } else {
+      print(
+        "Player data not available to toggle focus mode. Attempting to load.",
+      );
+      await _loadPlayerData();
     }
   }
 
@@ -181,7 +203,10 @@ class _SettingsModalContentState extends State<SettingsModalContent> {
                       _SettingOption(
                         icon: Icons.center_focus_strong,
                         label: "Mode Fokus",
-                        onTap: _toggleFocusMode,
+                        onTap:
+                            _isLoadingPlayer || _isUpdatingFocus
+                                ? null
+                                : _toggleFocusMode,
                         isActive: _player?.isFocused ?? false,
                       ),
                     ],

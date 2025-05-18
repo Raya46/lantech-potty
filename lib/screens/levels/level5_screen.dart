@@ -33,12 +33,45 @@ class _LevelFiveScreenState extends State<LevelFiveScreen> {
 
   void _showPuzzleSolvedDialog() {
     if (!mounted) return;
+
+    const int starsEarned = 3;
+    Widget starDisplay = Row(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(3, (index) {
+        return Icon(
+          index < starsEarned ? Icons.star : Icons.star_border,
+          color: Colors.amber,
+          size: 30,
+        );
+      }),
+    );
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Selamat!'),
-          content: const Text('Anda berhasil menyelesaikan puzzle!'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Text(
+                'Anda berhasil menyelesaikan puzzle!',
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 10),
+              starDisplay,
+              const SizedBox(height: 5),
+              Text(
+                "Kamu mendapatkan $starsEarned bintang!",
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
           actions: <Widget>[
             TextButton(
               child: const Text('Main Lagi'),
@@ -89,10 +122,12 @@ class _LevelFiveScreenState extends State<LevelFiveScreen> {
         child: Column(
           children: [
             Header(title: 'Level 5'),
-            Expanded(child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: GameWidget(game: _puzzleGame!),
-            )),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: GameWidget(game: _puzzleGame!),
+              ),
+            ),
           ],
         ),
       ),

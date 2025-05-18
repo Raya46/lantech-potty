@@ -113,10 +113,12 @@ class HiddenObjectGame extends FlameGame {
   List<SceneObjectData> allObjectsData = [];
   List<SceneObjectData> targetObjectsData = [];
   Set<String> foundTargetIds = {};
+  int wrongTaps = 0; // Tambahkan untuk melacak tap yang salah
 
   final Function(List<SceneObjectData> targets, Set<String> foundIds)
   onTargetsUpdated;
-  final VoidCallback onAllTargetsFound;
+  final Function(int wrongTaps)
+  onAllTargetsFound; // Modifikasi untuk mengirim wrongTaps
   final Function(String message) onShowFeedback;
 
   HiddenObjectGame({
@@ -140,6 +142,7 @@ class HiddenObjectGame extends FlameGame {
     allObjectsData.clear();
     targetObjectsData.clear();
     foundTargetIds.clear();
+    wrongTaps = 0; // Reset wrongTaps setiap game baru
     // Hapus komponen lama jika ada (untuk reset)
     children.whereType<SceneObjectComponent>().forEach(remove);
 
@@ -248,6 +251,12 @@ class HiddenObjectGame extends FlameGame {
     double edgePadding,
     int maxPlacementAttempts,
   ) {
+    if (component.width == 0 || component.height == 0) {
+      print(
+        "Komponen ${component.data.name} memiliki ukuran nol, tidak dapat ditempatkan.",
+      );
+      return false; // Tidak bisa menempatkan komponen dengan ukuran nol
+    }
     bool positionFound = false;
     int attempts = 0;
 
@@ -259,11 +268,27 @@ class HiddenObjectGame extends FlameGame {
           edgePadding +
           random.nextDouble() * (size.y - component.height - 2 * edgePadding);
 
-      posX = max(edgePadding + component.width / 2, posX);
-      posY = max(edgePadding + component.height / 2, posY);
+      posX = max(
+        edgePadding + component.width / 2,
+        posX,
+      ); // Pastikan di dalam batas kiri
+      posY = max(
+        edgePadding + component.height / 2,
+        posY,
+      ); // Pastikan di dalam batas atas
 
+      // Pastikan di dalam batas kanan dan bawah
       posX = min(posX, size.x - edgePadding - component.width / 2);
       posY = min(posY, size.y - edgePadding - component.height / 2);
+
+      // Cek apakah posisi valid (tidak NaN)
+      if (posX.isNaN || posY.isNaN) {
+        print(
+          "Posisi NaN untuk ${component.data.name}. Ukuran game: $size, Ukuran komponen: ${component.size}",
+        );
+        attempts++;
+        continue; // Coba lagi jika posisi tidak valid
+      }
 
       component.position = Vector2(posX, posY);
 
@@ -276,7 +301,6 @@ class HiddenObjectGame extends FlameGame {
       bool overlaps = false;
       for (Rect occupied in occupiedRects) {
         if (componentRect.overlaps(occupied.inflate(5))) {
-          // Mengurangi inflate ke 5
           overlaps = true;
           break;
         }
@@ -286,12 +310,12 @@ class HiddenObjectGame extends FlameGame {
         positionFound = true;
         occupiedRects.add(componentRect);
         add(component);
-        return true; // Berhasil ditempatkan
+        return true;
       } else {
         attempts++;
       }
     } while (!positionFound && attempts < maxPlacementAttempts);
-    return false; // Gagal ditempatkan
+    return false;
   }
 
   void onTargetFound(SceneObjectData foundObject) {
@@ -301,15 +325,17 @@ class HiddenObjectGame extends FlameGame {
 
       if (foundTargetIds.length == targetObjectsData.length &&
           targetObjectsData.isNotEmpty) {
-        print("Semua target ditemukan!");
+        print("Semua target ditemukan! Kesalahan: $wrongTaps");
         // Panggil callback untuk UI Flutter
-        onAllTargetsFound();
+        onAllTargetsFound(wrongTaps);
       }
     }
   }
 
   void onWrongObjectTapped(SceneObjectData tappedObject) {
+    wrongTaps++; // Increment kesalahan
     onShowFeedback("Itu bukan target, coba cari yang lain!");
+    print("Salah tap. Total kesalahan: $wrongTaps");
   }
 
   Future<void> resetGame() async {
