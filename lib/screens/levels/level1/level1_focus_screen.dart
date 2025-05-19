@@ -1,0 +1,230 @@
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:toilet_training/models/player.dart';
+import 'package:toilet_training/models/step.dart';
+import 'package:toilet_training/services/player_service.dart';
+import 'package:toilet_training/widgets/background.dart';
+import 'package:toilet_training/widgets/header.dart';
+import 'package:toilet_training/widgets/modal_setting.dart';
+import 'package:toilet_training/screens/levels/level1/level1_play_screen.dart';
+import 'package:toilet_training/screens/menus/choose_level_screen.dart';
+
+class LevelOneFocusScreen extends StatefulWidget {
+  const LevelOneFocusScreen({super.key});
+
+  @override
+  State<LevelOneFocusScreen> createState() => _LevelOneFocusScreenState();
+}
+
+class _LevelOneFocusScreenState extends State<LevelOneFocusScreen> {
+  Player? _player;
+  bool _isLoadingPlayer = true;
+  List<String> _imagePaths = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPlayerDataAndSetupImages();
+  }
+
+  Future<void> _loadPlayerDataAndSetupImages() async {
+    setState(() {
+      _isLoadingPlayer = true;
+    });
+    try {
+      _player = await getPlayer();
+      _player!.gender ??= 'perempuan';
+      _player!.isFocused ??= false;
+    } catch (e) {
+      _player =
+          Player(null)
+            ..gender = 'perempuan'
+            ..isFocused = false;
+      await savePlayer(_player!); 
+    }
+    await _determineImagePaths(); 
+    if (mounted) {
+      setState(() {
+        _isLoadingPlayer = false;
+      });
+    }
+  }
+
+  Future<void> _determineImagePaths() async {
+    List<String> paths = [];
+    if (_player == null) {
+      if (mounted) {
+        setState(() {
+          _imagePaths = [];
+        });
+      }
+      return;
+    }
+    try {
+      final String response = await rootBundle.loadString(
+        'lib/models/static/step-static.json',
+      );
+      final List<dynamic> data = json.decode(response);
+      List<ToiletStep> steps =
+          data.map((e) => ToiletStep.fromJson(e)).where((step) {
+            return step.gender == _player!.gender &&
+                step.focus == _player!.isFocused;
+          }).toList();
+      steps.sort((a, b) => a.id.compareTo(b.id));
+      paths = steps.map((step) => step.image).toList();
+
+      if (paths.isEmpty) {}
+    } catch (e) {
+      paths = [];
+    }
+    if (mounted) {
+      setState(() {
+        _imagePaths = paths;
+      });
+    }
+  }
+
+  Future<void> _showSettingsModal(BuildContext context) async {
+    final currentContext = context; // Simpan context sebelum async gap
+    await showDialog(
+      context: currentContext,
+      barrierDismissible: true,
+      builder: (BuildContext dialogContext) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: SettingsModalContent(
+            onClose: () {
+              Navigator.of(dialogContext).pop();
+            },
+          ),
+        );
+      },
+    );
+    // Setelah modal ditutup, muat ulang data pemain dan gambar
+    // Pastikan _player diperbarui sebelum _determineImagePaths
+    await _loadPlayerDataAndSetupImages();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isLoadingPlayer || _player == null) {
+      return Scaffold(
+        body: Background(
+          gender:
+              _player?.gender ?? 'perempuan', // Default jika _player masih null
+          child: const Center(child: CircularProgressIndicator()),
+        ),
+      );
+    }
+
+    return Scaffold(
+      body: Background(
+        gender: _player!.gender!, // _player dijamin tidak null di sini
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Header(
+              onTapBack: () {
+                Get.off(() => const ChooseLevelScreen());
+              },
+              title: "Latih Fokusmu !",
+              onTapSettings: () => _showSettingsModal(context),
+            ),
+            if (_imagePaths.isEmpty && !_isLoadingPlayer)
+              Expanded(
+                child: Center(
+                  child: Text(
+                    _player!.isFocused == true
+                        ? "Tidak ada gambar fokus yang ditemukan untuk gender ini."
+                        : "Tidak ada gambar non-fokus yang dikonfigurasi untuk gender ini.",
+                    style: TextStyle(
+                      color: Colors.orange[700],
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              )
+            else if (_imagePaths.isNotEmpty)
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20.0),
+                  child: Row(
+                    mainAxisAlignment:
+                        MainAxisAlignment
+                            .center, // Pusatkan gambar jika sedikit
+                    children:
+                        _imagePaths
+                            .map(
+                              (path) => Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8.0,
+                                ),
+                                child: Image.asset(
+                                  path,
+                                  width: 150.0,
+                                  height: 200.0,
+                                  fit:
+                                      BoxFit
+                                          .contain, // Ubah ke contain agar rasio aspek terjaga
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      width: 150,
+                                      height: 200,
+                                      color: Colors.grey[300],
+                                      child: Center(
+                                        child: Icon(
+                                          Icons.broken_image,
+                                          color: Colors.grey[600],
+                                          size: 50,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            )
+                            .toList(),
+                  ),
+                ),
+              ),
+            Padding(
+              // Pindahkan tombol ke dalam Column dan gunakan Padding
+              padding: const EdgeInsets.all(16.0),
+              child: Align(
+                alignment: Alignment.bottomRight,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFC2E0FF),
+                    foregroundColor: const Color(0xFF52AACA),
+                  ),
+                  onPressed:
+                      _isLoadingPlayer || _imagePaths.isEmpty
+                          ? null
+                          : () {
+                            if (_player != null) {
+                              Get.to(
+                                () => LevelOnePlayScreen(
+                                  gender: _player!.gender!,
+                                  isFocused: _player!.isFocused!,
+                                  imagePathsForGame: _imagePaths,
+                                ),
+                              );
+                            }
+                          },
+                  child: const Text("Selanjutnya"),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

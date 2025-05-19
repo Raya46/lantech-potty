@@ -3,15 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:toilet_training/games/puzzle/puzzle_game.dart';
 import 'package:toilet_training/widgets/background.dart';
 import 'package:toilet_training/widgets/header.dart';
+import 'package:toilet_training/screens/levels/level5/level5_start_screen.dart';
+import 'package:get/get.dart';
 
-class LevelFiveScreen extends StatefulWidget {
-  const LevelFiveScreen({super.key});
+class LevelFivePlayScreen extends StatefulWidget {
+  const LevelFivePlayScreen({super.key});
 
   @override
-  State<LevelFiveScreen> createState() => _LevelFiveScreenState();
+  State<LevelFivePlayScreen> createState() => _LevelFivePlayScreenState();
 }
 
-class _LevelFiveScreenState extends State<LevelFiveScreen> {
+class _LevelFivePlayScreenState extends State<LevelFivePlayScreen> {
   PuzzleGame? _puzzleGame;
   String? _initializationError;
 
@@ -19,12 +21,8 @@ class _LevelFiveScreenState extends State<LevelFiveScreen> {
   void initState() {
     super.initState();
     try {
-      print("Attempting to initialize PuzzleGame...");
       _puzzleGame = PuzzleGame(onPuzzleSolved: _showPuzzleSolvedDialog);
-      print("PuzzleGame instance created.");
-    } catch (e, s) {
-      print("Error during PuzzleGame instance creation: $e");
-      print(s);
+    } catch (e) {
       setState(() {
         _initializationError = e.toString();
       });
@@ -76,17 +74,15 @@ class _LevelFiveScreenState extends State<LevelFiveScreen> {
             TextButton(
               child: const Text('Main Lagi'),
               onPressed: () {
-                Navigator.of(context).pop(); // Tutup dialog
-                // Game akan direset otomatis oleh logic di dalam PuzzleGame
-                // Jika tidak, panggil _puzzleGame?.resetGame(); jika perlu
+                Navigator.of(context).pop(); 
               },
             ),
             TextButton(
               child: const Text('Kembali'),
               onPressed: () {
-                Navigator.of(context).pop(); // Tutup dialog
+                Navigator.of(context).pop(); 
                 if (Navigator.canPop(context)) {
-                  Navigator.of(context).pop(); // Kembali ke layar sebelumnya
+                  Navigator.of(context).pop();
                 }
               },
             ),
@@ -121,7 +117,11 @@ class _LevelFiveScreenState extends State<LevelFiveScreen> {
         gender: 'perempuan',
         child: Column(
           children: [
-            Header(title: 'Level 5'),
+            Header(
+              onTapBack: (){
+                Get.off(() => const LevelFiveStartScreen());
+              },
+              title: 'Level 5'),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),

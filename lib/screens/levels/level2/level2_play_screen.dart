@@ -5,211 +5,23 @@ import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:get/get.dart';
+import 'package:toilet_training/models/bathroom_item.dart';
 import 'package:toilet_training/models/player.dart';
+import 'package:toilet_training/screens/levels/level3/level3_start_screen.dart';
 import 'package:toilet_training/services/player_service.dart';
-import 'package:toilet_training/screens/levels/level3_screen.dart';
 import 'package:toilet_training/widgets/background.dart';
 import 'package:toilet_training/widgets/header.dart';
+import 'package:toilet_training/screens/levels/level2/level2_start_screen.dart';
 
-class BathroomItem {
-  final int id;
-  final String name;
-  final String image;
-
-  BathroomItem({required this.id, required this.name, required this.image});
-
-  factory BathroomItem.fromJson(Map<String, dynamic> json) {
-    return BathroomItem(
-      id: json['id'],
-      name: json['name'],
-      image: json['image'],
-    );
-  }
-}
-
-class LevelTwoScreen extends StatefulWidget {
-  const LevelTwoScreen({super.key});
+class LevelTwoPlayScreen extends StatefulWidget {
+  const LevelTwoPlayScreen({super.key});
 
   @override
-  State<LevelTwoScreen> createState() => _LevelTwoScreenState();
+  State<LevelTwoPlayScreen> createState() => _LevelTwoPlayScreenState();
 }
 
-class _LevelTwoScreenState extends State<LevelTwoScreen> {
+class _LevelTwoPlayScreenState extends State<LevelTwoPlayScreen> {
   Player? _player;
-  bool _isLoadingPlayer = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadPlayerData();
-  }
-
-  Future<void> _loadPlayerData() async {
-    setState(() {
-      _isLoadingPlayer = true;
-    });
-    try {
-      _player = await getPlayer();
-      _player?.gender ??= 'perempuan';
-      _player?.isFocused ??= false;
-      _player?.level2Score ??= 0;
-    } catch (e) {
-      print("Error loading player in LevelTwoScreen: $e");
-      _player =
-          Player(null)
-            ..gender = 'perempuan'
-            ..isFocused = false
-            ..level2Score = 0;
-      await savePlayer(_player!);
-    }
-    setState(() {
-      _isLoadingPlayer = false;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (_isLoadingPlayer || _player == null) {
-      return Scaffold(
-        body: Background(
-          gender: _player?.gender ?? 'perempuan',
-          child: Center(child: CircularProgressIndicator()),
-        ),
-      );
-    }
-    return Scaffold(
-      body: Background(
-        gender: _player!.gender!,
-        child: Column(
-          children: [
-            Header(title: ""),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Center(
-                      child: Image.asset(
-                        _player!.gender == 'perempuan'
-                            ? 'assets/images/female-happy.png'
-                            : 'assets/images/male-happy.png',
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  flex: 3,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24.0,
-                      vertical: 16.0,
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Stack(
-                          children: [
-                            Text(
-                              "Level 2",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 34,
-                                fontWeight: FontWeight.bold,
-                                foreground:
-                                    Paint()
-                                      ..style = PaintingStyle.stroke
-                                      ..strokeWidth = 1.5
-                                      ..color = const Color(0xFF4A2C2A),
-                              ),
-                            ),
-                            Text(
-                              "Level 2",
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                fontSize: 34,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFFFFA07A),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Stack(
-                          children: [
-                            Text(
-                              "Tentukan Benda yang Tepat",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 34,
-                                fontWeight: FontWeight.bold,
-                                foreground:
-                                    Paint()
-                                      ..style = PaintingStyle.stroke
-                                      ..strokeWidth = 1.5
-                                      ..color = const Color(0xFF4A2C2A),
-                              ),
-                            ),
-                            Text(
-                              "Tentukan Benda yang Tepat",
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                fontSize: 34,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFFFFA07A),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 30),
-                        Padding(
-                          padding: const EdgeInsets.only(right: 10.0),
-                          child: Center(
-                            child: GestureDetector(
-                              onTap: () {
-                                Get.to(
-                                  () => LevelTwoFocusScreen(player: _player!),
-                                  transition: Transition.circularReveal,
-                                  duration: Duration(milliseconds: 1500),
-                                );
-                              },
-                              child: CircleAvatar(
-                                radius: 35,
-                                backgroundColor: const Color(0xFF52AACA),
-                                child: const Icon(
-                                  Icons.play_arrow,
-                                  size: 45,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class LevelTwoFocusScreen extends StatefulWidget {
-  final Player player;
-  const LevelTwoFocusScreen({super.key, required this.player});
-
-  @override
-  State<LevelTwoFocusScreen> createState() => _LevelTwoFocusScreenState();
-}
-
-class _LevelTwoFocusScreenState extends State<LevelTwoFocusScreen> {
   List<BathroomItem> _allItems = [];
   BathroomItem? _correctItem;
   List<BathroomItem> _currentChoices = [];
@@ -219,12 +31,17 @@ class _LevelTwoFocusScreenState extends State<LevelTwoFocusScreen> {
   late ConfettiController _confettiController;
   int _wrongAttemptsInQuestion = 0;
 
+  Future<void> _loadPlayer() async {
+    _player = await getPlayer();
+  }
+
   @override
   void initState() {
     super.initState();
     _confettiController = ConfettiController(
       duration: const Duration(seconds: 2),
     );
+    _loadPlayer();
     _loadItems();
   }
 
@@ -257,7 +74,6 @@ class _LevelTwoFocusScreenState extends State<LevelTwoFocusScreen> {
           _feedbackMessage = "Gagal memuat data permainan.";
         });
       }
-      print('Error loading bathroom items: $e');
     }
   }
 
@@ -304,14 +120,9 @@ class _LevelTwoFocusScreenState extends State<LevelTwoFocusScreen> {
 
   Future<void> _saveScore(int stars) async {
     try {
-      widget.player.level2Score = stars;
-      await updatePlayer(widget.player);
-      print(
-        "Level 2 score saved: $stars stars for player ID ${widget.player.id}",
-      );
-    } catch (e) {
-      print("Error saving score for Level 2: $e");
-    }
+      _player!.level2Score = stars;
+      await updatePlayer(_player!);
+    } catch (e) {}
   }
 
   void _checkAnswer(BathroomItem selectedItem) {
@@ -360,7 +171,7 @@ class _LevelTwoFocusScreenState extends State<LevelTwoFocusScreen> {
         children: [
           if (isCorrect)
             Image.asset(
-              widget.player.gender == 'perempuan'
+              _player!.gender == 'perempuan'
                   ? 'assets/images/female-happy.png'
                   : 'assets/images/male-happy.png',
               height: 100,
@@ -416,7 +227,7 @@ class _LevelTwoFocusScreenState extends State<LevelTwoFocusScreen> {
             foregroundColor: Colors.white,
           ),
           onPressed: () {
-            Get.off(() => const LevelThreeScreen());
+            Get.off(() => const LevelThreeStartScreen());
           },
           child: Text("Lanjut Level 3"),
         ),
@@ -431,10 +242,15 @@ class _LevelTwoFocusScreenState extends State<LevelTwoFocusScreen> {
       body: Stack(
         children: [
           Background(
-            gender: widget.player.gender!,
+            gender: _player!.gender!,
             child: Column(
               children: [
-                Header(title: "Level 2: Kenali Benda"),
+                Header(
+                  onTapBack: () {
+                    Get.off(() => const LevelTwoStartScreen());
+                  },
+                  title: "Level 2: Kenali Benda",
+                ),
                 Expanded(
                   child:
                       _isLoading

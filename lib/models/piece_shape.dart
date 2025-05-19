@@ -1,5 +1,4 @@
 class PieceShape {
-  /// 0: datar, 1: keluar (tab), -1: masuk (lekukan)
   int topTab;
   int bottomTab;
   int leftTab;

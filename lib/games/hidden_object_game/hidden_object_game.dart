@@ -1,113 +1,12 @@
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:flame/components.dart';
-import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart'; // Untuk Size, Offset, Rect jika masih diperlukan sementara
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:toilet_training/models/scene_object.dart';
+import 'package:toilet_training/games/hidden_object_game/scene_object_component.dart';
 
-// Data class untuk objek scene, terpisah dari komponen Flame
-class SceneObjectData {
-  final String id;
-  final String name;
-  final String imagePath;
-  bool isTarget;
-  bool isFound;
-
-  SceneObjectData({
-    required this.id,
-    required this.name,
-    required this.imagePath,
-    this.isTarget = false,
-    this.isFound = false,
-  });
-
-  factory SceneObjectData.fromJson(Map<String, dynamic> json) {
-    return SceneObjectData(
-      id: json['id'].toString(),
-      name: json['name'] ?? 'Unknown',
-      imagePath: json['image'] ?? '',
-    );
-  }
-}
-
-// Komponen Flame untuk merepresentasikan objek di scene
-class SceneObjectComponent extends SpriteComponent with TapCallbacks {
-  final SceneObjectData data;
-  final HiddenObjectGame gameRef; // Referensi ke game utama
-  bool _isHighlighted = false;
-
-  SceneObjectComponent(this.data, {required this.gameRef})
-    : super(anchor: Anchor.center);
-
-  @override
-  Future<void> onLoad() async {
-    try {
-      sprite = await Sprite.load(
-        data.imagePath.replaceFirst('assets/images/', ''),
-      );
-      // Ukuran bisa diatur di sini berdasarkan kebutuhan atau gambar
-      // Contoh: buat semua objek memiliki lebar/tinggi dasar dan skala dari sana
-      double baseDimension = 80 + Random().nextDouble() * 50; // 80-130
-      if (sprite != null) {
-        if (sprite!.originalSize.x >= sprite!.originalSize.y) {
-          width = baseDimension;
-          height =
-              sprite!.originalSize.y * (baseDimension / sprite!.originalSize.x);
-        } else {
-          height = baseDimension;
-          width =
-              sprite!.originalSize.x * (baseDimension / sprite!.originalSize.y);
-        }
-      } else {
-        size = Vector2.all(baseDimension); // Fallback jika sprite gagal dimuat
-        print("Sprite gagal dimuat untuk: ${data.imagePath}");
-      }
-    } catch (e) {
-      print("Error loading sprite for ${data.imagePath}: $e");
-      size = Vector2.all(100); // Fallback size
-    }
-  }
-
-  @override
-  void onTapDown(TapDownEvent event) {
-    if (data.isFound) return;
-
-    if (data.isTarget) {
-      data.isFound = true;
-      _isHighlighted = true; // Untuk efek visual sementara
-      gameRef.onTargetFound(data);
-      // Mungkin tambahkan efek visual atau suara
-      print("Target ditemukan: ${data.name}");
-    } else {
-      gameRef.onWrongObjectTapped(data);
-      print("Salah objek: ${data.name}");
-      // Mungkin berikan feedback negatif
-    }
-    event.handled = true;
-  }
-
-  @override
-  void render(Canvas canvas) {
-    super.render(canvas);
-    if (_isHighlighted && data.isFound) {
-      // Gambar lingkaran hijau sebagai highlight
-      final paint =
-          Paint()
-            ..color = Colors.green.withOpacity(0.5)
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = 5;
-      canvas.drawCircle(
-        Offset(width / 2, height / 2),
-        min(width, height) / 2,
-        paint,
-      );
-    }
-  }
-}
-
-// Game utama untuk Level 3
 class HiddenObjectGame extends FlameGame {
   final int numberOfTargets = 3;
   List<SceneObjectData> allObjectsData = [];
@@ -175,7 +74,6 @@ class HiddenObjectGame extends FlameGame {
           targetObjectsData.add(potentialTargets[i]);
         }
       } else {
-        print("Tidak ada objek toilet (ID 1-9) untuk dijadikan target.");
         // Handle jika tidak ada target
       }
 
@@ -206,9 +104,6 @@ class HiddenObjectGame extends FlameGame {
           edgePadding,
           maxPlacementAttempts,
         )) {
-          print(
-            "### KRITIS: Gagal menempatkan TARGET ${targetData.name} setelah $maxPlacementAttempts percobaan! ###",
-          );
           // Anda mungkin ingin strategi fallback di sini, misal menempatkan di tengah dengan paksa
           // atau mengurangi jumlah target jika penempatan gagal.
         }
@@ -216,10 +111,8 @@ class HiddenObjectGame extends FlameGame {
 
       // Kemudian tempatkan objek non-target hingga batas tertentu
       for (var objData in allObjectsData) {
-        if (objData.isTarget)
-          continue; // Lewati target karena sudah ditempatkan (atau coba ditempatkan)
-        if (placedNonTargets >= maxNonTargetObjectsToPlace)
-          break; // Batasi jumlah non-target
+        if (objData.isTarget) continue; // Lewati target karena sudah ditempatkan (atau coba ditempatkan)
+        if (placedNonTargets >= maxNonTargetObjectsToPlace) break; // Batasi jumlah non-target
 
         final component = SceneObjectComponent(objData, gameRef: this);
         await component.onLoad();
@@ -232,14 +125,10 @@ class HiddenObjectGame extends FlameGame {
           maxPlacementAttempts,
         )) {
           placedNonTargets++;
-        } else {
-          print(
-            "Info: Gagal menempatkan objek non-target ${objData.name} setelah $maxPlacementAttempts percobaan.",
-          );
-        }
+        } else {}
       }
     } catch (e) {
-      print("Error loading/processing scene objects in Flame: $e");
+      print(e);
     }
   }
 
@@ -252,9 +141,6 @@ class HiddenObjectGame extends FlameGame {
     int maxPlacementAttempts,
   ) {
     if (component.width == 0 || component.height == 0) {
-      print(
-        "Komponen ${component.data.name} memiliki ukuran nol, tidak dapat ditempatkan.",
-      );
       return false; // Tidak bisa menempatkan komponen dengan ukuran nol
     }
     bool positionFound = false;
@@ -283,9 +169,6 @@ class HiddenObjectGame extends FlameGame {
 
       // Cek apakah posisi valid (tidak NaN)
       if (posX.isNaN || posY.isNaN) {
-        print(
-          "Posisi NaN untuk ${component.data.name}. Ukuran game: $size, Ukuran komponen: ${component.size}",
-        );
         attempts++;
         continue; // Coba lagi jika posisi tidak valid
       }
@@ -325,7 +208,6 @@ class HiddenObjectGame extends FlameGame {
 
       if (foundTargetIds.length == targetObjectsData.length &&
           targetObjectsData.isNotEmpty) {
-        print("Semua target ditemukan! Kesalahan: $wrongTaps");
         // Panggil callback untuk UI Flutter
         onAllTargetsFound(wrongTaps);
       }
@@ -335,7 +217,6 @@ class HiddenObjectGame extends FlameGame {
   void onWrongObjectTapped(SceneObjectData tappedObject) {
     wrongTaps++; // Increment kesalahan
     onShowFeedback("Itu bukan target, coba cari yang lain!");
-    print("Salah tap. Total kesalahan: $wrongTaps");
   }
 
   Future<void> resetGame() async {

@@ -8,15 +8,17 @@ import 'package:toilet_training/services/player_service.dart';
 import 'package:toilet_training/widgets/background.dart';
 import 'package:toilet_training/widgets/header.dart';
 import 'package:toilet_training/widgets/modal_setting.dart';
+import 'package:get/get.dart';
+import 'package:toilet_training/screens/levels/level4/level4_start_screen.dart';
 
-class LevelFourScreen extends StatefulWidget {
-  const LevelFourScreen({super.key});
+class LevelFourPlayScreen extends StatefulWidget {
+  const LevelFourPlayScreen({super.key});
 
   @override
-  State<LevelFourScreen> createState() => _LevelFourScreenState();
+  State<LevelFourPlayScreen> createState() => _LevelFourPlayScreenState();
 }
 
-class _LevelFourScreenState extends State<LevelFourScreen> {
+class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
   List<ToiletStep> _steps = [];
   int currentStepIndex = 0;
   ToiletStep? _droppedStepOnTarget;
@@ -37,7 +39,6 @@ class _LevelFourScreenState extends State<LevelFourScreen> {
   Future<void> _initializeScreen() async {
     await _loadPlayerData();
     if (_player == null) {
-      print("Player gagal dimuat di initializeScreen Level 4");
       if (mounted) setState(() => _isLoadingPlayer = false);
       return;
     }
@@ -63,7 +64,6 @@ class _LevelFourScreenState extends State<LevelFourScreen> {
       _player!.isFocused ??= false;
       _player!.level4Score ??= 0; // Inisialisasi skor level 4 jika null
     } catch (e) {
-      print("Error loading player for Level 4: $e. Creating new player.");
       _player =
           Player(null)
             ..gender = 'laki-laki'
@@ -76,13 +76,9 @@ class _LevelFourScreenState extends State<LevelFourScreen> {
 
   Future<void> loadSteps() async {
     if (_player == null) {
-      print("Player data not loaded yet. Cannot load steps.");
       return;
     }
     if (_player!.gender == 'laki-laki' && _selectedTypeForMale == null) {
-      print(
-        "Male gender selected, but type (BAB/BAK) not chosen. Cannot load steps.",
-      );
       if (mounted) setState(() => _isChoosingMaleType = true);
       return;
     }
@@ -120,9 +116,6 @@ class _LevelFourScreenState extends State<LevelFourScreen> {
       });
 
       if (_steps.isEmpty) {
-        print(
-          "No steps found for gender: ${_player!.gender}, focus: ${_player!.isFocused}, type: ${_selectedTypeForMale}",
-        );
       }
     }
   }
@@ -206,9 +199,7 @@ class _LevelFourScreenState extends State<LevelFourScreen> {
     try {
       _player!.level4Score = stars; // Simpan skor untuk Level 4
       await updatePlayer(_player!);
-      print("Level 4 score saved: $stars stars");
     } catch (e) {
-      print("Error saving score for Level 4: $e");
     }
   }
 
@@ -240,6 +231,9 @@ class _LevelFourScreenState extends State<LevelFourScreen> {
           child: Column(
             children: [
               Header(
+                onTapBack: () {
+                  Get.off(() => const LevelFourStartScreen());
+                },
                 title: "Level 4",
                 onTapSettings: () => _showSettingsModal(context),
               ),
@@ -343,6 +337,9 @@ class _LevelFourScreenState extends State<LevelFourScreen> {
         child: Column(
           children: [
             Header(
+              onTapBack: (){
+                Get.off(() => const LevelFourStartScreen());
+              },
               title: "Level 4",
               onTapSettings: () => _showSettingsModal(context),
             ),
