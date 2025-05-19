@@ -23,11 +23,46 @@ class _LevelOneFocusScreenState extends State<LevelOneFocusScreen> {
   Player? _player;
   bool _isLoadingPlayer = true;
   List<String> _imagePaths = [];
+  final ScrollController _scrollController = ScrollController();
+  bool _showLeftArrow = false;
+  bool _showRightArrow = true;
 
   @override
   void initState() {
     super.initState();
     _loadPlayerDataAndSetupImages();
+    _scrollController.addListener(_scrollListener);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _scrollListener();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_scrollListener);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollListener() {
+    if (!mounted || !_scrollController.hasClients) return;
+
+    final position = _scrollController.position;
+    final hasScrollableContent =
+        position.maxScrollExtent > position.minScrollExtent;
+
+    setState(() {
+      if (hasScrollableContent) {
+        _showLeftArrow = position.pixels > position.minScrollExtent;
+        _showRightArrow = position.pixels < position.maxScrollExtent;
+      } else {
+        _showLeftArrow = false;
+        _showRightArrow = false;
+      }
+    });
   }
 
   Future<void> _loadPlayerDataAndSetupImages() async {
@@ -43,12 +78,18 @@ class _LevelOneFocusScreenState extends State<LevelOneFocusScreen> {
           Player(null)
             ..gender = 'perempuan'
             ..isFocused = false;
-      await savePlayer(_player!); 
+      await savePlayer(_player!);
     }
-    await _determineImagePaths(); 
+    await _determineImagePaths();
     if (mounted) {
       setState(() {
         _isLoadingPlayer = false;
+      });
+      // Call scroll listener after images are loaded and layout is updated
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _scrollListener();
+        }
       });
     }
   }
@@ -88,7 +129,7 @@ class _LevelOneFocusScreenState extends State<LevelOneFocusScreen> {
   }
 
   Future<void> _showSettingsModal(BuildContext context) async {
-    final currentContext = context; 
+    final currentContext = context;
     await showDialog(
       context: currentContext,
       barrierDismissible: true,
@@ -112,8 +153,7 @@ class _LevelOneFocusScreenState extends State<LevelOneFocusScreen> {
     if (_isLoadingPlayer || _player == null) {
       return Scaffold(
         body: Background(
-          gender:
-              _player?.gender ?? 'perempuan', 
+          gender: _player?.gender ?? 'perempuan',
           child: const Center(child: CircularProgressIndicator()),
         ),
       );
@@ -121,7 +161,7 @@ class _LevelOneFocusScreenState extends State<LevelOneFocusScreen> {
 
     return Scaffold(
       body: Background(
-        gender: _player!.gender!, 
+        gender: _player!.gender!,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -149,47 +189,56 @@ class _LevelOneFocusScreenState extends State<LevelOneFocusScreen> {
                 ),
               )
             else if (_imagePaths.isNotEmpty)
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 20.0),
-                  child: Row(
-                    mainAxisAlignment:
-                        MainAxisAlignment
-                            .center, 
-                    children:
-                        _imagePaths
-                            .map(
-                              (path) => Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8.0,
-                                ),
-                                child: Image.asset(
-                                  path,
-                                  width: 150.0,
-                                  height: 200.0,
-                                  fit:
-                                      BoxFit
-                                          .contain, 
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Container(
-                                      width: 150,
-                                      height: 200,
-                                      color: Colors.grey[300],
-                                      child: Center(
-                                        child: Icon(
-                                          Icons.broken_image,
-                                          color: Colors.grey[600],
-                                          size: 50,
-                                        ),
+              Expanded(
+                // Added Expanded to ensure Stack takes available space
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    SingleChildScrollView(
+                      controller: _scrollController,
+                      scrollDirection: Axis.horizontal,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 20.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children:
+                              _imagePaths
+                                  .map(
+                                    (path) => Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8.0,
                                       ),
-                                    );
-                                  },
-                                ),
-                              ),
-                            )
-                            .toList(),
-                  ),
+                                      child: Image.asset(
+                                        path,
+                                        width: 150.0,
+                                        height: 200.0,
+                                        fit: BoxFit.contain,
+                                        errorBuilder: (
+                                          context,
+                                          error,
+                                          stackTrace,
+                                        ) {
+                                          return Container(
+                                            width: 150,
+                                            height: 200,
+                                            color: Colors.grey[300],
+                                            child: Center(
+                                              child: Icon(
+                                                Icons.broken_image,
+                                                color: Colors.grey[600],
+                                                size: 50,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             Padding(
