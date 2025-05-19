@@ -33,10 +33,8 @@ class Header extends StatelessWidget {
               Get.back(canPop: false);
             },
             onTapSound: () {
-              print("Sound Tapped");
             },
             onTapMusic: () {
-              print("Music Tapped");
             },
           ),
         );

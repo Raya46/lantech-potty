@@ -88,7 +88,7 @@ class _LevelOneFocusScreenState extends State<LevelOneFocusScreen> {
   }
 
   Future<void> _showSettingsModal(BuildContext context) async {
-    final currentContext = context; // Simpan context sebelum async gap
+    final currentContext = context; 
     await showDialog(
       context: currentContext,
       barrierDismissible: true,
@@ -104,8 +104,6 @@ class _LevelOneFocusScreenState extends State<LevelOneFocusScreen> {
         );
       },
     );
-    // Setelah modal ditutup, muat ulang data pemain dan gambar
-    // Pastikan _player diperbarui sebelum _determineImagePaths
     await _loadPlayerDataAndSetupImages();
   }
 
@@ -115,7 +113,7 @@ class _LevelOneFocusScreenState extends State<LevelOneFocusScreen> {
       return Scaffold(
         body: Background(
           gender:
-              _player?.gender ?? 'perempuan', // Default jika _player masih null
+              _player?.gender ?? 'perempuan', 
           child: const Center(child: CircularProgressIndicator()),
         ),
       );
@@ -123,7 +121,7 @@ class _LevelOneFocusScreenState extends State<LevelOneFocusScreen> {
 
     return Scaffold(
       body: Background(
-        gender: _player!.gender!, // _player dijamin tidak null di sini
+        gender: _player!.gender!, 
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -158,7 +156,7 @@ class _LevelOneFocusScreenState extends State<LevelOneFocusScreen> {
                   child: Row(
                     mainAxisAlignment:
                         MainAxisAlignment
-                            .center, // Pusatkan gambar jika sedikit
+                            .center, 
                     children:
                         _imagePaths
                             .map(
@@ -172,7 +170,7 @@ class _LevelOneFocusScreenState extends State<LevelOneFocusScreen> {
                                   height: 200.0,
                                   fit:
                                       BoxFit
-                                          .contain, // Ubah ke contain agar rasio aspek terjaga
+                                          .contain, 
                                   errorBuilder: (context, error, stackTrace) {
                                     return Container(
                                       width: 150,
@@ -195,7 +193,6 @@ class _LevelOneFocusScreenState extends State<LevelOneFocusScreen> {
                 ),
               ),
             Padding(
-              // Pindahkan tombol ke dalam Column dan gunakan Padding
               padding: const EdgeInsets.all(16.0),
               child: Align(
                 alignment: Alignment.bottomRight,

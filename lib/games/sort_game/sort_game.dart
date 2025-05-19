@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:confetti/confetti.dart';
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ import 'package:toilet_training/models/step.dart';
 import 'package:toilet_training/screens/levels/level2/level2_start_screen.dart';
 import 'package:toilet_training/services/player_service.dart';
 import 'package:toilet_training/games/sort_game/sort_game_component.dart';
+import 'package:toilet_training/widgets/modal_result.dart';
 
 class ToiletSortGame extends FlameGame {
   final BuildContext context;
@@ -19,8 +21,7 @@ class ToiletSortGame extends FlameGame {
   List<ImageSprite> currentImageSprites = [];
   bool isLoading = true;
 
-  int sequenceLength =
-      3; // Harus lebih kecil atau sama dengan jumlah gambar yang tersedia
+  int sequenceLength = 3;
   final double imageSize = 160.0;
   final double placeholderPadding = 5.0;
   final double placeholderSize = 160.0 + 2 * 5.0;
@@ -30,16 +31,17 @@ class ToiletSortGame extends FlameGame {
   List<PlaceholderSlot> placeholderSlots = [];
   final String gender;
   final bool isFocused;
-  final List<String>
-  imagePaths; // Daftar path gambar yang sudah difilter untuk game
+  final List<String> imagePaths;
   Map<String, int> imagePathToIdMap = {};
   int _wrongAttempts = 0;
+  final ConfettiController confettiController;
 
   ToiletSortGame({
-    required this.context, // Terima context dari Flutter
+    required this.context,
     required this.gender,
     required this.isFocused,
     required this.imagePaths,
+    required this.confettiController,
   });
 
   @override
@@ -52,7 +54,6 @@ class ToiletSortGame extends FlameGame {
 
   Future<void> _initializeGame() async {
     setStateQuietly(() {
-      // Gunakan untuk update internal Flame tanpa memicu rebuild besar
       isLoading = true;
       _wrongAttempts = 0;
       currentImageSprites.forEach(remove);
@@ -79,10 +80,7 @@ class ToiletSortGame extends FlameGame {
     List<ToiletStep> allStepsForContext =
         jsonData
             .map((e) => ToiletStep.fromJson(e))
-            .where(
-              (step) =>
-                  step.gender == this.gender && step.focus == this.isFocused,
-            )
+            .where((step) => step.gender == gender && step.focus == isFocused)
             .toList();
     allStepsForContext.sort((a, b) => a.id.compareTo(b.id));
 
@@ -140,44 +138,38 @@ class ToiletSortGame extends FlameGame {
         ),
         size: Vector2(placeholderSize, placeholderSize),
       );
-      add(placeholder); // Tambahkan slot ke game
+      add(placeholder);
       placeholderSlots.add(placeholder);
     }
 
     for (int i = 0; i < displayImagePaths.length; i++) {
       final path = displayImagePaths[i];
-      final placeholderForThisImage =
-          placeholderSlots[i]; // Asumsi urutan placeholder sesuai
+      final placeholderForThisImage = placeholderSlots[i];
 
       String spritePath = path;
       if (path.startsWith('assets/images/')) {
         spritePath = path.substring('assets/images/'.length);
       }
 
-      try {
-        final sprite = await Sprite.load(spritePath);
-        final imageId =
-            imagePathToIdMap[path]!; // Kita sudah pastikan path valid
+      final sprite = await Sprite.load(spritePath);
+      final imageId = imagePathToIdMap[path]!;
 
-        final imageComponent = ImageSprite(
-          sprite: sprite,
-          imagePath: path,
-          imageIdentifier: imageId,
-          initialPosition: Vector2(
-            placeholderForThisImage.position.x +
-                (placeholderSize - imageSize) / 2,
-            placeholderForThisImage.position.y +
-                (placeholderSize - imageSize) / 2,
-          ),
-          size: Vector2(imageSize, imageSize),
-          gameRef: this,
-        );
-        imageComponent.priority = 1;
-        add(imageComponent); // Tambahkan sprite ke game
-        currentImageSprites.add(imageComponent);
-      } catch (e) {
-        // Handle error, misal dengan skip atau placeholder
-      }
+      final imageComponent = ImageSprite(
+        sprite: sprite,
+        imagePath: path,
+        imageIdentifier: imageId,
+        initialPosition: Vector2(
+          placeholderForThisImage.position.x +
+              (placeholderSize - imageSize) / 2,
+          placeholderForThisImage.position.y +
+              (placeholderSize - imageSize) / 2,
+        ),
+        size: Vector2(imageSize, imageSize),
+        gameRef: this,
+      );
+      imageComponent.priority = 1;
+      add(imageComponent);
+      currentImageSprites.add(imageComponent);
     }
     setStateQuietly(() {
       isLoading = false;
@@ -211,16 +203,14 @@ class ToiletSortGame extends FlameGame {
 
   int _calculateStars(int wrongAttempts) {
     if (wrongAttempts == 0) return 3;
-    if (wrongAttempts <= 2) return 2; // Contoh: 1 atau 2 kesalahan = 2 bintang
-    return 1; // Lebih dari 2 kesalahan = 1 bintang
+    if (wrongAttempts <= 2) return 2;
+    return 1;
   }
 
   Future<void> _saveScore(int stars) async {
-    try {
-      Player player = await getPlayer();
-      player.level1Score = stars;
-      await updatePlayer(player);
-    } catch (e) {}
+    Player player = await getPlayer();
+    player.level1Score = stars;
+    await updatePlayer(player);
   }
 
   void checkOrder() {
@@ -240,67 +230,30 @@ class ToiletSortGame extends FlameGame {
       _saveScore(starsEarned);
     } else {
       _wrongAttempts++;
-      dialogTitle = "Oops, Coba Lagi! ${correctSequenceIds}";
-      dialogContentText =
-          "Susunannya belum tepat. Ayo coba lagi! ${correctSequenceIds}";
+      dialogTitle = "Oops, Coba Lagi!";
+      dialogContentText = "Susunannya belum tepat. Ayo coba lagi!";
     }
 
-    Widget starDisplay = Row(
-      mainAxisSize: MainAxisSize.min,
-      children: List.generate(3, (index) {
-        return Icon(
-          index < starsEarned ? Icons.star : Icons.star_border,
-          color: Colors.amber,
-          size: 30,
-        );
-      }),
-    );
-
-    Get.dialog(
-      AlertDialog(
-        title: Text(
-          dialogTitle,
-          style: TextStyle(
-            color: isCorrect ? Colors.green : Colors.red,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(dialogContentText),
-            if (isCorrect) ...[
-              const SizedBox(height: 10),
-              starDisplay,
-              const SizedBox(height: 5),
-              Text(
-                "Kamu mendapatkan $starsEarned bintang!",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-              ),
-            ],
-          ],
-        ),
-        actions: [
-          TextButton(
-            child: const Text("OK"),
-            onPressed: () {
-              Get.back();
-              if (isCorrect) {
-                _initializeGame(); // Main lagi
-              }
-            },
-          ),
-          if (isCorrect)
-            TextButton(
-              child: const Text("Lanjut Level"),
-              onPressed: () {
+    ModalResult.show(
+      context: context,
+      title: dialogTitle,
+      message: dialogContentText,
+      starsEarned: starsEarned,
+      isSuccess: isCorrect,
+      confettiController: isCorrect ? confettiController : null,
+      primaryActionText: "OK",
+      onPrimaryAction: () {
+        if (isCorrect) {
+          _initializeGame();
+        }
+      },
+      secondaryActionText: isCorrect ? "Lanjut Level" : null,
+      onSecondaryAction:
+          isCorrect
+              ? () {
                 Get.off(() => const LevelTwoStartScreen());
-              },
-            ),
-        ],
-      ),
-      barrierDismissible: false,
+              }
+              : null,
     );
   }
 

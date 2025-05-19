@@ -29,19 +29,17 @@ class _StartScreenState extends State<StartScreen> {
     try {
       _player = await getPlayer();
       if (_player == null) {
-        print("Player data not found in ChooseLevelScreen! Creating default.");
         _player = Player(null);
-        _player!.gender = 'perempuan'; // Default gender
-        _player!.isFocused = false; // Default focus state
+        _player!.gender = 'perempuan'; 
+        _player!.isFocused = false; 
         await savePlayer(_player!);
       }
-      _player!.gender ??= 'perempuan'; // Ensure gender is not null
+      _player!.gender ??= 'perempuan'; 
     } catch (e) {
-      print("Error loading player in ChooseLevelScreen: $e. Creating default.");
       _player = Player(null);
       _player!.gender = 'perempuan';
       _player!.isFocused = false;
-      // await savePlayer(_player!); // Consider if saving here is appropriate
+      
     }
     setState(() {
       _isLoadingPlayer = false;

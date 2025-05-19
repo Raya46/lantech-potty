@@ -12,6 +12,7 @@ import 'package:toilet_training/widgets/header.dart';
 import 'package:toilet_training/widgets/modal_setting.dart';
 import 'package:toilet_training/games/sort_game/sort_game.dart';
 import 'package:toilet_training/screens/levels/level1/level1_start_screen.dart';
+import 'package:confetti/confetti.dart';
 
 class LevelOnePlayScreen extends StatefulWidget {
   final String gender;
@@ -35,13 +36,23 @@ class _LevelOnePlayScreenState extends State<LevelOnePlayScreen> {
   Player? _playerObject;
   bool _isLoading = true;
   UniqueKey _gameKey = UniqueKey();
+  late ConfettiController _confettiController;
 
   @override
   void initState() {
     super.initState();
     _currentIsFocused = widget.isFocused;
     _currentImagePathsForGame = List.from(widget.imagePathsForGame);
+    _confettiController = ConfettiController(
+      duration: const Duration(seconds: 2),
+    );
     _loadPlayerStatusAndUpdateGame();
+  }
+
+  @override
+  void dispose() {
+    _confettiController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadPlayerStatusAndUpdateGame() async {
@@ -67,15 +78,14 @@ class _LevelOnePlayScreenState extends State<LevelOnePlayScreen> {
 
         if (_currentImagePathsForGame.isEmpty) {}
       } else {
-        // Jika _playerObject null setelah getPlayer(), gunakan data widget awal
         _currentIsFocused = widget.isFocused;
         _currentImagePathsForGame = List.from(widget.imagePathsForGame);
       }
     } catch (e) {
-      _currentIsFocused = widget.isFocused; // Fallback ke widget.isFocused
+      _currentIsFocused = widget.isFocused; 
       _currentImagePathsForGame = List.from(
         widget.imagePathsForGame,
-      ); // Fallback
+      ); 
     }
     if (mounted) {
       setState(() {
@@ -118,9 +128,7 @@ class _LevelOnePlayScreenState extends State<LevelOnePlayScreen> {
 
     if (_currentImagePathsForGame.isEmpty && !_isLoading) {
       return Scaffold(
-        appBar: AppBar(
-          title: Text("Susun Langkah Toilet"),
-        ), // Placeholder AppBar
+        appBar: AppBar(title: Text("Susun Langkah Toilet")),
         body: Background(
           gender: widget.gender,
           child: Center(
@@ -134,7 +142,7 @@ class _LevelOnePlayScreenState extends State<LevelOnePlayScreen> {
                 ),
                 SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: () => Get.back(), // Kembali ke layar sebelumnya
+                  onPressed: () => Get.back(),
                   child: Text("Kembali"),
                 ),
               ],
@@ -147,65 +155,86 @@ class _LevelOnePlayScreenState extends State<LevelOnePlayScreen> {
     return Scaffold(
       body: Background(
         gender: widget.gender,
-        child: Column(
+        child: Stack(
           children: [
-            Header(
-              onTapBack: () {
-                Get.off(() => const LevelOneStartScreen());
-              },
-              title: "Susun Langkah Toilet",
-              onTapSettings: _showSettingsModal,
-            ),
-            Expanded(
-              child: GameWidget(
-                key: _gameKey,
-                game: ToiletSortGame(
-                  context:
-                      context, // Berikan BuildContext dari LevelOnePlayScreen
-                  gender: widget.gender,
-                  isFocused: _currentIsFocused,
-                  imagePaths: List.from(_currentImagePathsForGame),
+            Column(
+              children: [
+                Header(
+                  onTapBack: () {
+                    Get.off(() => const LevelOneStartScreen());
+                  },
+                  title: "Susun Langkah Toilet",
+                  onTapSettings: _showSettingsModal,
                 ),
-                overlayBuilderMap: {
-                  'checkButton': (ctx, game) {
-                    final toiletGame = game as ToiletSortGame;
-                    return Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 30.0),
-                        child: ElevatedButton(
-                          onPressed:
-                              toiletGame.isLoading
-                                  ? null
-                                  : toiletGame
-                                      .checkOrder, // Nonaktifkan jika game sedang loading
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                widget.gender == 'laki-laki'
-                                    ? const Color(0xFFC2E0FF)
-                                    : const Color(0xFFFFDDD2),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 40,
-                              vertical: 15,
-                            ),
-                            textStyle: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            foregroundColor:
-                                widget.gender == 'laki-laki'
-                                    ? const Color(0xFF52AACA)
-                                    : const Color(0xFFFC9D99),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30.0),
+                Expanded(
+                  child: GameWidget(
+                    key: _gameKey,
+                    game: ToiletSortGame(
+                      context: context,
+                      gender: widget.gender,
+                      isFocused: _currentIsFocused,
+                      imagePaths: List.from(_currentImagePathsForGame),
+                      confettiController: _confettiController,
+                    ),
+                    overlayBuilderMap: {
+                      'checkButton': (ctx, game) {
+                        final toiletGame = game as ToiletSortGame;
+                        return Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Padding(
+                            padding: const EdgeInsets.only(bottom: 30.0),
+                            child: ElevatedButton(
+                              onPressed:
+                                  toiletGame.isLoading
+                                      ? null
+                                      : toiletGame.checkOrder,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    widget.gender == 'laki-laki'
+                                        ? const Color(0xFFC2E0FF)
+                                        : const Color(0xFFFFDDD2),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 40,
+                                  vertical: 15,
+                                ),
+                                textStyle: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                foregroundColor:
+                                    widget.gender == 'laki-laki'
+                                        ? const Color(0xFF52AACA)
+                                        : const Color(0xFFFC9D99),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30.0),
+                                ),
+                              ),
+                              child: const Text("Periksa Urutan"),
                             ),
                           ),
-                          child: const Text("Periksa Urutan"),
-                        ),
-                      ),
-                    );
-                  },
-                },
+                        );
+                      },
+                    },
+                  ),
+                ),
+              ],
+            ),
+            Align(
+              alignment: Alignment.topCenter,
+              child: ConfettiWidget(
+                confettiController: _confettiController,
+                blastDirectionality: BlastDirectionality.explosive,
+                shouldLoop: false,
+                colors: const [
+                  Colors.green,
+                  Colors.blue,
+                  Colors.pink,
+                  Colors.orange,
+                  Colors.purple,
+                ],
+                gravity: 0.3,
+                emissionFrequency: 0.05,
+                numberOfParticles: 15,
               ),
             ),
           ],
