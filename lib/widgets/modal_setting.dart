@@ -87,7 +87,6 @@ class _SettingsModalContentState extends State<SettingsModalContent> {
         });
       }
     } catch (e) {
-      print("Error loading player in modal: $e. Creating new player.");
       Player newPlayer = Player(null);
       newPlayer.isFocused = false;
       await savePlayer(newPlayer);
@@ -113,9 +112,7 @@ class _SettingsModalContentState extends State<SettingsModalContent> {
 
       try {
         await updatePlayer(_player!);
-        print("Focus mode updated to: ${_player!.isFocused} (persisted)");
       } catch (e) {
-        print("Error updating player focus mode: $e");
         if (mounted) {
           setState(() {
             _player!.isFocused = originalFocusValue;
@@ -129,9 +126,6 @@ class _SettingsModalContentState extends State<SettingsModalContent> {
         }
       }
     } else {
-      print(
-        "Player data not available to toggle focus mode. Attempting to load.",
-      );
       await _loadPlayerData();
     }
   }

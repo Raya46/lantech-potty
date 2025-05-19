@@ -10,8 +10,10 @@ import 'package:toilet_training/models/player.dart';
 import 'package:toilet_training/screens/levels/level3/level3_start_screen.dart';
 import 'package:toilet_training/services/player_service.dart';
 import 'package:toilet_training/widgets/background.dart';
+import 'package:toilet_training/widgets/bathroom_guess_card.dart';
 import 'package:toilet_training/widgets/header.dart';
 import 'package:toilet_training/screens/levels/level2/level2_start_screen.dart';
+import 'package:toilet_training/widgets/modal_result.dart';
 
 class LevelTwoPlayScreen extends StatefulWidget {
   const LevelTwoPlayScreen({super.key});
@@ -119,10 +121,8 @@ class _LevelTwoPlayScreenState extends State<LevelTwoPlayScreen> {
   }
 
   Future<void> _saveScore(int stars) async {
-    try {
-      _player!.level2Score = stars;
-      await updatePlayer(_player!);
-    } catch (e) {}
+    _player!.level2Score = stars;
+    await updatePlayer(_player!);
   }
 
   void _checkAnswer(BathroomItem selectedItem) {
@@ -130,9 +130,15 @@ class _LevelTwoPlayScreenState extends State<LevelTwoPlayScreen> {
 
     bool isCorrect = selectedItem.id == _correctItem!.id;
     int starsEarned = 0;
+    String dialogTitle;
+    String currentFeedbackMessage;
 
     if (isCorrect) {
-      _feedbackMessage = "Hebat!";
+      _feedbackMessage =
+          "Hebat! Benda yang benar adalah ${_correctItem!.name}.";
+      currentFeedbackMessage =
+          "Hebat! Benda yang benar adalah ${_correctItem!.name}.";
+      dialogTitle = "Luar Biasa! 🎉";
       _confettiController.play();
       starsEarned = _calculateStars(_wrongAttemptsInQuestion);
       _saveScore(starsEarned);
@@ -140,6 +146,9 @@ class _LevelTwoPlayScreenState extends State<LevelTwoPlayScreen> {
       _wrongAttemptsInQuestion++;
       _feedbackMessage =
           "Oops, itu bukan ${_correctItem!.name}. Coba perhatikan lagi!";
+      currentFeedbackMessage =
+          "Oops, itu bukan ${_correctItem!.name}. Coba perhatikan lagi!";
+      dialogTitle = "Coba Lagi Yuk!";
     }
 
     if (mounted) {
@@ -148,91 +157,33 @@ class _LevelTwoPlayScreenState extends State<LevelTwoPlayScreen> {
       });
     }
 
-    Widget starDisplay = Row(
-      mainAxisSize: MainAxisSize.min,
-      children: List.generate(3, (index) {
-        return Icon(
-          index < starsEarned ? Icons.star : Icons.star_border,
-          color: Colors.amber,
-          size: 30,
-        );
-      }),
-    );
-
-    Get.defaultDialog(
-      title: isCorrect ? "Luar Biasa! 🎉" : "Coba Lagi Yuk!",
-      titleStyle: TextStyle(
-        fontSize: 22,
-        fontWeight: FontWeight.bold,
-        color: isCorrect ? Colors.green : Colors.orange,
-      ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (isCorrect)
-            Image.asset(
-              _player!.gender == 'perempuan'
-                  ? 'assets/images/female-happy.png'
-                  : 'assets/images/male-happy.png',
-              height: 100,
-            ),
-          const SizedBox(height: 15),
-          Row(
-            children: [
-              Text(
-                _feedbackMessage,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 18, color: Colors.black87),
-              ),
-              if (isCorrect) ...[
-                Text(
-                  _correctItem!.name,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black54,
-                  ),
-                ),
-                starDisplay,
-              ],
-            ],
-          ),
-        ],
-      ),
-      actions: [
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: isCorrect ? Colors.green : Colors.orange,
-            foregroundColor: Colors.white,
-          ),
-          onPressed: () {
-            Get.back();
-            if (isCorrect) {
-              _setupNewQuestion();
-            } else {
-              if (mounted) {
-                setState(() {
-                  _answered = false;
-                  _feedbackMessage = "";
-                });
+    ModalResult.show(
+      context: context,
+      title: dialogTitle,
+      message: currentFeedbackMessage,
+      starsEarned: starsEarned,
+      isSuccess: isCorrect,
+      playerGender: _player?.gender,
+      primaryActionText: isCorrect ? "Main Lagi" : "Ulangi",
+      onPrimaryAction: () {
+        if (isCorrect) {
+          _setupNewQuestion();
+        } else {
+          if (mounted) {
+            setState(() {
+              _answered = false;
+              _feedbackMessage = "";
+            });
+          }
+        }
+      },
+      secondaryActionText: isCorrect ? "Lanjut Level 3" : null,
+      onSecondaryAction:
+          isCorrect
+              ? () {
+                Get.off(() => const LevelThreeStartScreen());
               }
-            }
-          },
-          child: Text(isCorrect ? "Main Lagi" : "Ulangi"),
-        ),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: isCorrect ? Colors.green : Colors.orange,
-            foregroundColor: Colors.white,
-          ),
-          onPressed: () {
-            Get.off(() => const LevelThreeStartScreen());
-          },
-          child: Text("Lanjut Level 3"),
-        ),
-      ],
-      barrierDismissible: false,
+              : null,
     );
   }
 
@@ -299,59 +250,11 @@ class _LevelTwoPlayScreenState extends State<LevelTwoPlayScreen> {
                                     itemCount: _currentChoices.length,
                                     itemBuilder: (context, index) {
                                       final item = _currentChoices[index];
-                                      return GestureDetector(
+                                      return BathroomGuessCard(
                                         onTap: () => _checkAnswer(item),
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius: BorderRadius.circular(
-                                              15,
-                                            ),
-                                            border: Border.all(
-                                              color:
-                                                  _answered &&
-                                                          item.id ==
-                                                              _correctItem?.id
-                                                      ? Colors.green
-                                                      : _answered &&
-                                                          item.id !=
-                                                              _correctItem?.id
-                                                      ? Colors.red
-                                                      : Colors.grey[300]!,
-                                              width: _answered ? 3 : 1.5,
-                                            ),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.grey.withOpacity(
-                                                  0.3,
-                                                ),
-                                                spreadRadius: 2,
-                                                blurRadius: 5,
-                                                offset: const Offset(0, 3),
-                                              ),
-                                            ],
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(20.0),
-                                            child: Image.asset(
-                                              item.image,
-                                              fit: BoxFit.contain,
-                                              errorBuilder: (
-                                                context,
-                                                error,
-                                                stackTrace,
-                                              ) {
-                                                return const Center(
-                                                  child: Icon(
-                                                    Icons.broken_image,
-                                                    size: 40,
-                                                    color: Colors.grey,
-                                                  ),
-                                                );
-                                              },
-                                            ),
-                                          ),
-                                        ),
+                                        answered: _answered,
+                                        item: item,
+                                        correctItem: _correctItem!,
                                       );
                                     },
                                   ),

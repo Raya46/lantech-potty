@@ -2,13 +2,13 @@ import 'dart:math';
 
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
-import 'package:flutter/material.dart'; // Untuk Size, Offset, Rect jika masih diperlukan sementara
+import 'package:flutter/material.dart'; 
 import 'package:toilet_training/games/hidden_object_game/hidden_object_game.dart';
 import 'package:toilet_training/models/scene_object.dart';
 
 class SceneObjectComponent extends SpriteComponent with TapCallbacks {
   final SceneObjectData data;
-  final HiddenObjectGame gameRef; // Referensi ke game utama
+  final HiddenObjectGame gameRef; 
   bool _isHighlighted = false;
 
   SceneObjectComponent(this.data, {required this.gameRef})
@@ -20,9 +20,7 @@ class SceneObjectComponent extends SpriteComponent with TapCallbacks {
       sprite = await Sprite.load(
         data.imagePath.replaceFirst('assets/images/', ''),
       );
-      // Ukuran bisa diatur di sini berdasarkan kebutuhan atau gambar
-      // Contoh: buat semua objek memiliki lebar/tinggi dasar dan skala dari sana
-      double baseDimension = 80 + Random().nextDouble() * 50; // 80-130
+      double baseDimension = 80 + Random().nextDouble() * 50; 
       if (sprite != null) {
         if (sprite!.originalSize.x >= sprite!.originalSize.y) {
           width = baseDimension;
@@ -34,10 +32,10 @@ class SceneObjectComponent extends SpriteComponent with TapCallbacks {
               sprite!.originalSize.x * (baseDimension / sprite!.originalSize.y);
         }
       } else {
-        size = Vector2.all(baseDimension); // Fallback jika sprite gagal dimuat
+        size = Vector2.all(baseDimension); 
       }
     } catch (e) {
-      size = Vector2.all(100); // Fallback size
+      size = Vector2.all(100); 
     }
   }
 
@@ -47,12 +45,10 @@ class SceneObjectComponent extends SpriteComponent with TapCallbacks {
 
     if (data.isTarget) {
       data.isFound = true;
-      _isHighlighted = true; // Untuk efek visual sementara
+      _isHighlighted = true; 
       gameRef.onTargetFound(data);
-      // Mungkin tambahkan efek visual atau suara
     } else {
       gameRef.onWrongObjectTapped(data);
-      // Mungkin berikan feedback negatif
     }
     event.handled = true;
   }
@@ -61,7 +57,6 @@ class SceneObjectComponent extends SpriteComponent with TapCallbacks {
   void render(Canvas canvas) {
     super.render(canvas);
     if (_isHighlighted && data.isFound) {
-      // Gambar lingkaran hijau sebagai highlight
       final paint =
           Paint()
             ..color = Colors.green.withOpacity(0.5)

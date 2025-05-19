@@ -31,10 +31,8 @@ class _ChooseGenderScreenState extends State<ChooseGenderScreen> {
         _player = player;
       });
     } catch (e) {
-      // Jika belum ada player, buat player baru dengan nilai default
-      print("Error loading player: $e. Creating a new player.");
-      Player newPlayer = Player(null); // Level awal null atau sesuai kebutuhan
-      newPlayer.isFocused = false; // Default focus mode
+      Player newPlayer = Player(null); 
+      newPlayer.isFocused = false; 
       await savePlayer(newPlayer);
       setState(() {
         _player = newPlayer;
@@ -52,7 +50,6 @@ class _ChooseGenderScreenState extends State<ChooseGenderScreen> {
         duration: Duration(milliseconds: 1500),
       );
     } else {
-      print("Player data is not available to update gender.");
     }
   }
 
