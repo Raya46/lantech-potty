@@ -31,8 +31,8 @@ class _ChooseGenderScreenState extends State<ChooseGenderScreen> {
         _player = player;
       });
     } catch (e) {
-      Player newPlayer = Player(null); 
-      newPlayer.isFocused = false; 
+      Player newPlayer = Player(null);
+      newPlayer.isFocused = false;
       await savePlayer(newPlayer);
       setState(() {
         _player = newPlayer;
@@ -49,8 +49,7 @@ class _ChooseGenderScreenState extends State<ChooseGenderScreen> {
         transition: Transition.leftToRight,
         duration: Duration(milliseconds: 1500),
       );
-    } else {
-    }
+    } else {}
   }
 
   @override
@@ -74,7 +73,7 @@ class _ChooseGenderScreenState extends State<ChooseGenderScreen> {
                 children: [
                   GenderCard(
                     text: "Perempuan",
-                    gender: Gender.female,
+                    gender: 'perempuan',
                     onTap: () {
                       _updateAndNavigate("perempuan");
                     },
@@ -82,7 +81,7 @@ class _ChooseGenderScreenState extends State<ChooseGenderScreen> {
                   SizedBox(width: 40),
                   GenderCard(
                     text: "Laki-laki",
-                    gender: Gender.male,
+                    gender: 'laki-laki',
                     onTap: () {
                       _updateAndNavigate("laki-laki");
                     },

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 
-enum Gender { male, female }
 
 class GenderCard extends StatelessWidget {
-  final Gender gender;
+  final String gender;
   final String text;
   final VoidCallback? onTap;
 
@@ -17,12 +16,12 @@ class GenderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Color cardColor =
-        gender == Gender.female
+        gender == 'perempuan'
             ? const Color(0xFFEA9077)
             : const Color(0xFF78C0E0);
 
     final String imageAssetPath =
-        gender == Gender.female
+        gender == 'perempuan'
             ? 'assets/images/female-goto-toilet.png'
             : 'assets/images/male-goto-toilet.png';
 

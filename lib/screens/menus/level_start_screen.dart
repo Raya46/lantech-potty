@@ -25,11 +25,30 @@ class LevelStartScreen extends StatefulWidget {
   State<LevelStartScreen> createState() => _LevelStartScreenState();
 }
 
-class _LevelStartScreenState extends State<LevelStartScreen> {
+class _LevelStartScreenState extends State<LevelStartScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<Offset> _offsetAnimation;
+
   @override
   void initState() {
     super.initState();
     _loadPlayerData();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 1),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    _offsetAnimation = Tween<Offset>(
+      begin: Offset.zero,
+      end: const Offset(0.0, -0.05),
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   Future<void> _loadPlayerData() async {
@@ -91,11 +110,14 @@ class _LevelStartScreenState extends State<LevelStartScreen> {
                   child: Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: Center(
-                      child: Image.asset(
-                        widget.player!.gender == 'perempuan'
-                            ? 'assets/images/female-happy.png'
-                            : 'assets/images/male-happy.png',
-                        fit: BoxFit.contain,
+                      child: SlideTransition(
+                        position: _offsetAnimation,
+                        child: Image.asset(
+                          widget.player!.gender == 'perempuan'
+                              ? 'assets/images/female-happy.png'
+                              : 'assets/images/male-happy.png',
+                          fit: BoxFit.contain,
+                        ),
                       ),
                     ),
                   ),
