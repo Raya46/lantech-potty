@@ -1,12 +1,14 @@
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart'; // Import Get
-import 'package:toilet_training/games/hidden_object_game.dart';
-import 'package:toilet_training/models/player.dart'; // Import Player
-import 'package:toilet_training/services/player_service.dart'; // Import PlayerService
+import 'package:get/get.dart';
+import 'package:toilet_training/games/hidden_object_game/hidden_object_game.dart';
+import 'package:toilet_training/models/player.dart';
+import 'package:toilet_training/models/scene_object.dart';
+import 'package:toilet_training/services/player_service.dart';
 import 'package:toilet_training/widgets/background.dart';
 import 'package:toilet_training/widgets/header.dart';
-import 'package:toilet_training/screens/levels/level4_screen.dart'; // Untuk navigasi Lanjut
+import 'package:toilet_training/screens/levels/level4/level4_start_screen.dart';
+import 'package:toilet_training/screens/levels/level3/level3_start_screen.dart';
 
 class SceneObject {
   final dynamic id;
@@ -42,19 +44,19 @@ class SceneObject {
   }
 }
 
-class LevelThreeScreen extends StatefulWidget {
-  const LevelThreeScreen({super.key});
+class LevelThreePlayScreen extends StatefulWidget {
+  const LevelThreePlayScreen({super.key});
 
   @override
-  State<LevelThreeScreen> createState() => _LevelThreeScreenState();
+  State<LevelThreePlayScreen> createState() => _LevelThreePlayScreenState();
 }
 
-class _LevelThreeScreenState extends State<LevelThreeScreen> {
+class _LevelThreePlayScreenState extends State<LevelThreePlayScreen> {
   late HiddenObjectGame _game;
   List<SceneObjectData> _currentTargets = [];
   Set<String> _currentFoundIds = {};
   bool _isLoadingGame = true;
-  Player? _player; // Tambahkan variabel player
+  Player? _player;
   bool _isLoadingPlayer = true;
 
   @override
@@ -70,17 +72,15 @@ class _LevelThreeScreenState extends State<LevelThreeScreen> {
     });
     try {
       _player = await getPlayer();
-      _player?.level3Score ??= 0; // Inisialisasi skor jika null
+      _player?.level3Score ??= 0;
     } catch (e) {
-      print("Error loading player in LevelThreeScreen: $e");
       _player = Player(null)..level3Score = 0;
-      // await savePlayer(_player!); // Simpan jika player baru dibuat karena error
+      await savePlayer(_player!);
     }
-    _initializeGame(); // Panggil setelah _player dimuat
+    _initializeGame();
     if (mounted) {
       setState(() {
         _isLoadingPlayer = false;
-        // _isLoadingGame akan diatur oleh callback dari game
       });
     }
   }
@@ -97,7 +97,6 @@ class _LevelThreeScreenState extends State<LevelThreeScreen> {
         }
       },
       onAllTargetsFound: (int wrongTaps) {
-        // Terima wrongTaps
         if (mounted) {
           int stars = _calculateStars(wrongTaps);
           _saveScore(stars);
@@ -116,12 +115,11 @@ class _LevelThreeScreenState extends State<LevelThreeScreen> {
         }
       },
     );
-    // Tidak perlu setState di sini, _isLoadingGame dihandle oleh onTargetsUpdated
   }
 
   int _calculateStars(int wrongAttempts) {
     if (wrongAttempts == 0) return 3;
-    if (wrongAttempts <= 3) return 2; // Misal 1-3 kesalahan untuk bintang 2
+    if (wrongAttempts <= 3) return 2;
     return 1;
   }
 
@@ -130,10 +128,7 @@ class _LevelThreeScreenState extends State<LevelThreeScreen> {
     try {
       _player!.level3Score = stars;
       await updatePlayer(_player!);
-      print("Level 3 score saved: $stars stars");
-    } catch (e) {
-      print("Error saving score for Level 3: $e");
-    }
+    } catch (e) {}
   }
 
   void _resetLevel() {
@@ -141,10 +136,6 @@ class _LevelThreeScreenState extends State<LevelThreeScreen> {
       _isLoadingGame = true;
       _currentTargets.clear();
       _currentFoundIds.clear();
-    });
-    // _initializeGame(); // Seharusnya memanggil reset di game, bukan re-initialize UI state saja
-    _game.resetGame().then((_) {
-      // onTargetsUpdated akan dipanggil oleh game setelah reset
     });
   }
 
@@ -263,7 +254,9 @@ class _LevelThreeScreenState extends State<LevelThreeScreen> {
               ),
               onPressed: () {
                 Navigator.of(dialogContext).pop();
-                Get.off(() => const LevelFourScreen()); // Navigasi ke Level 4
+                Get.off(
+                  () => const LevelFourStartScreen(),
+                ); // Navigasi ke Level 4
               },
             ),
           ],
@@ -298,12 +291,15 @@ class _LevelThreeScreenState extends State<LevelThreeScreen> {
 
     return Scaffold(
       body: Background(
-        gender: _player!.gender!, // Player dijamin tidak null di sini
+        gender: _player!.gender!,
         child: Column(
           children: [
             Header(
+              onTapBack: () {
+                Get.off(() => const LevelThreeStartScreen());
+              },
               title: "Level 3: Cari Benda",
-            ), // Judul header lebih deskriptif
+            ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Text(

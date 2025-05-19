@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:toilet_training/widgets/modal_setting.dart';
 import 'package:get/get.dart';
+import 'package:toilet_training/widgets/modal_setting.dart';
 
 class Header extends StatelessWidget {
   final VoidCallback? onTapSettings;
+  final VoidCallback? onTapBack;
   final String title;
   final bool showInfoButton;
   final VoidCallback? onTapInfoButton;
@@ -11,6 +12,7 @@ class Header extends StatelessWidget {
 
   const Header({
     Key? key,
+    required this.onTapBack,
     this.onTapSettings,
     this.title = "Pilih Level!",
     this.showInfoButton = false,
@@ -40,10 +42,6 @@ class Header extends StatelessWidget {
         );
       },
     );
-  }
-
-  void onTapBack() {
-    Get.back();
   }
 
   @override

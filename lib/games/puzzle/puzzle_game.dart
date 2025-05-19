@@ -10,7 +10,7 @@ import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:toilet_training/models/puzzle_item.dart';
-import 'package:toilet_training/games/puzzle/piece_shape.dart';
+import 'package:toilet_training/models/piece_shape.dart';
 
 class PuzzleGame extends FlameGame with PanDetector, HasGameReference {
   late List<PuzzleItem> _puzzleItems;
@@ -101,7 +101,6 @@ class PuzzleGame extends FlameGame with PanDetector, HasGameReference {
     if (_puzzleItems.isNotEmpty) {
       final random = math.Random();
       _selectedItem = _puzzleItems[random.nextInt(_puzzleItems.length)];
-      print("Selected item: ${_selectedItem?.name}");
     }
   }
 
@@ -194,7 +193,6 @@ class PuzzleGame extends FlameGame with PanDetector, HasGameReference {
 
   void checkWinCondition() {
     if (_pieces.every((piece) => piece.isCorrectlyPlaced)) {
-      print("Puzzle Solved!");
       Future.delayed(const Duration(seconds: 1), () {
         onPuzzleSolved?.call();
         resetGame();
@@ -491,9 +489,6 @@ class PuzzlePieceComponent extends PositionComponent with DragCallbacks {
       position.x = targetBoardPos.x - ((shape.leftTab != 0) ? tabSize : 0);
       position.y = targetBoardPos.y - ((shape.topTab != 0) ? tabSize : 0);
       isCorrectlyPlaced = true;
-      print(
-        "Piece at grid (${correctGridPosition.x}, ${correctGridPosition.y}) placed correctly!",
-      );
       game.checkWinCondition();
     } else {
       position = initialPosition.clone();

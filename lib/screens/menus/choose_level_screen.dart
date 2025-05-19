@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:toilet_training/screens/levels/level1_screen.dart';
 import 'package:get/get.dart';
-import 'package:toilet_training/screens/levels/level2_screen.dart';
-import 'package:toilet_training/screens/levels/level3_screen.dart';
-import 'package:toilet_training/screens/levels/level4_screen.dart';
-import 'package:toilet_training/screens/levels/level5_screen.dart';
+import 'package:toilet_training/models/player.dart';
+import 'package:toilet_training/screens/levels/level1/level1_start_screen.dart';
+import 'package:toilet_training/screens/levels/level2/level2_start_screen.dart';
+import 'package:toilet_training/screens/levels/level3/level3_start_screen.dart';
+import 'package:toilet_training/screens/levels/level4/level4_start_screen.dart';
+import 'package:toilet_training/screens/levels/level5/level5_start_screen.dart';
+import 'package:toilet_training/services/player_service.dart';
 import 'package:toilet_training/widgets/background.dart';
 import "package:toilet_training/widgets/card_gender.dart";
 import "package:toilet_training/widgets/header.dart";
-import 'package:toilet_training/models/player.dart';
-import 'package:toilet_training/services/player_service.dart';
+import 'package:toilet_training/screens/menus/choose_gender_screen.dart';
 
 class ChooseLevelScreen extends StatefulWidget {
   const ChooseLevelScreen({super.key});
@@ -65,7 +66,11 @@ class _ChooseLevelScreenState extends State<ChooseLevelScreen> {
         gender: _player?.gender as String,
         child: Column(
           children: [
-            Header(title: "Pilih level"),
+            Header(
+              onTapBack: (){
+                Get.off(() => const ChooseGenderScreen());
+              },
+              title: "Pilih level"),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -78,7 +83,7 @@ class _ChooseLevelScreenState extends State<ChooseLevelScreen> {
                       gender: Gender.female,
                       onTap: () {
                         Get.to(
-                          () => LevelOneScreen(),
+                          () => LevelOneStartScreen(),
                           transition: Transition.circularReveal,
                           duration: Duration(milliseconds: 1500),
                         );
@@ -92,7 +97,7 @@ class _ChooseLevelScreenState extends State<ChooseLevelScreen> {
                       gender: Gender.female,
                       onTap: () {
                         Get.to(
-                          () => LevelTwoScreen(),
+                          () => LevelTwoStartScreen(),
                           transition: Transition.circularReveal,
                           duration: Duration(milliseconds: 1500),
                         );
@@ -106,7 +111,7 @@ class _ChooseLevelScreenState extends State<ChooseLevelScreen> {
                       gender: Gender.female,
                       onTap: () {
                         Get.to(
-                          () => LevelThreeScreen(),
+                          () => LevelThreeStartScreen(),
                           transition: Transition.circularReveal,
                           duration: Duration(milliseconds: 1500),
                         );
@@ -120,7 +125,7 @@ class _ChooseLevelScreenState extends State<ChooseLevelScreen> {
                       gender: Gender.female,
                       onTap: () {
                         Get.to(
-                          () => LevelFourScreen(),
+                          () => LevelFourStartScreen(),
                           transition: Transition.circularReveal,
                           duration: Duration(milliseconds: 1500),
                         );
@@ -134,7 +139,7 @@ class _ChooseLevelScreenState extends State<ChooseLevelScreen> {
                       gender: Gender.female,
                       onTap: () {
                         Get.to(
-                          () => LevelFiveScreen(),
+                          () => LevelFiveStartScreen(),
                           transition: Transition.circularReveal,
                           duration: Duration(milliseconds: 1500),
                         );

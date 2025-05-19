@@ -6,6 +6,7 @@ import 'package:toilet_training/widgets/background.dart';
 import "package:toilet_training/widgets/header.dart";
 import 'package:toilet_training/services/player_service.dart';
 import 'package:toilet_training/models/player.dart';
+import 'package:toilet_training/screens/menus/start_screen.dart';
 
 class ChooseGenderScreen extends StatefulWidget {
   const ChooseGenderScreen({super.key});
@@ -51,9 +52,7 @@ class _ChooseGenderScreenState extends State<ChooseGenderScreen> {
         duration: Duration(milliseconds: 1500),
       );
     } else {
-      // Handle jika _player masih null, meskipun _loadPlayerData seharusnya sudah mengatasi ini
       print("Player data is not available to update gender.");
-      // Mungkin tampilkan error atau coba load lagi
     }
   }
 
@@ -61,11 +60,15 @@ class _ChooseGenderScreenState extends State<ChooseGenderScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Background(
-        // Tentukan gender default untuk background jika _player belum termuat
         gender: _player?.gender ?? 'male',
         child: Column(
           children: [
-            Header(title: "Pilih Gender"),
+            Header(
+              onTapBack: () {
+                Get.off(() => const StartScreen());
+              },
+              title: "Pilih Gender",
+            ),
             if (_player == null)
               Center(child: CircularProgressIndicator())
             else
