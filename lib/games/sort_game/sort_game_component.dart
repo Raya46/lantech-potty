@@ -1,4 +1,5 @@
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
 import 'package:toilet_training/games/sort_game/sort_game.dart';
@@ -31,24 +32,56 @@ class PlaceholderSlot extends PositionComponent {
 class ImageSprite extends SpriteComponent with DragCallbacks {
   final String imagePath;
   final int imageIdentifier;
-  Vector2 initialPosition;
   final ToiletSortGame gameRef;
+  final double animationDelay;
+  Vector2? previousPosition;
 
   ImageSprite({
     required Sprite? sprite,
     required this.imagePath,
     required this.imageIdentifier,
-    required this.initialPosition,
+    required Vector2 centerPosition,
     required Vector2 size,
     required this.gameRef,
-  }) : super(sprite: sprite, position: initialPosition, size: size) {
-    anchor = Anchor.topLeft;
+    this.animationDelay = 0.0,
+  }) : super(sprite: sprite, position: centerPosition, size: size);
+
+  @override
+  Future<void> onLoad() async {
+    await super.onLoad();
+    anchor = Anchor.center;
+    scale = Vector2.zero();
+
+    final appearSequence = SequenceEffect([
+      ScaleEffect.to(
+        Vector2.all(1.1),
+        EffectController(duration: 0.6, curve: Curves.elasticOut),
+      ),
+      ScaleEffect.to(
+        Vector2.all(1.0),
+        EffectController(duration: 0.4, curve: Curves.easeOut),
+      ),
+    ]);
+
+    if (animationDelay > 0) {
+      Future.delayed(
+        Duration(milliseconds: (animationDelay * 1000).round()),
+        () {
+          if (isMounted) {
+            add(appearSequence);
+          }
+        },
+      );
+    } else {
+      add(appearSequence);
+    }
   }
 
   @override
   void onDragStart(DragStartEvent event) {
     super.onDragStart(event);
     priority = 10;
+    previousPosition = position.clone();
   }
 
   @override

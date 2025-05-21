@@ -20,4 +20,3 @@ class BuildFeedbackCard extends StatelessWidget {
     );
   }
 }
-

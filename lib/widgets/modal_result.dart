@@ -71,19 +71,7 @@ class ModalResult {
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 16, color: Color(0xFF8B5A2B)),
             ),
-            if (starsEarned > 0 || isSuccess) ...[
-              const SizedBox(height: 15),
-              starDisplay,
-              const SizedBox(height: 5),
-              Text(
-                "Kamu mendapatkan $starsEarned bintang!",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF8B5A2B),
-                ),
-              ),
-            ],
+            if (starsEarned > 0 || isSuccess) ...[starDisplay],
             if (child != null) ...[const SizedBox(height: 15), child],
           ],
         ),
@@ -99,7 +87,7 @@ class ModalResult {
             ),
             onPressed: () {
               Get.back();
-              onPrimaryAction(); 
+              onPrimaryAction();
             },
             child: Text(
               primaryActionText,
@@ -110,17 +98,15 @@ class ModalResult {
             SizedBox(width: 10),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(
-                  0xFF5C9A4A,
-                ), 
+                backgroundColor: Color(0xFF5C9A4A),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15),
                 ),
                 padding: EdgeInsets.symmetric(horizontal: 25, vertical: 12),
               ),
               onPressed: () {
-                Get.back(); 
-                onSecondaryAction(); 
+                Get.back();
+                onSecondaryAction();
               },
               child: Text(
                 secondaryActionText,

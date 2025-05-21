@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +24,8 @@ class PuzzleGame extends FlameGame with PanDetector, HasGameReference {
   double pieceCoreSize = 0;
   late double tabSize;
   Vector2 gameSize = Vector2.zero();
+  double _cumulativeAnimationDelayMs = 0.0;
+  final double _pieceDelayIncrementMs = 150.0;
 
   final VoidCallback? onPuzzleSolved;
 
@@ -40,6 +43,7 @@ class PuzzleGame extends FlameGame with PanDetector, HasGameReference {
     final double referenceDimension = math.min(gameSize.x, gameSize.y);
     pieceCoreSize = (referenceDimension * 0.5) / gridSize;
     tabSize = pieceCoreSize * 0.25;
+    _cumulativeAnimationDelayMs = 0.0;
 
     _generatePieceShapes();
 
@@ -113,6 +117,7 @@ class PuzzleGame extends FlameGame with PanDetector, HasGameReference {
     final singlePieceImageHeight = imageHeight / gridSize;
 
     _pieces.clear();
+    _cumulativeAnimationDelayMs = 0.0;
 
     final double boardMarginX = gameSize.x * 0.1;
     final double boardMarginY = gameSize.y * 0.1;
@@ -136,7 +141,11 @@ class PuzzleGame extends FlameGame with PanDetector, HasGameReference {
           tabSize: tabSize,
           correctGridPosition: Vector2(c.toDouble(), r.toDouble()),
           boardTopLeft: Vector2(boardMarginX, boardMarginY),
+          animationDelay: Duration(
+            milliseconds: _cumulativeAnimationDelayMs.toInt(),
+          ),
         );
+        _cumulativeAnimationDelayMs += _pieceDelayIncrementMs;
 
         _pieces.add(piece);
       }
@@ -210,6 +219,7 @@ class PuzzleGame extends FlameGame with PanDetector, HasGameReference {
     _pieces.clear();
     _board = null;
     _fullUiImage = null;
+    _cumulativeAnimationDelayMs = 0.0;
 
     _selectRandomItem();
     if (_selectedItem != null) {
@@ -267,6 +277,7 @@ class PuzzlePieceComponent extends PositionComponent with DragCallbacks {
   final double tabSize;
   final Vector2 correctGridPosition;
   final Vector2 boardTopLeft;
+  final Duration animationDelay;
 
   late Vector2 initialPosition;
   bool isDragging = false;
@@ -289,10 +300,39 @@ class PuzzlePieceComponent extends PositionComponent with DragCallbacks {
     required this.tabSize,
     required this.correctGridPosition,
     required this.boardTopLeft,
+    this.animationDelay = Duration.zero,
   }) {
     _buildPathAndBoundingBox();
     size = Vector2(_boundingRect.width, _boundingRect.height);
     anchor = Anchor.topLeft;
+  }
+
+  @override
+  Future<void> onLoad() async {
+    super.onLoad();
+
+    this.scale = Vector2.zero();
+
+    final appearSequence = SequenceEffect([
+      ScaleEffect.to(
+        Vector2.all(1.1),
+        EffectController(duration: 0.6, curve: Curves.elasticOut),
+      ),
+      ScaleEffect.to(
+        Vector2.all(1.0),
+        EffectController(duration: 0.4, curve: Curves.easeOut),
+      ),
+    ]);
+
+    if (animationDelay > Duration.zero) {
+      Future.delayed(animationDelay, () {
+        if (isMounted) {
+          add(appearSequence);
+        }
+      });
+    } else {
+      add(appearSequence);
+    }
   }
 
   void _buildPathAndBoundingBox() {
