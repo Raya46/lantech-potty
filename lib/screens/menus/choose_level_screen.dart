@@ -23,45 +23,17 @@ class _ChooseLevelScreenState extends State<ChooseLevelScreen> {
   Player? _player;
   bool _isLoadingPlayer = true;
   final ScrollController _scrollController = ScrollController();
-  bool _showLeftArrow = false;
-  bool _showRightArrow = true;
 
   @override
   void initState() {
     super.initState();
     _loadPlayerData();
-    _scrollController.addListener(_scrollListener);
-
-    // A small delay to allow the layout to settle before checking scroll extent.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        _scrollListener();
-      }
-    });
   }
 
   @override
   void dispose() {
-    _scrollController.removeListener(_scrollListener);
     _scrollController.dispose();
     super.dispose();
-  }
-
-  void _scrollListener() {
-    if (!mounted || !_scrollController.hasClients) return;
-
-    final position = _scrollController.position;
-    setState(() {
-      _showLeftArrow = position.pixels > position.minScrollExtent;
-      _showRightArrow = position.pixels < position.maxScrollExtent;
-    });
-    // If there's no scrollable content, hide both arrows
-    if (position.maxScrollExtent == position.minScrollExtent) {
-      setState(() {
-        _showLeftArrow = false;
-        _showRightArrow = false;
-      });
-    }
   }
 
   Future<void> _loadPlayerData() async {
@@ -89,13 +61,21 @@ class _ChooseLevelScreenState extends State<ChooseLevelScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoadingPlayer) {
+    if (_isLoadingPlayer || _player == null) {
       return Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
+    final List<Map<String, dynamic>> levels = [
+      {'text': "Level 1", 'screen': () => LevelOneStartScreen()},
+      {'text': "Level 2", 'screen': () => LevelTwoStartScreen()},
+      {'text': "Level 3", 'screen': () => LevelThreeStartScreen()},
+      {'text': "Level 4", 'screen': () => LevelFourStartScreen()},
+      {'text': "Level 5", 'screen': () => LevelFiveStartScreen()},
+    ];
+
     return Scaffold(
       body: Background(
-        gender: _player?.gender as String,
+        gender: _player!.gender!,
         child: Column(
           children: [
             Header(
@@ -105,122 +85,60 @@ class _ChooseLevelScreenState extends State<ChooseLevelScreen> {
               title: "Pilih level",
             ),
             Expanded(
-              // Added Expanded to ensure Stack takes available space
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  SingleChildScrollView(
-                    controller: _scrollController,
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: GenderCard(
-                            text: "Level 1",
-                            gender: _player!.gender as String,
-                            onTap: () {
-                              Get.to(
-                                () => LevelOneStartScreen(),
-                                transition: Transition.circularReveal,
-                                duration: Duration(milliseconds: 1500),
+              child: Center(
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    SingleChildScrollView(
+                      controller: _scrollController,
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        spacing: 16.0,
+                        children:
+                            levels.map((levelData) {
+                              return GenderCard(
+                                text: levelData['text'],
+                                gender: _player!.gender!,
+                                onTap: () {
+                                  Get.to(
+                                    levelData['screen'],
+                                    transition: Transition.circularReveal,
+                                    duration: Duration(milliseconds: 1500),
+                                  );
+                                },
                               );
-                            },
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: GenderCard(
-                            text: "Level 2",
-                            gender: _player!.gender as String,
-                            onTap: () {
-                              Get.to(
-                                () => LevelTwoStartScreen(),
-                                transition: Transition.circularReveal,
-                                duration: Duration(milliseconds: 1500),
-                              );
-                            },
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: GenderCard(
-                            text: "Level 3",
-                            gender: _player!.gender as String,
-                            onTap: () {
-                              Get.to(
-                                () => LevelThreeStartScreen(),
-                                transition: Transition.circularReveal,
-                                duration: Duration(milliseconds: 1500),
-                              );
-                            },
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: GenderCard(
-                            text: "Level 4",
-                            gender: _player!.gender as String,
-                            onTap: () {
-                              Get.to(
-                                () => LevelFourStartScreen(),
-                                transition: Transition.circularReveal,
-                                duration: Duration(milliseconds: 1500),
-                              );
-                            },
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: GenderCard(
-                            text: "Level 5",
-                            gender: _player!.gender as String,
-                            onTap: () {
-                              Get.to(
-                                () => LevelFiveStartScreen(),
-                                transition: Transition.circularReveal,
-                                duration: Duration(milliseconds: 1500),
-                              );
-                            },
-                          ),
-                        ),
-                      ],
+                            }).toList(),
+                      ),
                     ),
-                  ),
-                  if (_showLeftArrow)
                     Positioned(
                       left: 0,
-                      child: Container(
-                        padding: EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.3),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.arrow_back_ios_new,
-                          color: Colors.white,
-                          size: 20,
-                        ),
+                      child: IconButton(
+                        icon: Icon(Icons.arrow_back_ios),
+                        onPressed: () {
+                          _scrollController.animateTo(
+                            _scrollController.offset - 200,
+                            duration: Duration(milliseconds: 300),
+                            curve: Curves.easeOut,
+                          );
+                        },
                       ),
                     ),
-                  if (_showRightArrow)
                     Positioned(
                       right: 0,
-                      child: Container(
-                        padding: EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.3),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.arrow_forward_ios,
-                          color: Colors.white,
-                          size: 20,
-                        ),
+                      child: IconButton(
+                        icon: Icon(Icons.arrow_forward_ios),
+                        onPressed: () {
+                          _scrollController.animateTo(
+                            _scrollController.offset + 200,
+                            duration: Duration(milliseconds: 300),
+                            curve: Curves.easeOut,
+                          );
+                        },
                       ),
                     ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],

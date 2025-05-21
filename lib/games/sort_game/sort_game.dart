@@ -9,7 +9,8 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:toilet_training/models/player.dart';
 import 'package:toilet_training/models/step.dart';
-import 'package:toilet_training/screens/levels/level2/level2_start_screen.dart';
+import 'package:toilet_training/screens/levels/level1/level1_start_screen.dart';
+import 'package:toilet_training/screens/menus/choose_level_screen.dart';
 import 'package:toilet_training/services/player_service.dart';
 import 'package:toilet_training/games/sort_game/sort_game_component.dart';
 import 'package:toilet_training/widgets/modal_result.dart';
@@ -22,9 +23,10 @@ class ToiletSortGame extends FlameGame {
   bool isLoading = true;
 
   int sequenceLength = 3;
-  final double imageSize = 160.0;
-  final double placeholderPadding = 5.0;
-  final double placeholderSize = 160.0 + 2 * 5.0;
+  static const double imageRenderSize = 150.0;
+  static const double placeholderPadding = 5.0;
+  static const double placeholderSize =
+      imageRenderSize + 2 * placeholderPadding;
   final double spacing = 15.0;
   double yPosition = 0;
 
@@ -48,7 +50,9 @@ class ToiletSortGame extends FlameGame {
   Future<void> onLoad() async {
     await super.onLoad();
     camera.backdrop = Component();
-    overlays.add('checkButton');
+    if (!overlays.isActive('checkButton')) {
+      overlays.add('checkButton');
+    }
     await _initializeGame();
   }
 
@@ -66,10 +70,10 @@ class ToiletSortGame extends FlameGame {
     });
 
     if (imagePaths.isEmpty) {
+      print("Image paths are empty, cannot initialize game.");
       setStateQuietly(() {
         isLoading = false;
       });
-
       return;
     }
 
@@ -89,6 +93,7 @@ class ToiletSortGame extends FlameGame {
     }
 
     if (allStepsForContext.length < sequenceLength) {
+      print("Not enough steps for sequence length.");
       setStateQuietly(() {
         isLoading = false;
       });
@@ -97,12 +102,8 @@ class ToiletSortGame extends FlameGame {
 
     final random = Random();
     int maxStartIndex = allStepsForContext.length - sequenceLength;
-    int startIndex = 0;
-    if (maxStartIndex > 0) {
-      startIndex = random.nextInt(maxStartIndex + 1);
-    } else {
-      startIndex = 0;
-    }
+    int startIndex =
+        (maxStartIndex > 0) ? random.nextInt(maxStartIndex + 1) : 0;
 
     List<ToiletStep> selectedSteps = allStepsForContext.sublist(
       startIndex,
@@ -113,22 +114,24 @@ class ToiletSortGame extends FlameGame {
     correctSequenceIds = selectedSteps.map((step) => step.id).toList();
 
     List<String> displayImagePaths = List.from(correctImagePathSequence);
-    bool areEqual;
-    int safetyBreak = 0;
-    do {
-      displayImagePaths.shuffle(random);
-      areEqual = _arePathListsEqual(
-        displayImagePaths,
-        correctImagePathSequence,
-      );
-      safetyBreak++;
-    } while (areEqual && displayImagePaths.length > 1 && safetyBreak < 20);
+    if (displayImagePaths.length > 1) {
+      bool areEqual;
+      int safetyBreak = 0;
+      do {
+        displayImagePaths.shuffle(random);
+        areEqual = _arePathListsEqual(
+          displayImagePaths,
+          correctImagePathSequence,
+        );
+        safetyBreak++;
+      } while (areEqual && safetyBreak < 20);
+    }
 
     double totalWidthOfPlaceholders =
         (placeholderSize * sequenceLength) + (spacing * (sequenceLength - 1));
     double startXPlaceholders = (size.x - totalWidthOfPlaceholders) / 2;
-    yPosition = (size.y - placeholderSize - 100) / 2;
-    if (yPosition < 20) yPosition = 20;
+    yPosition = (size.y - placeholderSize - 120) / 2;
+    if (yPosition < 50) yPosition = 50;
 
     for (int i = 0; i < sequenceLength; i++) {
       final placeholder = PlaceholderSlot(
@@ -142,6 +145,7 @@ class ToiletSortGame extends FlameGame {
       placeholderSlots.add(placeholder);
     }
 
+    double cumulativeDelay = 0.0;
     for (int i = 0; i < displayImagePaths.length; i++) {
       final path = displayImagePaths[i];
       final placeholderForThisImage = placeholderSlots[i];
@@ -154,22 +158,24 @@ class ToiletSortGame extends FlameGame {
       final sprite = await Sprite.load(spritePath);
       final imageId = imagePathToIdMap[path]!;
 
+      Vector2 centerPos = Vector2(
+        placeholderForThisImage.position.x + placeholderSize / 2,
+        placeholderForThisImage.position.y + placeholderSize / 2,
+      );
+
       final imageComponent = ImageSprite(
         sprite: sprite,
         imagePath: path,
         imageIdentifier: imageId,
-        initialPosition: Vector2(
-          placeholderForThisImage.position.x +
-              (placeholderSize - imageSize) / 2,
-          placeholderForThisImage.position.y +
-              (placeholderSize - imageSize) / 2,
-        ),
-        size: Vector2(imageSize, imageSize),
+        centerPosition: centerPos,
+        size: Vector2(imageRenderSize, imageRenderSize),
         gameRef: this,
+        animationDelay: cumulativeDelay,
       );
       imageComponent.priority = 1;
       add(imageComponent);
       currentImageSprites.add(imageComponent);
+      cumulativeDelay += 0.2;
     }
     setStateQuietly(() {
       isLoading = false;
@@ -228,6 +234,7 @@ class ToiletSortGame extends FlameGame {
       dialogTitle = "Benar Sekali!";
       dialogContentText = "Kamu berhasil menyusunnya dengan benar.";
       _saveScore(starsEarned);
+      confettiController.play();
     } else {
       _wrongAttempts++;
       dialogTitle = "Oops, Coba Lagi!";
@@ -240,30 +247,75 @@ class ToiletSortGame extends FlameGame {
       message: dialogContentText,
       starsEarned: starsEarned,
       isSuccess: isCorrect,
-      confettiController: isCorrect ? confettiController : null,
-      primaryActionText: "OK",
+      primaryActionText: isCorrect ? "Ulangi Level" : "Coba Lagi",
       onPrimaryAction: () {
         if (isCorrect) {
-          _initializeGame();
-        }
+          Get.off(() => const LevelOneStartScreen());
+        } else {}
       },
-      secondaryActionText: isCorrect ? "Lanjut Level" : null,
+      secondaryActionText: isCorrect ? "Pilih Level" : null,
       onSecondaryAction:
           isCorrect
               ? () {
-                Get.off(() => const LevelTwoStartScreen());
+                Get.offAll(() => const ChooseLevelScreen());
               }
               : null,
     );
   }
 
   void onImageDrop(ImageSprite droppedSprite, Vector2 dropPosition) {
+    placeholderSlots.sort((a, b) => a.position.x.compareTo(b.position.x));
+
+    PlaceholderSlot? closestSlot;
+    double minDistance = double.infinity;
+
+    for (final slot in placeholderSlots) {
+      final distance = (dropPosition - slot.center).length;
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestSlot = slot;
+      }
+    }
+
+    if (closestSlot != null) {
+      ImageSprite? spriteInTargetSlot;
+
+      for (ImageSprite otherSprite in currentImageSprites) {
+        if (otherSprite != droppedSprite) {
+          if ((otherSprite.position - closestSlot.center).length <
+              placeholderSize / 3) {
+            spriteInTargetSlot = otherSprite;
+            break;
+          }
+        }
+      }
+
+      if (spriteInTargetSlot != null) {
+        PlaceholderSlot? originalSlotOfDroppedSprite;
+        double minDistanceForOriginal = double.infinity;
+        for (final slot in placeholderSlots) {
+          if ((droppedSprite.previousPosition! - slot.center).length <
+              minDistanceForOriginal) {
+            minDistanceForOriginal =
+                (droppedSprite.previousPosition! - slot.center).length;
+            originalSlotOfDroppedSprite = slot;
+          }
+        }
+
+        if (originalSlotOfDroppedSprite != null &&
+            originalSlotOfDroppedSprite != closestSlot) {
+          spriteInTargetSlot.position = originalSlotOfDroppedSprite.center;
+        }
+      }
+      droppedSprite.position = closestSlot.center;
+    }
+
     currentImageSprites.sort((a, b) => a.position.x.compareTo(b.position.x));
     for (int i = 0; i < currentImageSprites.length; i++) {
       final targetPlaceholder = placeholderSlots[i];
       currentImageSprites[i].position = Vector2(
-        targetPlaceholder.position.x + (placeholderSize - imageSize) / 2,
-        targetPlaceholder.position.y + (placeholderSize - imageSize) / 2,
+        targetPlaceholder.position.x + placeholderSize / 2,
+        targetPlaceholder.position.y + placeholderSize / 2,
       );
     }
   }

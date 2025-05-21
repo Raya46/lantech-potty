@@ -4,6 +4,8 @@ import 'package:toilet_training/screens/menus/choose_gender_screen.dart';
 import 'package:toilet_training/services/player_service.dart';
 import 'package:toilet_training/widgets/background.dart';
 import 'package:get/get.dart';
+import 'package:toilet_training/widgets/play_button.dart';
+import 'package:toilet_training/widgets/float_animated_widget.dart';
 
 class StartScreen extends StatefulWidget {
   const StartScreen({super.key});
@@ -30,16 +32,15 @@ class _StartScreenState extends State<StartScreen> {
       _player = await getPlayer();
       if (_player == null) {
         _player = Player(null);
-        _player!.gender = 'perempuan'; 
-        _player!.isFocused = false; 
+        _player!.gender = 'perempuan';
+        _player!.isFocused = false;
         await savePlayer(_player!);
       }
-      _player!.gender ??= 'perempuan'; 
+      _player!.gender ??= 'perempuan';
     } catch (e) {
       _player = Player(null);
       _player!.gender = 'perempuan';
       _player!.isFocused = false;
-      
     }
     setState(() {
       _isLoadingPlayer = false;
@@ -61,9 +62,11 @@ class _StartScreenState extends State<StartScreen> {
               flex: 3,
               child: Container(
                 padding: const EdgeInsets.only(bottom: 0),
-                child: Image.asset(
-                  'assets/images/${_player?.gender == 'laki-laki' ? 'male-goto-toilet.png' : 'female-goto-toilet.png'}',
-                  fit: BoxFit.contain,
+                child: FloatAnimatedWidget(
+                  child: Image.asset(
+                    'assets/images/${_player?.gender == 'laki-laki' ? 'male-goto-toilet.png' : 'female-goto-toilet.png'}',
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ),
             ),
@@ -132,23 +135,14 @@ class _StartScreenState extends State<StartScreen> {
                     Padding(
                       padding: const EdgeInsets.only(right: 100.0),
                       child: Center(
-                        child: GestureDetector(
-                          onTap: () {
+                        child: PlayButton(
+                          onPressed: () {
                             Get.to(
                               () => const ChooseGenderScreen(),
                               transition: Transition.circularReveal,
-                              duration: Duration(milliseconds: 1500),
+                              duration: const Duration(milliseconds: 1500),
                             );
                           },
-                          child: CircleAvatar(
-                            radius: 35,
-                            backgroundColor: const Color(0xFF52AACA),
-                            child: const Icon(
-                              Icons.play_arrow,
-                              size: 45,
-                              color: Colors.white,
-                            ),
-                          ),
                         ),
                       ),
                     ),

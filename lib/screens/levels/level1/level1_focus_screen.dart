@@ -24,45 +24,17 @@ class _LevelOneFocusScreenState extends State<LevelOneFocusScreen> {
   bool _isLoadingPlayer = true;
   List<String> _imagePaths = [];
   final ScrollController _scrollController = ScrollController();
-  bool _showLeftArrow = false;
-  bool _showRightArrow = true;
 
   @override
   void initState() {
     super.initState();
     _loadPlayerDataAndSetupImages();
-    _scrollController.addListener(_scrollListener);
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        _scrollListener();
-      }
-    });
   }
 
   @override
   void dispose() {
-    _scrollController.removeListener(_scrollListener);
     _scrollController.dispose();
     super.dispose();
-  }
-
-  void _scrollListener() {
-    if (!mounted || !_scrollController.hasClients) return;
-
-    final position = _scrollController.position;
-    final hasScrollableContent =
-        position.maxScrollExtent > position.minScrollExtent;
-
-    setState(() {
-      if (hasScrollableContent) {
-        _showLeftArrow = position.pixels > position.minScrollExtent;
-        _showRightArrow = position.pixels < position.maxScrollExtent;
-      } else {
-        _showLeftArrow = false;
-        _showRightArrow = false;
-      }
-    });
   }
 
   Future<void> _loadPlayerDataAndSetupImages() async {
@@ -78,18 +50,11 @@ class _LevelOneFocusScreenState extends State<LevelOneFocusScreen> {
           Player(null)
             ..gender = 'perempuan'
             ..isFocused = false;
-      await savePlayer(_player!);
     }
     await _determineImagePaths();
     if (mounted) {
       setState(() {
         _isLoadingPlayer = false;
-      });
-      // Call scroll listener after images are loaded and layout is updated
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          _scrollListener();
-        }
       });
     }
   }
@@ -116,8 +81,6 @@ class _LevelOneFocusScreenState extends State<LevelOneFocusScreen> {
           }).toList();
       steps.sort((a, b) => a.id.compareTo(b.id));
       paths = steps.map((step) => step.image).toList();
-
-      if (paths.isEmpty) {}
     } catch (e) {
       paths = [];
     }
@@ -130,6 +93,7 @@ class _LevelOneFocusScreenState extends State<LevelOneFocusScreen> {
 
   Future<void> _showSettingsModal(BuildContext context) async {
     final currentContext = context;
+
     await showDialog(
       context: currentContext,
       barrierDismissible: true,
@@ -159,20 +123,20 @@ class _LevelOneFocusScreenState extends State<LevelOneFocusScreen> {
       );
     }
 
-    return Scaffold(
-      body: Background(
-        gender: _player!.gender!,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Header(
-              onTapBack: () {
-                Get.off(() => const ChooseLevelScreen());
-              },
-              title: "Latih Fokusmu !",
-              onTapSettings: () => _showSettingsModal(context),
-            ),
-            if (_imagePaths.isEmpty && !_isLoadingPlayer)
+    if (_imagePaths.isEmpty) {
+      return Scaffold(
+        body: Background(
+          gender: _player!.gender!,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Header(
+                onTapBack: () {
+                  Get.off(() => const ChooseLevelScreen());
+                },
+                title: "Latih Fokusmu !",
+                onTapSettings: () => _showSettingsModal(context),
+              ),
               Expanded(
                 child: Center(
                   child: Text(
@@ -187,60 +151,105 @@ class _LevelOneFocusScreenState extends State<LevelOneFocusScreen> {
                     textAlign: TextAlign.center,
                   ),
                 ),
-              )
-            else if (_imagePaths.isNotEmpty)
-              Expanded(
-                // Added Expanded to ensure Stack takes available space
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    SingleChildScrollView(
-                      controller: _scrollController,
-                      scrollDirection: Axis.horizontal,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 20.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children:
-                              _imagePaths
-                                  .map(
-                                    (path) => Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8.0,
-                                      ),
-                                      child: Image.asset(
-                                        path,
-                                        width: 150.0,
-                                        height: 200.0,
-                                        fit: BoxFit.contain,
-                                        errorBuilder: (
-                                          context,
-                                          error,
-                                          stackTrace,
-                                        ) {
-                                          return Container(
-                                            width: 150,
-                                            height: 200,
-                                            color: Colors.grey[300],
-                                            child: Center(
-                                              child: Icon(
-                                                Icons.broken_image,
-                                                color: Colors.grey[600],
-                                                size: 50,
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  )
-                                  .toList(),
-                        ),
-                      ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Align(
+                  alignment: Alignment.bottomRight,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFC2E0FF),
+                      foregroundColor: const Color(0xFF52AACA),
                     ),
-                  ],
+                    onPressed: null,
+                    child: const Text("Selanjutnya"),
+                  ),
                 ),
               ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return Scaffold(
+      body: Background(
+        gender: _player!.gender!,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Header(
+              onTapBack: () {
+                Get.off(() => const ChooseLevelScreen());
+              },
+              title: "Latih Fokusmu !",
+              onTapSettings: () => _showSettingsModal(context),
+            ),
+            Expanded(
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  SingleChildScrollView(
+                    controller: _scrollController,
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      children:
+                          _imagePaths.map((path) {
+                            return SizedBox(
+                              width: 150.0,
+                              height: 200.0,
+                              child: Image.asset(
+                                path,
+                                fit: BoxFit.contain,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    width: 150,
+                                    height: 200,
+                                    color: Colors.grey[300],
+                                    child: Center(
+                                      child: Icon(
+                                        Icons.broken_image,
+                                        color: Colors.grey[600],
+                                        size: 50,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            );
+                          }).toList(),
+                    ),
+                  ),
+                  Positioned(
+                    left: 0,
+                    child: IconButton(
+                      icon: Icon(Icons.arrow_back_ios),
+                      onPressed: () {
+                        _scrollController.animateTo(
+                          _scrollController.offset - 200,
+                          duration: Duration(milliseconds: 300),
+                          curve: Curves.easeOut,
+                        );
+                      },
+                    ),
+                  ),
+                  Positioned(
+                    right: 0,
+                    child: IconButton(
+                      icon: Icon(Icons.arrow_forward_ios),
+                      onPressed: () {
+                        _scrollController.animateTo(
+                          _scrollController.offset + 200,
+                          duration: Duration(milliseconds: 300),
+                          curve: Curves.easeOut,
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Align(
@@ -251,7 +260,7 @@ class _LevelOneFocusScreenState extends State<LevelOneFocusScreen> {
                     foregroundColor: const Color(0xFF52AACA),
                   ),
                   onPressed:
-                      _isLoadingPlayer || _imagePaths.isEmpty
+                      _isLoadingPlayer
                           ? null
                           : () {
                             if (_player != null) {
