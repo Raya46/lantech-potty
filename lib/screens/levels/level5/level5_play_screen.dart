@@ -1,5 +1,6 @@
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:toilet_training/games/puzzle/puzzle_game.dart';
 import 'package:toilet_training/widgets/background.dart';
 import 'package:toilet_training/widgets/header.dart';
@@ -41,10 +42,37 @@ class _LevelFivePlayScreenState extends State<LevelFivePlayScreen> {
     super.dispose();
   }
 
+  Future<void> _playSoundForResult(int starsEarned) async {
+    String? soundPath;
+    if (starsEarned == 3) {
+      soundPath = 'assets/sounds/3_bintang.mp3';
+    } else if (starsEarned == 2) {
+      soundPath = 'assets/sounds/2_bintang.mp3';
+    } else if (starsEarned == 1) {
+      soundPath = 'assets/sounds/belum_berhasil.mp3';
+    }
+
+    if (soundPath != null) {
+      final audioPlayer = AudioPlayer();
+      try {
+        await audioPlayer.setAsset(soundPath);
+        audioPlayer.play();
+        audioPlayer.processingStateStream.listen((state) {
+          if (state == ProcessingState.completed) {
+            audioPlayer.dispose();
+          }
+        });
+      } catch (e) {
+        audioPlayer.dispose();
+      }
+    }
+  }
+
   void _showPuzzleSolvedDialog() {
     if (!mounted) return;
 
     const int starsEarned = 3;
+    _playSoundForResult(starsEarned);
 
     ModalResult.show(
       context: context,

@@ -74,10 +74,7 @@ class _StartScreenState extends State<StartScreen> {
             Expanded(
               flex: 3,
               child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24.0,
-                  vertical: 16.0,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,

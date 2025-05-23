@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:toilet_training/models/player.dart';
 import 'package:toilet_training/models/step.dart';
 import 'package:toilet_training/services/player_service.dart';
@@ -147,49 +148,64 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
   }
 
   Widget _buildMaleTypeSelectionUI() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            "Pilih jenis aktivitas:",
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF8B5A2B),
-            ),
-          ),
-          SizedBox(height: 20),
-          Row(
+    return Column(
+      children: [
+        Header(
+          onTapBack: () => Get.off(() => const LevelFourStartScreen()),
+          title: "Level 4",
+          onTapSettings: () => _showSettingsModal(context),
+        ),
+        Center(
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFFFFA07A),
-                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                ),
-                onPressed: () => _onMaleTypeSelected('bab'),
-                child: Text(
-                  "Buang Air Besar (BAB)",
-                  style: TextStyle(fontSize: 16, color: Colors.white),
+              Text(
+                "Pilih jenis aktivitas:",
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF8B5A2B),
                 ),
               ),
-              SizedBox(width: 20),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFFFFA07A),
-                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                ),
-                onPressed: () => _onMaleTypeSelected('bak'),
-                child: Text(
-                  "Buang Air Kecil (BAK)",
-                  style: TextStyle(fontSize: 16, color: Colors.white),
-                ),
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFFFFA07A),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 30,
+                        vertical: 15,
+                      ),
+                    ),
+                    onPressed: () => _onMaleTypeSelected('bab'),
+                    child: Text(
+                      "Buang Air Besar (BAB)",
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                  ),
+                  SizedBox(width: 20),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFFFFA07A),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 30,
+                        vertical: 15,
+                      ),
+                    ),
+                    onPressed: () => _onMaleTypeSelected('bak'),
+                    child: Text(
+                      "Buang Air Kecil (BAK)",
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -207,6 +223,32 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
     if (_player == null) return;
     _player!.level4Score = stars;
     await updatePlayer(_player!);
+  }
+
+  Future<void> _playSoundForResult(int starsEarned) async {
+    String? soundPath;
+    if (starsEarned == 3) {
+      soundPath = 'assets/sounds/3_bintang.mp3';
+    } else if (starsEarned == 2) {
+      soundPath = 'assets/sounds/2_bintang.mp3';
+    } else if (starsEarned == 1) {
+      soundPath = 'assets/sounds/belum_berhasil.mp3';
+    }
+
+    if (soundPath != null) {
+      final audioPlayer = AudioPlayer();
+      try {
+        await audioPlayer.setAsset(soundPath);
+        audioPlayer.play();
+        audioPlayer.processingStateStream.listen((state) {
+          if (state == ProcessingState.completed) {
+            audioPlayer.dispose();
+          }
+        });
+      } catch (e) {
+        audioPlayer.dispose();
+      }
+    }
   }
 
   @override
@@ -569,6 +611,8 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
         _wrongAttempts > 0
             ? "Kamu menyelesaikan dengan $_wrongAttempts kesalahan."
             : "Kamu hebat! Semua langkah sudah benar.";
+
+    _playSoundForResult(starsEarned);
 
     ModalResult.show(
       context: context,

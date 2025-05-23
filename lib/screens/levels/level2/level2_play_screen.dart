@@ -5,6 +5,7 @@ import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:get/get.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:toilet_training/models/bathroom_item.dart';
 import 'package:toilet_training/models/player.dart';
 import 'package:toilet_training/screens/levels/level3/level3_start_screen.dart';
@@ -134,6 +135,32 @@ class _LevelTwoPlayScreenState extends State<LevelTwoPlayScreen> {
     await updatePlayer(_player!);
   }
 
+  Future<void> _playSoundForResult(int starsEarned) async {
+    String? soundPath;
+    if (starsEarned == 3) {
+      soundPath = 'assets/sounds/3_bintang.mp3';
+    } else if (starsEarned == 2) {
+      soundPath = 'assets/sounds/2_bintang.mp3';
+    } else if (starsEarned == 1) {
+      soundPath = 'assets/sounds/belum_berhasil.mp3';
+    }
+
+    if (soundPath != null) {
+      final audioPlayer = AudioPlayer();
+      try {
+        await audioPlayer.setAsset(soundPath);
+        audioPlayer.play();
+        audioPlayer.processingStateStream.listen((state) {
+          if (state == ProcessingState.completed) {
+            audioPlayer.dispose();
+          }
+        });
+      } catch (e) {
+        audioPlayer.dispose();
+      }
+    }
+  }
+
   void _checkAnswer(BathroomItem selectedItem) {
     if (_answered) return;
 
@@ -151,6 +178,7 @@ class _LevelTwoPlayScreenState extends State<LevelTwoPlayScreen> {
       _confettiController.play();
       starsEarned = _calculateStars(_wrongAttemptsInQuestion);
       _saveScore(starsEarned);
+      _playSoundForResult(starsEarned);
     } else {
       _wrongAttemptsInQuestion++;
       _feedbackMessage =

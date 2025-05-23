@@ -6,6 +6,8 @@ class PlayButton extends StatefulWidget {
   final Color backgroundColor;
   final Color iconColor;
   final IconData icon;
+  final Color outlineColor;
+  final double outlineWidth;
 
   const PlayButton({
     super.key,
@@ -14,6 +16,8 @@ class PlayButton extends StatefulWidget {
     this.backgroundColor = const Color(0xFF52AACA),
     this.iconColor = Colors.white,
     this.icon = Icons.play_arrow,
+    this.outlineColor = Colors.black,
+    this.outlineWidth = 3.0,
   });
 
   @override
@@ -50,13 +54,22 @@ class _PlayButtonState extends State<PlayButton>
       onTap: widget.onPressed,
       child: ScaleTransition(
         scale: _scaleAnimation,
-        child: CircleAvatar(
-          radius: widget.size / 2,
-          backgroundColor: widget.backgroundColor,
-          child: Icon(
-            widget.icon,
-            size: widget.size * 0.65,
-            color: widget.iconColor,
+        child: Container(
+          width: widget.size + (widget.outlineWidth * 2),
+          height: widget.size + (widget.outlineWidth * 2),
+          padding: EdgeInsets.all(widget.outlineWidth),
+          decoration: BoxDecoration(
+            color: widget.outlineColor,
+            shape: BoxShape.circle,
+          ),
+          child: CircleAvatar(
+            radius: widget.size / 2,
+            backgroundColor: widget.backgroundColor,
+            child: Icon(
+              widget.icon,
+              size: widget.size * 0.65,
+              color: widget.iconColor,
+            ),
           ),
         ),
       ),

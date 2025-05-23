@@ -9,40 +9,7 @@ import 'package:toilet_training/services/player_service.dart';
 import 'package:toilet_training/widgets/background.dart';
 import 'package:toilet_training/widgets/header.dart';
 import 'package:toilet_training/screens/levels/level4/level4_start_screen.dart';
-
-class SceneObject {
-  final dynamic id;
-  final String name;
-  final String imagePath;
-  Offset position;
-  Size size;
-  bool isTarget;
-  bool isFound;
-
-  SceneObject({
-    required this.id,
-    required this.name,
-    required this.imagePath,
-    required this.position,
-    required this.size,
-    this.isTarget = false,
-    this.isFound = false,
-  });
-
-  factory SceneObject.fromJson(
-    Map<String, dynamic> json,
-    Offset defaultPosition,
-    Size defaultSize,
-  ) {
-    return SceneObject(
-      id: json['id'].toString(),
-      name: json['name'],
-      imagePath: json['image'],
-      position: defaultPosition,
-      size: defaultSize,
-    );
-  }
-}
+import 'package:just_audio/just_audio.dart';
 
 class LevelThreePlayScreen extends StatefulWidget {
   const LevelThreePlayScreen({super.key});
@@ -100,6 +67,7 @@ class _LevelThreePlayScreenState extends State<LevelThreePlayScreen> {
           int stars = _calculateStars(wrongTaps);
           _saveScore(stars);
           _showSuccessDialog(starsEarned: stars, wrongAttempts: wrongTaps);
+          _playSoundForResult(stars);
         }
       },
       onShowFeedback: (message) {
@@ -120,6 +88,32 @@ class _LevelThreePlayScreenState extends State<LevelThreePlayScreen> {
     if (wrongAttempts == 0) return 3;
     if (wrongAttempts <= 3) return 2;
     return 1;
+  }
+
+  Future<void> _playSoundForResult(int starsEarned) async {
+    String? soundPath;
+    if (starsEarned == 3) {
+      soundPath = 'assets/sounds/3_bintang.mp3';
+    } else if (starsEarned == 2) {
+      soundPath = 'assets/sounds/2_bintang.mp3';
+    } else if (starsEarned == 1) {
+      soundPath = 'assets/sounds/belum_berhasil.mp3';
+    }
+
+    if (soundPath != null) {
+      final audioPlayer = AudioPlayer();
+      try {
+        await audioPlayer.setAsset(soundPath);
+        audioPlayer.play();
+        audioPlayer.processingStateStream.listen((state) {
+          if (state == ProcessingState.completed) {
+            audioPlayer.dispose();
+          }
+        });
+      } catch (e) {
+        audioPlayer.dispose();
+      }
+    }
   }
 
   Future<void> _saveScore(int stars) async {
@@ -253,7 +247,6 @@ class _LevelThreePlayScreenState extends State<LevelThreePlayScreen> {
                 ),
               ),
               onPressed: () {
-                Navigator.of(dialogContext).pop();
                 Get.off(() => const LevelFourStartScreen());
               },
             ),

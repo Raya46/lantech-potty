@@ -7,9 +7,9 @@ import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:toilet_training/models/player.dart';
 import 'package:toilet_training/models/step.dart';
-import 'package:toilet_training/screens/levels/level1/level1_start_screen.dart';
 import 'package:toilet_training/screens/menus/choose_level_screen.dart';
 import 'package:toilet_training/services/player_service.dart';
 import 'package:toilet_training/games/sort_game/sort_game_component.dart';
@@ -70,7 +70,6 @@ class ToiletSortGame extends FlameGame {
     });
 
     if (imagePaths.isEmpty) {
-      print("Image paths are empty, cannot initialize game.");
       setStateQuietly(() {
         isLoading = false;
       });
@@ -93,7 +92,6 @@ class ToiletSortGame extends FlameGame {
     }
 
     if (allStepsForContext.length < sequenceLength) {
-      print("Not enough steps for sequence length.");
       setStateQuietly(() {
         isLoading = false;
       });
@@ -219,6 +217,34 @@ class ToiletSortGame extends FlameGame {
     await updatePlayer(player);
   }
 
+  Future<void> _playSoundForResult(int starsEarned, bool isSuccess) async {
+    if (!isSuccess) return;
+
+    String? soundPath;
+    if (starsEarned == 3) {
+      soundPath = 'assets/sounds/3_bintang.mp3';
+    } else if (starsEarned == 2) {
+      soundPath = 'assets/sounds/2_bintang.mp3';
+    } else if (starsEarned == 1) {
+      soundPath = 'assets/sounds/belum_berhasil.mp3';
+    }
+
+    if (soundPath != null) {
+      final audioPlayer = AudioPlayer();
+      try {
+        await audioPlayer.setAsset(soundPath);
+        audioPlayer.play();
+        audioPlayer.processingStateStream.listen((state) {
+          if (state == ProcessingState.completed) {
+            audioPlayer.dispose();
+          }
+        });
+      } catch (e) {
+        audioPlayer.dispose();
+      }
+    }
+  }
+
   void checkOrder() {
     if (isLoading) return;
 
@@ -234,7 +260,7 @@ class ToiletSortGame extends FlameGame {
       dialogTitle = "Benar Sekali!";
       dialogContentText = "Kamu berhasil menyusunnya dengan benar.";
       _saveScore(starsEarned);
-      confettiController.play();
+      _playSoundForResult(starsEarned, true);
     } else {
       _wrongAttempts++;
       dialogTitle = "Oops, Coba Lagi!";
@@ -247,12 +273,8 @@ class ToiletSortGame extends FlameGame {
       message: dialogContentText,
       starsEarned: starsEarned,
       isSuccess: isCorrect,
-      primaryActionText: isCorrect ? "Ulangi Level" : "Coba Lagi",
-      onPrimaryAction: () {
-        if (isCorrect) {
-          Get.off(() => const LevelOneStartScreen());
-        } else {}
-      },
+      primaryActionText: isCorrect ? "Main Lagi" : "Coba Lagi",
+      onPrimaryAction: () {},
       secondaryActionText: isCorrect ? "Pilih Level" : null,
       onSecondaryAction:
           isCorrect
