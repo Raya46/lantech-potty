@@ -10,10 +10,9 @@ class LevelThreeStartScreen extends StatefulWidget {
 }
 
 class _LevelThreeStartScreenState extends State<LevelThreeStartScreen> {
-
   @override
   Widget build(BuildContext context) {
-     return LevelStartScreen(
+    return LevelStartScreen(
       levelText: 'Level 3',
       levelDescription: 'Tentukan Benda yang Tepat',
       levelScreen: LevelThreePlayScreen(),

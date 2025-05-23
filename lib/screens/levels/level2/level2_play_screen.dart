@@ -34,7 +34,12 @@ class _LevelTwoPlayScreenState extends State<LevelTwoPlayScreen> {
   int _wrongAttemptsInQuestion = 0;
 
   Future<void> _loadPlayer() async {
-    _player = await getPlayer();
+    Player playerData = await getPlayer();
+    if (mounted) {
+      setState(() {
+        _player = playerData;
+      });
+    }
   }
 
   @override
@@ -43,8 +48,12 @@ class _LevelTwoPlayScreenState extends State<LevelTwoPlayScreen> {
     _confettiController = ConfettiController(
       duration: const Duration(seconds: 2),
     );
-    _loadPlayer();
-    _loadItems();
+    _initializeGame();
+  }
+
+  Future<void> _initializeGame() async {
+    await _loadPlayer();
+    await _loadItems();
   }
 
   @override
@@ -189,6 +198,9 @@ class _LevelTwoPlayScreenState extends State<LevelTwoPlayScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_player == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
     return Scaffold(
       body: Stack(
         children: [

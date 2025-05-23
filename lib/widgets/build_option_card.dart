@@ -2,21 +2,56 @@ import 'package:flutter/material.dart';
 import 'package:toilet_training/models/step.dart';
 import 'package:toilet_training/widgets/build_feedback_card.dart';
 
-class BuildOptionCard extends StatelessWidget {
+class BuildOptionCard extends StatefulWidget {
   const BuildOptionCard({super.key, required this.step});
   final ToiletStep step;
+
+  @override
+  State<BuildOptionCard> createState() => _BuildOptionCardState();
+}
+
+class _BuildOptionCardState extends State<BuildOptionCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+    _scaleAnimation = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween<double>(begin: 1.0, end: 1.2), weight: 40),
+      TweenSequenceItem(tween: Tween<double>(begin: 1.2, end: 0.9), weight: 30),
+      TweenSequenceItem(tween: Tween<double>(begin: 0.9, end: 1.0), weight: 30),
+    ]).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Draggable<ToiletStep>(
-      data: step,
-      feedback: BuildFeedbackCard(step: step),
-      childWhenDragging: SizedBox(width: 100, height: 140),
-      child: SizedBox(
-        width: 100,
-        height: 140,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Image.asset(step.image, fit: BoxFit.contain),
+    return ScaleTransition(
+      scale: _scaleAnimation,
+      child: Draggable<ToiletStep>(
+        data: widget.step,
+        feedback: BuildFeedbackCard(step: widget.step),
+        childWhenDragging: const SizedBox(width: 100, height: 140),
+        child: SizedBox(
+          width: 100,
+          height: 140,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Image.asset(widget.step.image, fit: BoxFit.contain),
+          ),
         ),
       ),
     );

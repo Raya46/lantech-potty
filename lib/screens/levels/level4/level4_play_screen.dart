@@ -6,6 +6,8 @@ import 'package:toilet_training/models/player.dart';
 import 'package:toilet_training/models/step.dart';
 import 'package:toilet_training/services/player_service.dart';
 import 'package:toilet_training/widgets/background.dart';
+import 'package:toilet_training/widgets/build_option_card.dart';
+import 'package:toilet_training/widgets/build_step_card.dart';
 import 'package:toilet_training/widgets/header.dart';
 import 'package:toilet_training/widgets/modal_setting.dart';
 import 'package:get/get.dart';
@@ -24,7 +26,7 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
   List<ToiletStep> _steps = [];
   int currentStepIndex = 0;
   ToiletStep? _droppedStepOnTarget;
-  int _wrongAttempts = 0; 
+  int _wrongAttempts = 0;
 
   Player? _player;
   bool _isLoadingPlayer = true;
@@ -54,8 +56,8 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
       if (mounted) setState(() => _isLoadingPlayer = false);
       return;
     }
-    _wrongAttempts = 0; 
-    _player!.level4Score ??= 0; 
+    _wrongAttempts = 0;
+    _player!.level4Score ??= 0;
 
     if (_player!.gender == 'laki-laki' && !_hasSelectedTypeForMale) {
       if (mounted) {
@@ -74,13 +76,13 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
       _player = await getPlayer();
       _player!.gender ??= 'laki-laki';
       _player!.isFocused ??= false;
-      _player!.level4Score ??= 0; 
+      _player!.level4Score ??= 0;
     } catch (e) {
       _player =
           Player(null)
             ..gender = 'laki-laki'
             ..isFocused = false
-            ..level4Score = 0; 
+            ..level4Score = 0;
       await savePlayer(_player!);
     }
     if (mounted) setState(() => _isLoadingPlayer = false);
@@ -94,7 +96,7 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
       if (mounted) setState(() => _isChoosingMaleType = true);
       return;
     }
-    _wrongAttempts = 0; 
+    _wrongAttempts = 0;
 
     final String response = await rootBundle.loadString(
       'lib/models/static/step-static.json',
@@ -138,7 +140,7 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
         _isChoosingMaleType = false;
         _hasSelectedTypeForMale = true;
         _isLoadingPlayer = true;
-        _wrongAttempts = 0; 
+        _wrongAttempts = 0;
       });
     }
     loadSteps();
@@ -193,7 +195,7 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
 
   int _calculateStars(int wrongAttempts) {
     if (wrongAttempts == 0) {
-      return 3; 
+      return 3;
     } else if (wrongAttempts <= 2) {
       return 2;
     } else {
@@ -203,8 +205,8 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
 
   Future<void> _saveScore(int stars) async {
     if (_player == null) return;
-      _player!.level4Score = stars; 
-      await updatePlayer(_player!);
+    _player!.level4Score = stars;
+    await updatePlayer(_player!);
   }
 
   @override
@@ -330,7 +332,9 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
               .toList();
       others.shuffle();
       options.addAll(others.take(2));
-      while (options.length > 3) {options.removeLast();}
+      while (options.length > 3) {
+        options.removeLast();
+      }
       options.shuffle();
     }
 
@@ -351,7 +355,6 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
                 Expanded(
                   child: Center(
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
                           "Apa Langkah Selanjutnya?",
@@ -361,10 +364,11 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
                             color: Color(0xFF8B5A2B),
                           ),
                         ),
+                        SizedBox(height: 10),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            _buildStepCard(currentStep),
+                            BuildStepCard(step: currentStep),
                             Padding(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 30.0,
@@ -378,7 +382,9 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
                             DragTarget<ToiletStep>(
                               builder: (context, candidateData, rejectedData) {
                                 if (_droppedStepOnTarget != null) {
-                                  return _buildStepCard(_droppedStepOnTarget!);
+                                  return BuildStepCard(
+                                    step: _droppedStepOnTarget!,
+                                  );
                                 }
                                 return Container(
                                   width: 100,
@@ -416,8 +422,7 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
                                 if (nextStep != null &&
                                     droppedStep.id == nextStep.id) {
                                   setState(() {
-                                    _droppedStepOnTarget =
-                                        droppedStep; 
+                                    _droppedStepOnTarget = droppedStep;
                                   });
 
                                   bool isFinalStepInSequenceDropped =
@@ -428,7 +433,7 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
                                     Future.delayed(Duration(seconds: 1), () {
                                       if (mounted) {
                                         setState(() {
-                                          currentStepIndex++; 
+                                          currentStepIndex++;
                                         });
                                         _saveScore(
                                           _calculateStars(_wrongAttempts),
@@ -443,8 +448,7 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
                                       if (mounted) {
                                         setState(() {
                                           currentStepIndex++;
-                                          _droppedStepOnTarget =
-                                              null; 
+                                          _droppedStepOnTarget = null;
                                         });
                                       }
                                     });
@@ -479,13 +483,12 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
                                         padding: const EdgeInsets.symmetric(
                                           horizontal: 12,
                                         ),
-                                        child: _buildOptionCard(step),
+                                        child: BuildOptionCard(step: step),
                                       ),
                                     )
                                     .toList(),
                           )
-                        else if (_steps
-                            .isNotEmpty) 
+                        else if (_steps.isNotEmpty)
                           Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: Text(
@@ -594,49 +597,6 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
           Get.off(() => const LevelFourStartScreen());
         }
       },
-    );
-  }
-
-  Widget _buildStepCard(ToiletStep step) {
-    return Center(
-      child: SizedBox(
-        width: 100,
-        height: 140,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Image.asset(step.image, fit: BoxFit.contain),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFeedbackCard(ToiletStep step) {
-    return Material(
-      color: Colors.transparent,
-      child: SizedBox(
-        width: 100,
-        height: 140,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Image.asset(step.image, fit: BoxFit.contain),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildOptionCard(ToiletStep step) {
-    return Draggable<ToiletStep>(
-      data: step,
-      feedback: _buildFeedbackCard(step),
-      childWhenDragging: SizedBox(width: 100, height: 140),
-      child: SizedBox(
-        width: 100,
-        height: 140,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Image.asset(step.image, fit: BoxFit.contain),
-        ),
-      ),
     );
   }
 }
