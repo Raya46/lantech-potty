@@ -2,10 +2,13 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:toilet_training/models/player.dart';
 import 'package:toilet_training/models/step.dart';
 import 'package:toilet_training/services/player_service.dart';
 import 'package:toilet_training/widgets/background.dart';
+import 'package:toilet_training/widgets/build_option_card.dart';
+import 'package:toilet_training/widgets/build_step_card.dart';
 import 'package:toilet_training/widgets/header.dart';
 import 'package:toilet_training/widgets/modal_setting.dart';
 import 'package:get/get.dart';
@@ -24,7 +27,7 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
   List<ToiletStep> _steps = [];
   int currentStepIndex = 0;
   ToiletStep? _droppedStepOnTarget;
-  int _wrongAttempts = 0; 
+  int _wrongAttempts = 0;
 
   Player? _player;
   bool _isLoadingPlayer = true;
@@ -54,8 +57,8 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
       if (mounted) setState(() => _isLoadingPlayer = false);
       return;
     }
-    _wrongAttempts = 0; 
-    _player!.level4Score ??= 0; 
+    _wrongAttempts = 0;
+    _player!.level4Score ??= 0;
 
     if (_player!.gender == 'laki-laki' && !_hasSelectedTypeForMale) {
       if (mounted) {
@@ -74,13 +77,13 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
       _player = await getPlayer();
       _player!.gender ??= 'laki-laki';
       _player!.isFocused ??= false;
-      _player!.level4Score ??= 0; 
+      _player!.level4Score ??= 0;
     } catch (e) {
       _player =
           Player(null)
             ..gender = 'laki-laki'
             ..isFocused = false
-            ..level4Score = 0; 
+            ..level4Score = 0;
       await savePlayer(_player!);
     }
     if (mounted) setState(() => _isLoadingPlayer = false);
@@ -94,7 +97,7 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
       if (mounted) setState(() => _isChoosingMaleType = true);
       return;
     }
-    _wrongAttempts = 0; 
+    _wrongAttempts = 0;
 
     final String response = await rootBundle.loadString(
       'lib/models/static/step-static.json',
@@ -138,62 +141,77 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
         _isChoosingMaleType = false;
         _hasSelectedTypeForMale = true;
         _isLoadingPlayer = true;
-        _wrongAttempts = 0; 
+        _wrongAttempts = 0;
       });
     }
     loadSteps();
   }
 
   Widget _buildMaleTypeSelectionUI() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            "Pilih jenis aktivitas:",
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF8B5A2B),
-            ),
-          ),
-          SizedBox(height: 20),
-          Row(
+    return Column(
+      children: [
+        Header(
+          onTapBack: () => Get.off(() => const LevelFourStartScreen()),
+          title: "Level 4",
+          onTapSettings: () => _showSettingsModal(context),
+        ),
+        Center(
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFFFFA07A),
-                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                ),
-                onPressed: () => _onMaleTypeSelected('bab'),
-                child: Text(
-                  "Buang Air Besar (BAB)",
-                  style: TextStyle(fontSize: 16, color: Colors.white),
+              Text(
+                "Pilih jenis aktivitas:",
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF8B5A2B),
                 ),
               ),
-              SizedBox(width: 20),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFFFFA07A),
-                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                ),
-                onPressed: () => _onMaleTypeSelected('bak'),
-                child: Text(
-                  "Buang Air Kecil (BAK)",
-                  style: TextStyle(fontSize: 16, color: Colors.white),
-                ),
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFFFFA07A),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 30,
+                        vertical: 15,
+                      ),
+                    ),
+                    onPressed: () => _onMaleTypeSelected('bab'),
+                    child: Text(
+                      "Buang Air Besar (BAB)",
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                  ),
+                  SizedBox(width: 20),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFFFFA07A),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 30,
+                        vertical: 15,
+                      ),
+                    ),
+                    onPressed: () => _onMaleTypeSelected('bak'),
+                    child: Text(
+                      "Buang Air Kecil (BAK)",
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
   int _calculateStars(int wrongAttempts) {
     if (wrongAttempts == 0) {
-      return 3; 
+      return 3;
     } else if (wrongAttempts <= 2) {
       return 2;
     } else {
@@ -203,8 +221,34 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
 
   Future<void> _saveScore(int stars) async {
     if (_player == null) return;
-      _player!.level4Score = stars; 
-      await updatePlayer(_player!);
+    _player!.level4Score = stars;
+    await updatePlayer(_player!);
+  }
+
+  Future<void> _playSoundForResult(int starsEarned) async {
+    String? soundPath;
+    if (starsEarned == 3) {
+      soundPath = 'assets/sounds/3_bintang.mp3';
+    } else if (starsEarned == 2) {
+      soundPath = 'assets/sounds/2_bintang.mp3';
+    } else if (starsEarned == 1) {
+      soundPath = 'assets/sounds/belum_berhasil.mp3';
+    }
+
+    if (soundPath != null) {
+      final audioPlayer = AudioPlayer();
+      try {
+        await audioPlayer.setAsset(soundPath);
+        audioPlayer.play();
+        audioPlayer.processingStateStream.listen((state) {
+          if (state == ProcessingState.completed) {
+            audioPlayer.dispose();
+          }
+        });
+      } catch (e) {
+        audioPlayer.dispose();
+      }
+    }
   }
 
   @override
@@ -330,7 +374,9 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
               .toList();
       others.shuffle();
       options.addAll(others.take(2));
-      while (options.length > 3) {options.removeLast();}
+      while (options.length > 3) {
+        options.removeLast();
+      }
       options.shuffle();
     }
 
@@ -351,7 +397,6 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
                 Expanded(
                   child: Center(
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
                           "Apa Langkah Selanjutnya?",
@@ -361,10 +406,11 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
                             color: Color(0xFF8B5A2B),
                           ),
                         ),
+                        SizedBox(height: 10),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            _buildStepCard(currentStep),
+                            BuildStepCard(step: currentStep),
                             Padding(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 30.0,
@@ -378,7 +424,9 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
                             DragTarget<ToiletStep>(
                               builder: (context, candidateData, rejectedData) {
                                 if (_droppedStepOnTarget != null) {
-                                  return _buildStepCard(_droppedStepOnTarget!);
+                                  return BuildStepCard(
+                                    step: _droppedStepOnTarget!,
+                                  );
                                 }
                                 return Container(
                                   width: 100,
@@ -416,8 +464,7 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
                                 if (nextStep != null &&
                                     droppedStep.id == nextStep.id) {
                                   setState(() {
-                                    _droppedStepOnTarget =
-                                        droppedStep; 
+                                    _droppedStepOnTarget = droppedStep;
                                   });
 
                                   bool isFinalStepInSequenceDropped =
@@ -428,7 +475,7 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
                                     Future.delayed(Duration(seconds: 1), () {
                                       if (mounted) {
                                         setState(() {
-                                          currentStepIndex++; 
+                                          currentStepIndex++;
                                         });
                                         _saveScore(
                                           _calculateStars(_wrongAttempts),
@@ -443,8 +490,7 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
                                       if (mounted) {
                                         setState(() {
                                           currentStepIndex++;
-                                          _droppedStepOnTarget =
-                                              null; 
+                                          _droppedStepOnTarget = null;
                                         });
                                       }
                                     });
@@ -479,13 +525,12 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
                                         padding: const EdgeInsets.symmetric(
                                           horizontal: 12,
                                         ),
-                                        child: _buildOptionCard(step),
+                                        child: BuildOptionCard(step: step),
                                       ),
                                     )
                                     .toList(),
                           )
-                        else if (_steps
-                            .isNotEmpty) 
+                        else if (_steps.isNotEmpty)
                           Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: Text(
@@ -567,6 +612,8 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
             ? "Kamu menyelesaikan dengan $_wrongAttempts kesalahan."
             : "Kamu hebat! Semua langkah sudah benar.";
 
+    _playSoundForResult(starsEarned);
+
     ModalResult.show(
       context: context,
       title: "Selamat!",
@@ -594,49 +641,6 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
           Get.off(() => const LevelFourStartScreen());
         }
       },
-    );
-  }
-
-  Widget _buildStepCard(ToiletStep step) {
-    return Center(
-      child: SizedBox(
-        width: 100,
-        height: 140,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Image.asset(step.image, fit: BoxFit.contain),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFeedbackCard(ToiletStep step) {
-    return Material(
-      color: Colors.transparent,
-      child: SizedBox(
-        width: 100,
-        height: 140,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Image.asset(step.image, fit: BoxFit.contain),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildOptionCard(ToiletStep step) {
-    return Draggable<ToiletStep>(
-      data: step,
-      feedback: _buildFeedbackCard(step),
-      childWhenDragging: SizedBox(width: 100, height: 140),
-      child: SizedBox(
-        width: 100,
-        height: 140,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Image.asset(step.image, fit: BoxFit.contain),
-        ),
-      ),
     );
   }
 }

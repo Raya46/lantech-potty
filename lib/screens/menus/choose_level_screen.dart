@@ -8,7 +8,7 @@ import 'package:toilet_training/screens/levels/level4/level4_start_screen.dart';
 import 'package:toilet_training/screens/levels/level5/level5_start_screen.dart';
 import 'package:toilet_training/services/player_service.dart';
 import 'package:toilet_training/widgets/background.dart';
-import "package:toilet_training/widgets/card_gender.dart";
+import "package:toilet_training/widgets/card_level.dart";
 import "package:toilet_training/widgets/header.dart";
 import 'package:toilet_training/screens/menus/choose_gender_screen.dart';
 
@@ -66,11 +66,11 @@ class _ChooseLevelScreenState extends State<ChooseLevelScreen> {
     }
 
     final List<Map<String, dynamic>> levels = [
-      {'text': "Level 1", 'screen': () => LevelOneStartScreen()},
-      {'text': "Level 2", 'screen': () => LevelTwoStartScreen()},
-      {'text': "Level 3", 'screen': () => LevelThreeStartScreen()},
-      {'text': "Level 4", 'screen': () => LevelFourStartScreen()},
-      {'text': "Level 5", 'screen': () => LevelFiveStartScreen()},
+      {'text': "Urutan Toilet", 'screen': () => LevelOneStartScreen()},
+      {'text': "Temukan Benda", 'screen': () => LevelTwoStartScreen()},
+      {'text': "Detektif Cilik!", 'screen': () => LevelThreeStartScreen()},
+      {'text': "Urutkan Aktivitas", 'screen': () => LevelFourStartScreen()},
+      {'text': "Puzzle", 'screen': () => LevelFiveStartScreen()},
     ];
 
     return Scaffold(
@@ -94,19 +94,30 @@ class _ChooseLevelScreenState extends State<ChooseLevelScreen> {
                       scrollDirection: Axis.horizontal,
                       padding: const EdgeInsets.all(16.0),
                       child: Row(
-                        spacing: 16.0,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children:
-                            levels.map((levelData) {
-                              return GenderCard(
-                                text: levelData['text'],
-                                gender: _player!.gender!,
-                                onTap: () {
-                                  Get.to(
-                                    levelData['screen'],
-                                    transition: Transition.circularReveal,
-                                    duration: Duration(milliseconds: 1500),
-                                  );
-                                },
+                            levels.asMap().entries.map((entry) {
+                              int idx = entry.key;
+                              Map<String, dynamic> levelData = entry.value;
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8.0,
+                                ),
+                                child: InkWell(
+                                  onTap: () {
+                                    Get.to(
+                                      levelData['screen'],
+                                      transition: Transition.circularReveal,
+                                      duration: Duration(milliseconds: 1500),
+                                    );
+                                  },
+                                  child: CardLevel(
+                                    title: levelData['text'],
+                                    gender: _player!.gender!,
+                                    level: idx + 1,
+                                    children: [],
+                                  ),
+                                ),
                               );
                             }).toList(),
                       ),

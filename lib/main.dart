@@ -10,6 +10,10 @@ void main() async {
     DeviceOrientation.landscapeLeft,
     DeviceOrientation.landscapeRight,
   ]);
+  SystemChrome.setEnabledSystemUIMode(
+    SystemUiMode.immersive,
+    overlays: [SystemUiOverlay.bottom],
+  );
   db = openDB();
   await db;
 

@@ -258,7 +258,7 @@ class _LevelStartScreenState extends State<LevelStartScreen>
                               child: Center(
                                 child: PlayButton(
                                   onPressed: () {
-                                    Get.to(
+                                    Get.off(
                                       () => widget.levelScreen,
                                       transition: Transition.circularReveal,
                                       duration: const Duration(

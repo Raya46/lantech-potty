@@ -2,13 +2,14 @@ import 'dart:math';
 
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
-import 'package:flutter/material.dart'; 
+import 'package:flame/effects.dart';
+import 'package:flutter/material.dart';
 import 'package:toilet_training/games/hidden_object_game/hidden_object_game.dart';
 import 'package:toilet_training/models/scene_object.dart';
 
 class SceneObjectComponent extends SpriteComponent with TapCallbacks {
   final SceneObjectData data;
-  final HiddenObjectGame gameRef; 
+  final HiddenObjectGame gameRef;
   bool _isHighlighted = false;
 
   SceneObjectComponent(this.data, {required this.gameRef})
@@ -20,7 +21,7 @@ class SceneObjectComponent extends SpriteComponent with TapCallbacks {
       sprite = await Sprite.load(
         data.imagePath.replaceFirst('assets/images/', ''),
       );
-      double baseDimension = 80 + Random().nextDouble() * 50; 
+      double baseDimension = 80 + Random().nextDouble() * 50;
       if (sprite != null) {
         if (sprite!.originalSize.x >= sprite!.originalSize.y) {
           width = baseDimension;
@@ -32,10 +33,30 @@ class SceneObjectComponent extends SpriteComponent with TapCallbacks {
               sprite!.originalSize.x * (baseDimension / sprite!.originalSize.y);
         }
       } else {
-        size = Vector2.all(baseDimension); 
+        size = Vector2.all(baseDimension);
       }
     } catch (e) {
-      size = Vector2.all(100); 
+      size = Vector2.all(100);
+    }
+    final appearSequence = SequenceEffect([
+      ScaleEffect.to(
+        Vector2.all(1.1),
+        EffectController(duration: 0.6, curve: Curves.elasticOut),
+      ),
+      ScaleEffect.to(
+        Vector2.all(1.0),
+        EffectController(duration: 0.4, curve: Curves.easeOut),
+      ),
+    ]);
+
+    if (0.2 > 0) {
+      Future.delayed(Duration(milliseconds: (0.2 * 1000).round()), () {
+        if (isMounted) {
+          add(appearSequence);
+        }
+      });
+    } else {
+      add(appearSequence);
     }
   }
 
@@ -45,7 +66,7 @@ class SceneObjectComponent extends SpriteComponent with TapCallbacks {
 
     if (data.isTarget) {
       data.isFound = true;
-      _isHighlighted = true; 
+      _isHighlighted = true;
       gameRef.onTargetFound(data);
     } else {
       gameRef.onWrongObjectTapped(data);

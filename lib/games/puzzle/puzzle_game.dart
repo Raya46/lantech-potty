@@ -254,7 +254,7 @@ class PuzzleBoardComponent extends PositionComponent {
     super.render(canvas);
     final paint =
         Paint()
-          ..color = Colors.grey.withOpacity(0.3)
+          ..color = Colors.black
           ..style = PaintingStyle.stroke
           ..strokeWidth = 2;
 

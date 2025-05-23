@@ -5,6 +5,7 @@ import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:get/get.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:toilet_training/models/bathroom_item.dart';
 import 'package:toilet_training/models/player.dart';
 import 'package:toilet_training/screens/levels/level3/level3_start_screen.dart';
@@ -34,7 +35,12 @@ class _LevelTwoPlayScreenState extends State<LevelTwoPlayScreen> {
   int _wrongAttemptsInQuestion = 0;
 
   Future<void> _loadPlayer() async {
-    _player = await getPlayer();
+    Player playerData = await getPlayer();
+    if (mounted) {
+      setState(() {
+        _player = playerData;
+      });
+    }
   }
 
   @override
@@ -43,8 +49,12 @@ class _LevelTwoPlayScreenState extends State<LevelTwoPlayScreen> {
     _confettiController = ConfettiController(
       duration: const Duration(seconds: 2),
     );
-    _loadPlayer();
-    _loadItems();
+    _initializeGame();
+  }
+
+  Future<void> _initializeGame() async {
+    await _loadPlayer();
+    await _loadItems();
   }
 
   @override
@@ -125,6 +135,32 @@ class _LevelTwoPlayScreenState extends State<LevelTwoPlayScreen> {
     await updatePlayer(_player!);
   }
 
+  Future<void> _playSoundForResult(int starsEarned) async {
+    String? soundPath;
+    if (starsEarned == 3) {
+      soundPath = 'assets/sounds/3_bintang.mp3';
+    } else if (starsEarned == 2) {
+      soundPath = 'assets/sounds/2_bintang.mp3';
+    } else if (starsEarned == 1) {
+      soundPath = 'assets/sounds/belum_berhasil.mp3';
+    }
+
+    if (soundPath != null) {
+      final audioPlayer = AudioPlayer();
+      try {
+        await audioPlayer.setAsset(soundPath);
+        audioPlayer.play();
+        audioPlayer.processingStateStream.listen((state) {
+          if (state == ProcessingState.completed) {
+            audioPlayer.dispose();
+          }
+        });
+      } catch (e) {
+        audioPlayer.dispose();
+      }
+    }
+  }
+
   void _checkAnswer(BathroomItem selectedItem) {
     if (_answered) return;
 
@@ -142,6 +178,7 @@ class _LevelTwoPlayScreenState extends State<LevelTwoPlayScreen> {
       _confettiController.play();
       starsEarned = _calculateStars(_wrongAttemptsInQuestion);
       _saveScore(starsEarned);
+      _playSoundForResult(starsEarned);
     } else {
       _wrongAttemptsInQuestion++;
       _feedbackMessage =
@@ -189,6 +226,9 @@ class _LevelTwoPlayScreenState extends State<LevelTwoPlayScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_player == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
     return Scaffold(
       body: Stack(
         children: [
