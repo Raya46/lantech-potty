@@ -325,6 +325,7 @@ class _LevelThreePlayScreenState extends State<LevelThreePlayScreen> {
                         label: Text(
                           obj.name,
                           style: TextStyle(
+                            fontSize: 30,
                             color: Colors.white,
                             fontWeight: FontWeight.w600,
                           ),

@@ -107,7 +107,7 @@ class _StartScreenState extends State<StartScreen> {
                     Stack(
                       children: [
                         Text(
-                          "POTTYFUN KID'S",
+                          "POTTY FUN KID'S",
                           style: TextStyle(
                             fontSize: 34,
                             fontWeight: FontWeight.bold,
@@ -119,7 +119,7 @@ class _StartScreenState extends State<StartScreen> {
                           ),
                         ),
                         Text(
-                          "POTTYFUN KID'S",
+                          "POTTY FUN KID'S",
                           style: const TextStyle(
                             fontSize: 34,
                             fontWeight: FontWeight.bold,

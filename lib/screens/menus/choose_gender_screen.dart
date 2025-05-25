@@ -68,25 +68,29 @@ class _ChooseGenderScreenState extends State<ChooseGenderScreen> {
             if (_player == null)
               Center(child: CircularProgressIndicator())
             else
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  GenderCard(
-                    text: "Perempuan",
-                    gender: 'perempuan',
-                    onTap: () {
-                      _updateAndNavigate("perempuan");
-                    },
+              Expanded(
+                child: Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      GenderCard(
+                        text: "Perempuan",
+                        gender: 'perempuan',
+                        onTap: () {
+                          _updateAndNavigate("perempuan");
+                        },
+                      ),
+                      SizedBox(width: 40),
+                      GenderCard(
+                        text: "Laki-laki",
+                        gender: 'laki-laki',
+                        onTap: () {
+                          _updateAndNavigate("laki-laki");
+                        },
+                      ),
+                    ],
                   ),
-                  SizedBox(width: 40),
-                  GenderCard(
-                    text: "Laki-laki",
-                    gender: 'laki-laki',
-                    onTap: () {
-                      _updateAndNavigate("laki-laki");
-                    },
-                  ),
-                ],
+                ),
               ),
           ],
         ),
