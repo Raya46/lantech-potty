@@ -168,39 +168,42 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
                 ),
               ),
               SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFFFFA07A),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 30,
-                        vertical: 15,
+              Center(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFFFFA07A),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 30,
+                          vertical: 15,
+                        ),
+                      ),
+                      onPressed: () => _onMaleTypeSelected('bab'),
+                      child: Text(
+                        "Buang Air Besar (BAB)",
+                        style: TextStyle(fontSize: 30, color: Colors.white),
                       ),
                     ),
-                    onPressed: () => _onMaleTypeSelected('bab'),
-                    child: Text(
-                      "Buang Air Besar (BAB)",
-                      style: TextStyle(fontSize: 16, color: Colors.white),
-                    ),
-                  ),
-                  SizedBox(width: 20),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFFFFA07A),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 30,
-                        vertical: 15,
+                    SizedBox(width: 20),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFFFFA07A),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 30,
+                          vertical: 15,
+                        ),
+                      ),
+                      onPressed: () => _onMaleTypeSelected('bak'),
+                      child: Text(
+                        "Buang Air Kecil (BAK)",
+                        style: TextStyle(fontSize: 30, color: Colors.white),
                       ),
                     ),
-                    onPressed: () => _onMaleTypeSelected('bak'),
-                    child: Text(
-                      "Buang Air Kecil (BAK)",
-                      style: TextStyle(fontSize: 16, color: Colors.white),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),

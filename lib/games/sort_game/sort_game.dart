@@ -23,12 +23,9 @@ class ToiletSortGame extends FlameGame {
   bool isLoading = true;
 
   int sequenceLength = 3;
-  static const double imageRenderSize = 150.0;
-  static const double placeholderPadding = 5.0;
-  static const double placeholderSize =
-      imageRenderSize + 2 * placeholderPadding;
-  final double spacing = 15.0;
-  double yPosition = 0;
+  double placeholderSize = 0.0;
+  double spacing = 0.0;
+  double yPosition = 0.0;
 
   List<PlaceholderSlot> placeholderSlots = [];
   final String gender;
@@ -91,25 +88,90 @@ class ToiletSortGame extends FlameGame {
       imagePathToIdMap[step.image] = step.id;
     }
 
-    if (allStepsForContext.length < sequenceLength) {
+    int effectiveSequenceLength = min(
+      this.sequenceLength,
+      allStepsForContext.length,
+    );
+
+    if (allStepsForContext.length < effectiveSequenceLength ||
+        effectiveSequenceLength == 0) {
+      if (allStepsForContext.isNotEmpty &&
+          this.sequenceLength > allStepsForContext.length) {
+        effectiveSequenceLength = allStepsForContext.length;
+      } else {
+        setStateQuietly(() {
+          isLoading = false;
+        });
+        return;
+      }
+    }
+
+    final random = Random();
+    int maxStartIndex = allStepsForContext.length - effectiveSequenceLength;
+    int startIndex =
+        (maxStartIndex >= 0) ? random.nextInt(maxStartIndex + 1) : 0;
+
+    if (startIndex + effectiveSequenceLength > allStepsForContext.length) {
+      effectiveSequenceLength = allStepsForContext.length - startIndex;
+    }
+
+    List<ToiletStep> selectedSteps = allStepsForContext.sublist(
+      startIndex,
+      startIndex + effectiveSequenceLength,
+    );
+
+    correctImagePathSequence = selectedSteps.map((step) => step.image).toList();
+    correctSequenceIds = selectedSteps.map((step) => step.id).toList();
+
+    final int numDisplayedItems = correctImagePathSequence.length;
+
+    if (numDisplayedItems == 0) {
       setStateQuietly(() {
         isLoading = false;
       });
       return;
     }
 
-    final random = Random();
-    int maxStartIndex = allStepsForContext.length - sequenceLength;
-    int startIndex =
-        (maxStartIndex > 0) ? random.nextInt(maxStartIndex + 1) : 0;
+    final double N = numDisplayedItems.toDouble();
+    double contentAreaWidth = size.x * 0.85;
+    double minImageSize = size.x * 0.12;
+    double maxImageSizeHorizontal = size.x * 0.35;
+    double maxImageSizeVertical = size.y * 0.25;
 
-    List<ToiletStep> selectedSteps = allStepsForContext.sublist(
-      startIndex,
-      startIndex + sequenceLength,
+    double calculatedImageRenderSize;
+    if (N == 1) {
+      calculatedImageRenderSize = contentAreaWidth * 0.5;
+    } else {
+      const double kSpacingFactor = 0.15;
+      calculatedImageRenderSize =
+          contentAreaWidth / (N + (N - 1) * kSpacingFactor);
+    }
+
+    final double finalImageRenderSize = calculatedImageRenderSize.clamp(
+      minImageSize,
+      min(maxImageSizeHorizontal, maxImageSizeVertical),
     );
 
-    correctImagePathSequence = selectedSteps.map((step) => step.image).toList();
-    correctSequenceIds = selectedSteps.map((step) => step.id).toList();
+    this.spacing = (N > 1) ? finalImageRenderSize * 0.15 : 0.0;
+    final double currentPlaceholderPadding = finalImageRenderSize * 0.05;
+    this.placeholderSize = finalImageRenderSize + 2 * currentPlaceholderPadding;
+
+    final double totalWidthOfPlaceholders =
+        (this.placeholderSize * N) + (this.spacing * (max(0, N - 1)));
+    final double startXPlaceholders = (size.x - totalWidthOfPlaceholders) / 2;
+
+    final double bottomUiOffset = size.y * 0.15;
+    final double availableHeightForGame = size.y - bottomUiOffset;
+
+    this.yPosition =
+        (availableHeightForGame * 0.4) - (this.placeholderSize / 2);
+
+    final double minTopMargin = size.y * 0.05;
+    this.yPosition = max(this.yPosition, minTopMargin);
+    this.yPosition = min(
+      this.yPosition,
+      size.y - this.placeholderSize - bottomUiOffset - minTopMargin,
+    );
 
     List<String> displayImagePaths = List.from(correctImagePathSequence);
     if (displayImagePaths.length > 1) {
@@ -125,19 +187,13 @@ class ToiletSortGame extends FlameGame {
       } while (areEqual && safetyBreak < 20);
     }
 
-    double totalWidthOfPlaceholders =
-        (placeholderSize * sequenceLength) + (spacing * (sequenceLength - 1));
-    double startXPlaceholders = (size.x - totalWidthOfPlaceholders) / 2;
-    yPosition = (size.y - placeholderSize - 120) / 2;
-    if (yPosition < 50) yPosition = 50;
-
-    for (int i = 0; i < sequenceLength; i++) {
+    for (int i = 0; i < numDisplayedItems; i++) {
       final placeholder = PlaceholderSlot(
         position: Vector2(
-          startXPlaceholders + i * (placeholderSize + spacing),
-          yPosition,
+          startXPlaceholders + i * (this.placeholderSize + this.spacing),
+          this.yPosition,
         ),
-        size: Vector2(placeholderSize, placeholderSize),
+        size: Vector2(this.placeholderSize, this.placeholderSize),
       );
       add(placeholder);
       placeholderSlots.add(placeholder);
@@ -157,8 +213,8 @@ class ToiletSortGame extends FlameGame {
       final imageId = imagePathToIdMap[path]!;
 
       Vector2 centerPos = Vector2(
-        placeholderForThisImage.position.x + placeholderSize / 2,
-        placeholderForThisImage.position.y + placeholderSize / 2,
+        placeholderForThisImage.position.x + this.placeholderSize / 2,
+        placeholderForThisImage.position.y + this.placeholderSize / 2,
       );
 
       final imageComponent = ImageSprite(
@@ -166,7 +222,7 @@ class ToiletSortGame extends FlameGame {
         imagePath: path,
         imageIdentifier: imageId,
         centerPosition: centerPos,
-        size: Vector2(imageRenderSize, imageRenderSize),
+        size: Vector2(finalImageRenderSize, finalImageRenderSize),
         gameRef: this,
         animationDelay: cumulativeDelay,
       );
