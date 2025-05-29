@@ -37,6 +37,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   flame: ^1.28.1 # Gunakan versi ini
   just_audio: ^0.10.3
+  audioplayers: ^5.2.1  # or latest
   isar: 
     version: 3.1.8
     hosted: https://pub.isar-community.dev/
@@ -79,6 +80,7 @@ flutter:
   assets:
     - assets/images/
     - assets/sounds/
+    - assets/sounds/backgound_music.mp3
     - lib/models/static/bathroom-data-static.json
     - lib/models/static/random-things-static.json
     - lib/models/static/step-static.json

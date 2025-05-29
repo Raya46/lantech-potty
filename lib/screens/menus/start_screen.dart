@@ -50,8 +50,9 @@ class _StartScreenState extends State<StartScreen> {
   @override
   Widget build(BuildContext context) {
     if (_isLoadingPlayer) {
-      return Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
+
     return Scaffold(
       body: Background(
         gender: _player?.gender as String,
@@ -61,6 +62,7 @@ class _StartScreenState extends State<StartScreen> {
             Expanded(
               flex: 3,
               child: Container(
+                // color: Color(0xFF4A2C2A),
                 padding: const EdgeInsets.only(bottom: 0),
                 child: FloatAnimatedWidget(
                   child: Image.asset(
@@ -73,11 +75,12 @@ class _StartScreenState extends State<StartScreen> {
 
             Expanded(
               flex: 3,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Container(
+                // color: Color(0xFF4A2C2A),
+                padding: const EdgeInsets.only(right: 96),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Stack(
                       children: [
@@ -93,9 +96,9 @@ class _StartScreenState extends State<StartScreen> {
                                   ..color = const Color(0xFF4A2C2A),
                           ),
                         ),
-                        Text(
+                        const Text(
                           "APLIKASI INTERAKTIF",
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 34,
                             fontWeight: FontWeight.bold,
                             color: Color(0xFFFFA07A),
@@ -118,9 +121,9 @@ class _StartScreenState extends State<StartScreen> {
                                   ..color = const Color(0xFF4A2C2A),
                           ),
                         ),
-                        Text(
+                        const Text(
                           "POTTY FUN KID'S",
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 34,
                             fontWeight: FontWeight.bold,
                             color: Color(0xFF00FFFF),
@@ -128,20 +131,15 @@ class _StartScreenState extends State<StartScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 20),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 100.0),
-                      child: Center(
-                        child: PlayButton(
-                          onPressed: () {
-                            Get.to(
-                              () => const ChooseGenderScreen(),
-                              transition: Transition.circularReveal,
-                              duration: const Duration(milliseconds: 1500),
-                            );
-                          },
-                        ),
-                      ),
+                    const SizedBox(height: 30),
+                    PlayButton(
+                      onPressed: () {
+                        Get.to(
+                          () => const ChooseGenderScreen(),
+                          transition: Transition.circularReveal,
+                          duration: const Duration(milliseconds: 1500),
+                        );
+                      },
                     ),
                   ],
                 ),

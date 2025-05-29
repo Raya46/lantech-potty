@@ -7,6 +7,7 @@ import 'package:toilet_training/widgets/header.dart';
 import 'package:toilet_training/screens/menus/choose_level_screen.dart';
 import 'package:toilet_training/widgets/play_button.dart';
 
+// ignore: must_be_immutable
 class LevelStartScreen extends StatefulWidget {
   LevelStartScreen({
     super.key,

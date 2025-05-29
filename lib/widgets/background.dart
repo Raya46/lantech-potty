@@ -54,7 +54,7 @@ class Background extends StatelessWidget {
         ),
         Positioned(
           bottom: MediaQuery.of(context).size.height * 0.04,
-          right: MediaQuery.of(context).size.width * 0.1 * -1,
+          right: MediaQuery.of(context).size.width * 0.1 * -1.5,
           child: Image.asset(
             'assets/images/rak-buku.png',
             width: 250,
