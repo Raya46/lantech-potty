@@ -1,13 +1,16 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:bordered_text/bordered_text.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:sizer/sizer.dart';
 import 'package:toilet_training/models/bathroom_item.dart';
 import 'package:toilet_training/models/player.dart';
+import 'package:toilet_training/responsive.dart';
 import 'package:toilet_training/screens/levels/level3/level3_start_screen.dart';
 import 'package:toilet_training/services/player_service.dart';
 import 'package:toilet_training/widgets/background.dart';
@@ -236,13 +239,36 @@ class _LevelTwoPlayScreenState extends State<LevelTwoPlayScreen> {
             gender: _player!.gender!,
             child: Column(
               children: [
-                Header(
-                  onTapBack: () {
-                    Get.off(() => const LevelTwoStartScreen());
-                  },
-                  title: "Level 2: Kenali Benda",
+                Expanded(
+                  flex: 1,
+                  child: Header(
+                    onTapBack: () {
+                      Get.off(() => const LevelTwoStartScreen());
+                    },
+                    title: "Level 2",
+                  ),
                 ),
                 Expanded(
+                  flex: 1,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: BorderedText(
+                      strokeWidth: 8.0,
+                      strokeColor: const Color.fromARGB(255, 3, 112, 112),
+                      child: Text(
+                        'Temukan gambar dari : ${_correctItem!.name}',
+                        style: TextStyle(
+                          fontSize:
+                              Responsive.isTablet(context) ? 16.sp : 14.sp,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF00FFFF),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  flex: 5,
                   child:
                       _isLoading
                           ? const Center(child: CircularProgressIndicator())
@@ -257,47 +283,34 @@ class _LevelTwoPlayScreenState extends State<LevelTwoPlayScreen> {
                           : _correctItem == null
                           ? const Center(child: Text("Memuat pertanyaan..."))
                           : Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Text(
-                                  'Temukan gambar dari : ${_correctItem!.name}',
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontSize: 32,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFFF480A4),
-                                  ),
+                                padding: EdgeInsets.symmetric(
+                                  horizontal:
+                                      MediaQuery.of(context).size.width * 0.1,
                                 ),
-                              ),
-                              Flexible(
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal:
-                                        MediaQuery.of(context).size.width * 0.1,
-                                  ),
-                                  child: GridView.builder(
-                                    shrinkWrap: true,
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                    gridDelegate:
-                                        const SliverGridDelegateWithFixedCrossAxisCount(
-                                          crossAxisCount: 3,
-                                          crossAxisSpacing: 15,
-                                          mainAxisSpacing: 15,
-                                          childAspectRatio: 1,
-                                        ),
-                                    itemCount: _currentChoices.length,
-                                    itemBuilder: (context, index) {
-                                      final item = _currentChoices[index];
-                                      return BathroomGuessCard(
-                                        onTap: () => _checkAnswer(item),
-                                        answered: _answered,
-                                        item: item,
-                                        correctItem: _correctItem!,
-                                      );
-                                    },
-                                  ),
+                                child: GridView.builder(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  gridDelegate:
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: 3,
+                                        crossAxisSpacing: 15,
+                                        mainAxisSpacing: 15,
+                                        childAspectRatio: 1,
+                                      ),
+                                  itemCount: _currentChoices.length,
+                                  itemBuilder: (context, index) {
+                                    final item = _currentChoices[index];
+                                    return BathroomGuessCard(
+                                      onTap: () => _checkAnswer(item),
+                                      answered: _answered,
+                                      item: item,
+                                      correctItem: _correctItem!,
+                                    );
+                                  },
                                 ),
                               ),
                             ],

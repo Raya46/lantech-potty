@@ -1,3 +1,4 @@
+import 'package:sizer/sizer.dart';
 import 'package:toilet_training/models/step.dart';
 import 'package:flutter/material.dart';
 
@@ -42,8 +43,8 @@ class _BuildStepCardState extends State<BuildStepCard>
       scale: _scaleAnimation,
       child: Center(
         child: SizedBox(
-          width: 100,
-          height: 140,
+          width: 25.w,
+          height: 25.h,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Image.asset(widget.step.image, fit: BoxFit.contain),

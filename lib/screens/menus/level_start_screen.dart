@@ -1,12 +1,16 @@
+import 'package:bordered_text/bordered_text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sizer/sizer.dart';
 import 'package:toilet_training/models/player.dart';
+import 'package:toilet_training/responsive.dart';
 import 'package:toilet_training/services/player_service.dart';
 import 'package:toilet_training/widgets/background.dart';
 import 'package:toilet_training/widgets/header.dart';
 import 'package:toilet_training/screens/menus/choose_level_screen.dart';
 import 'package:toilet_training/widgets/play_button.dart';
 
+// ignore: must_be_immutable
 class LevelStartScreen extends StatefulWidget {
   LevelStartScreen({
     super.key,
@@ -150,13 +154,17 @@ class _LevelStartScreenState extends State<LevelStartScreen>
         gender: widget.player!.gender!,
         child: Column(
           children: [
-            Header(
-              onTapBack: () {
-                Get.off(() => const ChooseLevelScreen());
-              },
-              title: "",
+            Expanded(
+              flex: 1,
+              child: Header(
+                onTapBack: () {
+                  Get.off(() => const ChooseLevelScreen());
+                },
+                title: "",
+              ),
             ),
             Expanded(
+              flex: 5,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -169,11 +177,14 @@ class _LevelStartScreenState extends State<LevelStartScreen>
                           scale: _characterScaleAnimation,
                           child: SlideTransition(
                             position: _offsetAnimation,
-                            child: Image.asset(
-                              widget.player!.gender == 'perempuan'
-                                  ? 'assets/images/female-happy.png'
-                                  : 'assets/images/male-happy.png',
-                              fit: BoxFit.contain,
+                            child: SizedBox(
+                              width: 40.w,
+                              child: Image.asset(
+                                widget.player!.gender == 'perempuan'
+                                    ? 'assets/images/female-happy.png'
+                                    : 'assets/images/male-happy.png',
+                                fit: BoxFit.contain,
+                              ),
                             ),
                           ),
                         ),
@@ -195,26 +206,19 @@ class _LevelStartScreenState extends State<LevelStartScreen>
                             scale: _levelTextScaleAnimation,
                             child: Stack(
                               children: [
-                                Text(
-                                  widget.levelText,
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: 34,
-                                    fontWeight: FontWeight.bold,
-                                    foreground:
-                                        Paint()
-                                          ..style = PaintingStyle.stroke
-                                          ..strokeWidth = 1.5
-                                          ..color = const Color(0xFF4A2C2A),
-                                  ),
-                                ),
-                                Text(
-                                  widget.levelText,
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontSize: 34,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFFFFA07A),
+                                BorderedText(
+                                  strokeWidth: 8.0,
+                                  strokeColor: const Color(0xFF4A2C2A),
+                                  child: Text(
+                                    widget.levelText,
+                                    style: TextStyle(
+                                      fontSize:
+                                          Responsive.isTablet(context)
+                                              ? 24.sp
+                                              : 20.sp,
+                                      fontWeight: FontWeight.bold,
+                                      color: const Color(0xFFFFA07A),
+                                    ),
                                   ),
                                 ),
                               ],
@@ -225,26 +229,20 @@ class _LevelStartScreenState extends State<LevelStartScreen>
                             scale: _descriptionTextScaleAnimation,
                             child: Stack(
                               children: [
-                                Text(
-                                  widget.levelDescription,
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: 34,
-                                    fontWeight: FontWeight.bold,
-                                    foreground:
-                                        Paint()
-                                          ..style = PaintingStyle.stroke
-                                          ..strokeWidth = 1.5
-                                          ..color = const Color(0xFF4A2C2A),
-                                  ),
-                                ),
-                                Text(
-                                  widget.levelDescription,
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontSize: 34,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFFFFA07A),
+                                BorderedText(
+                                  strokeWidth: 8.0,
+                                  strokeColor: const Color(0xFF4A2C2A),
+                                  child: Text(
+                                    textAlign: TextAlign.center,
+                                    widget.levelDescription,
+                                    style: TextStyle(
+                                      fontSize:
+                                          Responsive.isTablet(context)
+                                              ? 16.sp
+                                              : 14.sp,
+                                      fontWeight: FontWeight.bold,
+                                      color: const Color(0xFFFFA07A),
+                                    ),
                                   ),
                                 ),
                               ],

@@ -14,6 +14,7 @@ import 'package:toilet_training/screens/menus/choose_level_screen.dart';
 import 'package:toilet_training/services/player_service.dart';
 import 'package:toilet_training/games/sort_game/sort_game_component.dart';
 import 'package:toilet_training/widgets/modal_result.dart';
+import 'package:sizer/sizer.dart';
 
 class ToiletSortGame extends FlameGame {
   final BuildContext context;
@@ -133,23 +134,27 @@ class ToiletSortGame extends FlameGame {
     }
 
     final double N = numDisplayedItems.toDouble();
-    double contentAreaWidth = size.x * 0.85;
-    double minImageSize = size.x * 0.12;
-    double maxImageSizeHorizontal = size.x * 0.35;
-    double maxImageSizeVertical = size.y * 0.25;
+    double contentAreaWidth = 150.w;
+    double minImageSize = 30.w;
+    double maxImageSizeHorizontal = 500.w;
+    double maxImageSizeVertical = 500.h;
 
     double calculatedImageRenderSize;
     if (N == 1) {
-      calculatedImageRenderSize = contentAreaWidth * 0.5;
+      calculatedImageRenderSize = contentAreaWidth * 0.6;
     } else {
       const double kSpacingFactor = 0.15;
       calculatedImageRenderSize =
           contentAreaWidth / (N + (N - 1) * kSpacingFactor);
     }
 
+    final double maxImageSize = min(
+      maxImageSizeHorizontal,
+      maxImageSizeVertical,
+    );
     final double finalImageRenderSize = calculatedImageRenderSize.clamp(
       minImageSize,
-      min(maxImageSizeHorizontal, maxImageSizeVertical),
+      max(minImageSize, maxImageSize),
     );
 
     this.spacing = (N > 1) ? finalImageRenderSize * 0.15 : 0.0;

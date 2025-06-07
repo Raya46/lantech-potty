@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
+import 'package:toilet_training/responsive.dart';
 
 class CardLevel extends StatelessWidget {
   const CardLevel({
@@ -54,8 +56,8 @@ class CardLevel extends StatelessWidget {
     final Color topBackgroundColor = const Color(0xFFFFF8E1);
 
     return Container(
-      width: 180,
-      height: 250,
+      width: Responsive.isTablet(context) ? 45.w : 40.w,
+      height: Responsive.isTablet(context) ? 25.h : 30.h,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: topBackgroundColor,
@@ -86,12 +88,13 @@ class CardLevel extends StatelessWidget {
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
+                  fontSize: 14,
                 ),
               ),
             ),
           ),
           Expanded(
-            flex: 3,
+            flex: 4,
             child: Padding(
               padding: const EdgeInsets.all(12.0),
               child: Image.asset(imagePath, fit: BoxFit.contain),

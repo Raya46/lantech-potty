@@ -75,17 +75,13 @@ class _LevelOnePlayScreenState extends State<LevelOnePlayScreen> {
             }).toList();
         steps.sort((a, b) => a.id.compareTo(b.id));
         _currentImagePathsForGame = steps.map((step) => step.image).toList();
-
-        if (_currentImagePathsForGame.isEmpty) {}
       } else {
         _currentIsFocused = widget.isFocused;
         _currentImagePathsForGame = List.from(widget.imagePathsForGame);
       }
     } catch (e) {
-      _currentIsFocused = widget.isFocused; 
-      _currentImagePathsForGame = List.from(
-        widget.imagePathsForGame,
-      ); 
+      _currentIsFocused = widget.isFocused;
+      _currentImagePathsForGame = List.from(widget.imagePathsForGame);
     }
     if (mounted) {
       setState(() {
@@ -159,14 +155,18 @@ class _LevelOnePlayScreenState extends State<LevelOnePlayScreen> {
           children: [
             Column(
               children: [
-                Header(
-                  onTapBack: () {
-                    Get.off(() => const LevelOneStartScreen());
-                  },
-                  title: "Susun Langkah Toilet",
-                  onTapSettings: _showSettingsModal,
+                Expanded(
+                  flex: 1,
+                  child: Header(
+                    onTapBack: () {
+                      Get.off(() => const LevelOneStartScreen());
+                    },
+                    title: "Susun Langkah Toilet",
+                    onTapSettings: _showSettingsModal,
+                  ),
                 ),
                 Expanded(
+                  flex: 5,
                   child: GameWidget(
                     key: _gameKey,
                     game: ToiletSortGame(

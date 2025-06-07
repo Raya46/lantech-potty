@@ -78,78 +78,82 @@ class _ChooseLevelScreenState extends State<ChooseLevelScreen> {
         gender: _player!.gender!,
         child: Column(
           children: [
-            Header(
-              onTapBack: () {
-                Get.off(() => const ChooseGenderScreen());
-              },
-              title: "Pilih level",
+            Expanded(
+              flex: 1,
+              child: Header(
+                onTapBack: () {
+                  Get.off(() => const ChooseGenderScreen());
+                },
+                title: "Pilih level",
+              ),
             ),
             Expanded(
-              child: Center(
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    SingleChildScrollView(
-                      controller: _scrollController,
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children:
-                            levels.asMap().entries.map((entry) {
-                              int idx = entry.key;
-                              Map<String, dynamic> levelData = entry.value;
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8.0,
+              flex: 5,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  SingleChildScrollView(
+                    controller: _scrollController,
+                    padding: EdgeInsets.all(16),
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children:
+                          levels.asMap().entries.map((entry) {
+                            int idx = entry.key;
+                            Map<String, dynamic> levelData = entry.value;
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8.0,
+                              ),
+                              child: InkWell(
+                                onTap: () {
+                                  Get.to(
+                                    levelData['screen'],
+                                    transition: Transition.circularReveal,
+                                    duration: const Duration(
+                                      milliseconds: 1500,
+                                    ),
+                                  );
+                                },
+                                child: CardLevel(
+                                  title: levelData['text'],
+                                  gender: _player!.gender!,
+                                  level: idx + 1,
+                                  children: [],
                                 ),
-                                child: InkWell(
-                                  onTap: () {
-                                    Get.to(
-                                      levelData['screen'],
-                                      transition: Transition.circularReveal,
-                                      duration: Duration(milliseconds: 1500),
-                                    );
-                                  },
-                                  child: CardLevel(
-                                    title: levelData['text'],
-                                    gender: _player!.gender!,
-                                    level: idx + 1,
-                                    children: [],
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                      ),
+                              ),
+                            );
+                          }).toList(),
                     ),
-                    Positioned(
-                      left: 0,
-                      child: IconButton(
-                        icon: Icon(Icons.arrow_back_ios),
-                        onPressed: () {
-                          _scrollController.animateTo(
-                            _scrollController.offset - 200,
-                            duration: Duration(milliseconds: 300),
-                            curve: Curves.easeOut,
-                          );
-                        },
-                      ),
+                  ),
+                  Positioned(
+                    left: 0,
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_back_ios),
+                      onPressed: () {
+                        _scrollController.animateTo(
+                          _scrollController.offset - 200,
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeOut,
+                        );
+                      },
                     ),
-                    Positioned(
-                      right: 0,
-                      child: IconButton(
-                        icon: Icon(Icons.arrow_forward_ios),
-                        onPressed: () {
-                          _scrollController.animateTo(
-                            _scrollController.offset + 200,
-                            duration: Duration(milliseconds: 300),
-                            curve: Curves.easeOut,
-                          );
-                        },
-                      ),
+                  ),
+                  Positioned(
+                    right: 0,
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_forward_ios),
+                      onPressed: () {
+                        _scrollController.animateTo(
+                          _scrollController.offset + 200,
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeOut,
+                        );
+                      },
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ],
