@@ -1,10 +1,13 @@
 import 'dart:convert';
 
+import 'package:bordered_text/bordered_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:sizer/sizer.dart';
 import 'package:toilet_training/models/player.dart';
 import 'package:toilet_training/models/step.dart';
+import 'package:toilet_training/responsive.dart';
 import 'package:toilet_training/services/player_service.dart';
 import 'package:toilet_training/widgets/background.dart';
 import 'package:toilet_training/widgets/build_option_card.dart';
@@ -150,12 +153,16 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
   Widget _buildMaleTypeSelectionUI() {
     return Column(
       children: [
-        Header(
-          onTapBack: () => Get.off(() => const LevelFourStartScreen()),
-          title: "Level 4",
-          onTapSettings: () => _showSettingsModal(context),
+        Expanded(
+          flex: 1,
+          child: Header(
+            onTapBack: () => Get.off(() => const LevelFourStartScreen()),
+            title: "Level 4",
+            onTapSettings: () => _showSettingsModal(context),
+          ),
         ),
-        Center(
+        Expanded(
+          flex: 5,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -173,33 +180,39 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFFFFA07A),
-                        padding: EdgeInsets.symmetric(
+                    InkWell(
+                      onTap: () => _onMaleTypeSelected('bab'),
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
                           horizontal: 30,
                           vertical: 15,
                         ),
-                      ),
-                      onPressed: () => _onMaleTypeSelected('bab'),
-                      child: Text(
-                        "Buang Air Besar (BAB)",
-                        style: TextStyle(fontSize: 30, color: Colors.white),
+                        child: SizedBox(
+                          width: 40.w,
+                          child: Image.asset(
+                            'assets/images/26.png',
+                            fit: BoxFit.contain,
+                          ),
+                        ),
                       ),
                     ),
                     SizedBox(width: 20),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFFFFA07A),
-                        padding: EdgeInsets.symmetric(
+                    InkWell(
+                      onTap: () => _onMaleTypeSelected('bak'),
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
                           horizontal: 30,
                           vertical: 15,
                         ),
-                      ),
-                      onPressed: () => _onMaleTypeSelected('bak'),
-                      child: Text(
-                        "Buang Air Kecil (BAK)",
-                        style: TextStyle(fontSize: 30, color: Colors.white),
+                        child: SizedBox(
+                          width: 40.w,
+                          child: Image.asset(
+                            'assets/images/62.png',
+                            fit: BoxFit.contain,
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -390,168 +403,204 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
             gender: _player!.gender!,
             child: Column(
               children: [
-                Header(
-                  onTapBack: () {
-                    Get.off(() => const LevelFourStartScreen());
-                  },
-                  title: "Level 4",
-                  onTapSettings: () => _showSettingsModal(context),
+                Expanded(
+                  flex: 1,
+                  child: Header(
+                    onTapBack: () {
+                      Get.off(() => const LevelFourStartScreen());
+                    },
+                    title: "Level 4",
+                    onTapSettings: () => _showSettingsModal(context),
+                  ),
                 ),
                 Expanded(
-                  child: Center(
-                    child: Column(
-                      children: [
-                        Text(
-                          "Apa Langkah Selanjutnya?",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF8B5A2B),
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        Row(
+                  flex: 5,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            BuildStepCard(step: currentStep),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 30.0,
-                              ),
-                              child: Icon(
-                                Icons.arrow_forward,
-                                color: Color(0xFFF9A6A6),
-                                size: 60,
+                            Expanded(
+                              flex: 1,
+                              child: BorderedText(
+                                strokeWidth: 2.0,
+                                strokeColor: const Color(0xFF4A2C2A),
+                                child: Text(
+                                  "Apa Langkah Selanjutnya?",
+                                  style: TextStyle(
+                                    fontSize: 12.sp,
+                                    color: const Color(0xFF4A2C2A),
+                                  ),
+                                ),
                               ),
                             ),
-                            DragTarget<ToiletStep>(
-                              builder: (context, candidateData, rejectedData) {
-                                if (_droppedStepOnTarget != null) {
-                                  return BuildStepCard(
-                                    step: _droppedStepOnTarget!,
-                                  );
-                                }
-                                return Container(
-                                  width: 100,
-                                  height: 140,
-                                  decoration: BoxDecoration(
-                                    color:
-                                        candidateData.isNotEmpty
-                                            ? Color(0xFFFFF6E6).withOpacity(0.7)
-                                            : Color(0xFFFFF6E6),
-                                    border: Border.all(
-                                      color:
-                                          candidateData.isNotEmpty
-                                              ? Color(0xFFF9A6A6)
-                                              : Colors.transparent,
-                                      width: 2,
+                            SizedBox(height: 2.h,),
+                            Expanded(
+                              flex: 6,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  BuildStepCard(step: currentStep),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 30.0,
+                                    ),
+                                    child: Icon(
+                                      Icons.arrow_forward,
+                                      color: Color(0xFFF9A6A6),
+                                      size: 60,
                                     ),
                                   ),
-                                  child: Center(
-                                    child: Text(
-                                      "Ayo tarik\njawaban mu\nkesini",
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: Color(0xFF4A2C2A),
-                                      ),
-                                    ),
+                                  DragTarget<ToiletStep>(
+                                    builder: (
+                                      context,
+                                      candidateData,
+                                      rejectedData,
+                                    ) {
+                                      if (_droppedStepOnTarget != null) {
+                                        return BuildStepCard(
+                                          step: _droppedStepOnTarget!,
+                                        );
+                                      }
+                                      return Container(
+                                        width:
+                                            Responsive.isTablet(context)
+                                                ? 25.w
+                                                : 20.w,
+                                        height:
+                                            Responsive.isTablet(context)
+                                                ? 20.h
+                                                : 20.h,
+                                        decoration: BoxDecoration(
+                                          color:
+                                              candidateData.isNotEmpty
+                                                  ? Color(
+                                                    0xFFFFF6E6,
+                                                  ).withOpacity(0.7)
+                                                  : Color(0xFFFFF6E6),
+                                          border: Border.all(
+                                            color:
+                                                candidateData.isNotEmpty
+                                                    ? Color(0xFFF9A6A6)
+                                                    : Colors.transparent,
+                                            width: 2,
+                                          ),
+                                        ),
+                                        child: Center(
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                              "Ayo tarik\njawaban mu\nkesini",
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                fontSize: 10.sp,
+                                                fontWeight: FontWeight.bold,
+                                                color: Color(0xFF4A2C2A),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    onWillAccept: (data) {
+                                      return _droppedStepOnTarget == null;
+                                    },
+                                    onAccept: (droppedStep) {
+                                      if (nextStep != null &&
+                                          droppedStep.id == nextStep.id) {
+                                        setState(() {
+                                          _droppedStepOnTarget = droppedStep;
+                                        });
+                                                      
+                                        bool isFinalStepInSequenceDropped =
+                                            (currentStepIndex + 1 ==
+                                                _steps.length - 1);
+                                                      
+                                        if (isFinalStepInSequenceDropped) {
+                                          Future.delayed(Duration(seconds: 1), () {
+                                            if (mounted) {
+                                              setState(() {
+                                                currentStepIndex++;
+                                              });
+                                              _saveScore(
+                                                _calculateStars(_wrongAttempts),
+                                              );
+                                              _showCompletionDialog(
+                                                "Level 4 Selesai!",
+                                              );
+                                            }
+                                          });
+                                        } else {
+                                          Future.delayed(Duration(seconds: 1), () {
+                                            if (mounted) {
+                                              setState(() {
+                                                currentStepIndex++;
+                                                _droppedStepOnTarget = null;
+                                              });
+                                            }
+                                          });
+                                        }
+                                      } else {
+                                        if (mounted) {
+                                          setState(() {
+                                            _wrongAttempts++;
+                                          });
+                                        }
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              "Bukan itu langkahnya, coba lagi!",
+                                            ),
+                                            backgroundColor: Colors.orange,
+                                            duration: Duration(seconds: 1),
+                                          ),
+                                        );
+                                      }
+                                    },
                                   ),
-                                );
-                              },
-                              onWillAccept: (data) {
-                                return _droppedStepOnTarget == null;
-                              },
-                              onAccept: (droppedStep) {
-                                if (nextStep != null &&
-                                    droppedStep.id == nextStep.id) {
-                                  setState(() {
-                                    _droppedStepOnTarget = droppedStep;
-                                  });
-
-                                  bool isFinalStepInSequenceDropped =
-                                      (currentStepIndex + 1 ==
-                                          _steps.length - 1);
-
-                                  if (isFinalStepInSequenceDropped) {
-                                    Future.delayed(Duration(seconds: 1), () {
-                                      if (mounted) {
-                                        setState(() {
-                                          currentStepIndex++;
-                                        });
-                                        _saveScore(
-                                          _calculateStars(_wrongAttempts),
-                                        );
-                                        _showCompletionDialog(
-                                          "Level 4 Selesai!",
-                                        );
-                                      }
-                                    });
-                                  } else {
-                                    Future.delayed(Duration(seconds: 1), () {
-                                      if (mounted) {
-                                        setState(() {
-                                          currentStepIndex++;
-                                          _droppedStepOnTarget = null;
-                                        });
-                                      }
-                                    });
-                                  }
-                                } else {
-                                  if (mounted) {
-                                    setState(() {
-                                      _wrongAttempts++;
-                                    });
-                                  }
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        "Bukan itu langkahnya, coba lagi!",
-                                      ),
-                                      backgroundColor: Colors.orange,
-                                      duration: Duration(seconds: 1),
-                                    ),
-                                  );
-                                }
-                              },
+                                ],
+                              ),
                             ),
                           ],
                         ),
-                        if (nextStep != null)
-                          Row(
+                      ),
+                      if (nextStep != null)
+                        Expanded(
+                          child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children:
                                 options
                                     .map(
                                       (step) => Padding(
                                         padding: const EdgeInsets.symmetric(
-                                          horizontal: 12,
+                                          // horizontal: 12,
                                         ),
                                         child: BuildOptionCard(step: step),
                                       ),
                                     )
                                     .toList(),
-                          )
-                        else if (_steps.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Text(
-                              _steps.isNotEmpty &&
-                                      currentStepIndex >= _steps.length - 1 &&
-                                      _droppedStepOnTarget != null
-                                  ? "Kerja Bagus!"
-                                  : "Pilih langkah yang benar!",
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Color(0xFF8B5A2B),
-                                fontWeight: FontWeight.bold,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
                           ),
-                      ],
-                    ),
+                        )
+                      else if (_steps.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Text(
+                            _steps.isNotEmpty &&
+                                    currentStepIndex >= _steps.length - 1 &&
+                                    _droppedStepOnTarget != null
+                                ? "Kerja Bagus!"
+                                : "Pilih langkah yang benar!",
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Color(0xFF8B5A2B),
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               ],

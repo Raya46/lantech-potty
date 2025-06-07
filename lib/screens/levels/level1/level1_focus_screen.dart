@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:sizer/sizer.dart';
 import 'package:toilet_training/models/player.dart';
 import 'package:toilet_training/models/step.dart';
 import 'package:toilet_training/services/player_service.dart';
@@ -130,14 +131,18 @@ class _LevelOneFocusScreenState extends State<LevelOneFocusScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Header(
-                onTapBack: () {
-                  Get.off(() => const ChooseLevelScreen());
-                },
-                title: "Latih Fokusmu !",
-                onTapSettings: () => _showSettingsModal(context),
+              Expanded(
+                flex: 1,
+                child: Header(
+                  onTapBack: () {
+                    Get.off(() => const ChooseLevelScreen());
+                  },
+                  title: "Latih Fokusmu !",
+                  onTapSettings: () => _showSettingsModal(context),
+                ),
               ),
               Expanded(
+                flex: 5,
                 child: Center(
                   child: Text(
                     _player!.isFocused == true
@@ -178,14 +183,18 @@ class _LevelOneFocusScreenState extends State<LevelOneFocusScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Header(
-              onTapBack: () {
-                Get.off(() => const ChooseLevelScreen());
-              },
-              title: "Latih Fokusmu !",
-              onTapSettings: () => _showSettingsModal(context),
+            Expanded(
+              flex: 1,
+              child: Header(
+                onTapBack: () {
+                  Get.off(() => const ChooseLevelScreen());
+                },
+                title: "Latih Fokusmu !",
+                onTapSettings: () => _showSettingsModal(context),
+              ),
             ),
             Expanded(
+              flex: 5,
               child: Stack(
                 alignment: Alignment.center,
                 children: [
@@ -197,8 +206,8 @@ class _LevelOneFocusScreenState extends State<LevelOneFocusScreen> {
                       children:
                           _imagePaths.map((path) {
                             return SizedBox(
-                              width: 150.0,
-                              height: 200.0,
+                              width: 40.w,
+                              height: 30.h,
                               child: Image.asset(
                                 path,
                                 fit: BoxFit.contain,

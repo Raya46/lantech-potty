@@ -1,5 +1,8 @@
+import 'package:bordered_text/bordered_text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sizer/sizer.dart';
+import 'package:toilet_training/responsive.dart';
 import 'package:toilet_training/widgets/modal_setting.dart';
 
 class Header extends StatelessWidget {
@@ -32,10 +35,8 @@ class Header extends StatelessWidget {
             onClose: () {
               Get.back(canPop: false);
             },
-            onTapSound: () {
-            },
-            onTapMusic: () {
-            },
+            onTapSound: () {},
+            onTapMusic: () {},
           ),
         );
       },
@@ -80,26 +81,16 @@ class Header extends StatelessWidget {
             child: Stack(
               alignment: Alignment.center,
               children: [
-                Text(
-                  title,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    foreground:
-                        Paint()
-                          ..style = PaintingStyle.stroke
-                          ..strokeWidth = 2.0
-                          ..color = textOutlineColor,
-                  ),
-                ),
-                Text(
-                  title,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: textFillColor,
+                BorderedText(
+                  strokeWidth: 4.0,
+                  strokeColor: const Color(0xFF4A2C2A),
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: Responsive.isTablet(context) ? 16.sp : 16.sp,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFFFFA07A),
+                    ),
                   ),
                 ),
               ],

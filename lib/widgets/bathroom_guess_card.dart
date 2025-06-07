@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
 import 'package:toilet_training/models/bathroom_item.dart';
 
 class BathroomGuessCard extends StatefulWidget {
@@ -9,6 +10,7 @@ class BathroomGuessCard extends StatefulWidget {
     required this.item,
     required this.correctItem,
   });
+
   final VoidCallback onTap;
   final bool answered;
   final BathroomItem item;
@@ -53,36 +55,36 @@ class _BathroomGuessCardState extends State<BathroomGuessCard>
       child: GestureDetector(
         onTap: widget.onTap,
         child: Container(
+          width: 40.w,
+          height: 30.h,
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(15),
+            color: Color(0xFFFFF8E1),
+            borderRadius: BorderRadius.circular(3.w),
             border: Border.all(
-              color:
-                  widget.answered && widget.item.id == widget.correctItem.id
-                      ? Colors.green
-                      : widget.answered &&
-                          widget.item.id != widget.correctItem.id
+              color: widget.answered && widget.item.id == widget.correctItem.id
+                  ? Colors.green
+                  : widget.answered && widget.item.id != widget.correctItem.id
                       ? Colors.red
                       : Colors.grey[300]!,
-              width: widget.answered ? 3 : 1.5,
+              width: widget.answered ? 0.5.w : 0.3.w,
             ),
             boxShadow: [
               BoxShadow(
                 color: Colors.grey.withOpacity(0.3),
-                spreadRadius: 2,
-                blurRadius: 5,
-                offset: const Offset(0, 3),
+                spreadRadius: 0.5.w,
+                blurRadius: 1.w,
+                offset: Offset(0, 1.h),
               ),
             ],
           ),
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: EdgeInsets.all(4.w),
             child: Image.asset(
               widget.item.image,
               fit: BoxFit.contain,
               errorBuilder: (context, error, stackTrace) {
-                return const Center(
-                  child: Icon(Icons.broken_image, size: 40, color: Colors.grey),
+                return Center(
+                  child: Icon(Icons.broken_image, size: 8.w, color: Colors.grey),
                 );
               },
             ),

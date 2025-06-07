@@ -1,6 +1,7 @@
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sizer/sizer.dart';
 
 class ModalResult {
   static void show({
@@ -24,7 +25,7 @@ class ModalResult {
         return Icon(
           index < starsEarned ? Icons.star : Icons.star_border,
           color: Colors.amber,
-          size: 30,
+          size: 8.w,
         );
       }),
     );
@@ -49,7 +50,7 @@ class ModalResult {
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: titleColor,
-              fontSize: 22,
+              fontSize: 12.sp,
             ),
           ),
         ),
@@ -62,14 +63,14 @@ class ModalResult {
                 playerGender == 'perempuan'
                     ? 'assets/images/female-happy.png'
                     : 'assets/images/male-happy.png',
-                height: 80,
+                height: 10.h,
               ),
               const SizedBox(height: 10),
             ],
             Text(
               message,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16, color: Color(0xFF8B5A2B)),
+              style: TextStyle(fontSize: 10.sp, color: Color(0xFF8B5A2B)),
             ),
             if (starsEarned > 0 || isSuccess) ...[starDisplay],
             if (child != null) ...[const SizedBox(height: 15), child],
@@ -91,11 +92,11 @@ class ModalResult {
             },
             child: Text(
               primaryActionText,
-              style: TextStyle(fontSize: 16, color: Colors.white),
+              style: TextStyle(fontSize: 8.sp, color: Colors.white),
             ),
           ),
           if (onSecondaryAction != null && secondaryActionText != null) ...[
-            SizedBox(width: 10),
+            SizedBox(width: 8),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFF5C9A4A),
@@ -110,7 +111,7 @@ class ModalResult {
               },
               child: Text(
                 secondaryActionText,
-                style: TextStyle(fontSize: 16, color: Colors.white),
+                style: TextStyle(fontSize: 8.sp, color: Colors.white),
               ),
             ),
           ],

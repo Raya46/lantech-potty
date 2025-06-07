@@ -159,14 +159,18 @@ class _LevelOnePlayScreenState extends State<LevelOnePlayScreen> {
           children: [
             Column(
               children: [
-                Header(
-                  onTapBack: () {
-                    Get.off(() => const LevelOneStartScreen());
-                  },
-                  title: "Susun Langkah Toilet",
-                  onTapSettings: _showSettingsModal,
+                Expanded(
+                  flex: 1,
+                  child: Header(
+                    onTapBack: () {
+                      Get.off(() => const LevelOneStartScreen());
+                    },
+                    title: "Susun Langkah Toilet",
+                    onTapSettings: _showSettingsModal,
+                  ),
                 ),
                 Expanded(
+                  flex: 5,
                   child: GameWidget(
                     key: _gameKey,
                     game: ToiletSortGame(

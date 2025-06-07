@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
+import 'package:toilet_training/responsive.dart';
 
 class Background extends StatelessWidget {
   final String gender;
@@ -8,6 +10,8 @@ class Background extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isTablet = Responsive.isTablet(context);
+
     return Stack(
       children: [
         Column(
@@ -15,103 +19,111 @@ class Background extends StatelessWidget {
             Expanded(
               flex: 3,
               child: Container(
-                color:
-                    gender == 'laki-laki'
-                        ? const Color(0xFFC2E0FF)
-                        : const Color(0xFFFFDDD2),
+                color: gender == 'laki-laki'
+                    ? const Color(0xFFC2E0FF)
+                    : const Color(0xFFFFDDD2),
               ),
             ),
             Expanded(
               flex: 1,
               child: Container(
-                color:
-                    gender == 'laki-laki'
-                        ? const Color(0xFF52AACA)
-                        : const Color(0xFFFC9D99),
+                color: gender == 'laki-laki'
+                    ? const Color(0xFF52AACA)
+                    : const Color(0xFFFC9D99),
               ),
             ),
           ],
         ),
+
+        // Jendela kanan
         Positioned(
-          top: 1,
-          right: 20,
+          top: 1.h,
+          right: 5.w,
           child: Image.asset(
             'assets/images/jendela.png',
-            width: 100,
-            height: 100,
+            width: isTablet ? 20.w : 20.w, 
             fit: BoxFit.fill,
           ),
         ),
+
+        // Jendela kiri
         Positioned(
-          top: 1,
-          left: 20,
+          top: 1.h,
+          left: 5.w,
           child: Image.asset(
             'assets/images/jendela.png',
-            width: 150,
-            height: 150,
+            width: isTablet ? 30.w : 25.w, 
             fit: BoxFit.fill,
           ),
         ),
+
+        // Rak buku
         Positioned(
-          bottom: MediaQuery.of(context).size.height * 0.04,
-          right: MediaQuery.of(context).size.width * 0.1 * -1.5,
+          bottom: 4.h,
+          right: -15.w,
           child: Image.asset(
             'assets/images/rak-buku.png',
-            width: 250,
-            height: 300,
+            width: isTablet ? 40.w : 35.w, // was 250
             fit: BoxFit.fill,
           ),
         ),
+
+        // Tanaman kanan
         Positioned(
-          bottom: MediaQuery.of(context).size.height * 0.1 * -1,
-          right: -80,
+          bottom: -1.h,
+          right: -12.w,
           child: Image.asset(
             'assets/images/tanaman2.png',
-            width: 150,
-            height: 200,
+            width: isTablet ? 25.w : 25.w, // was 150
             fit: BoxFit.fill,
           ),
         ),
+
+        // Tanaman kiri
         Positioned(
-          bottom: MediaQuery.of(context).size.height * 0.1 * -1,
-          left: MediaQuery.of(context).size.width * 0.1 * -1,
+          bottom: -5.h,
+          left: -10.w,
           child: Image.asset(
             'assets/images/tanaman2.png',
-            width: 200,
-            height: 300,
+            width: isTablet ? 35.w : 30.w,  // was 200
             fit: BoxFit.fill,
           ),
         ),
+
+        // Tanaman kecil tengah
         Positioned(
-          bottom: MediaQuery.of(context).size.height * 0.16,
-          right: MediaQuery.of(context).size.width * 0.51,
+          bottom: 10.h,
+          left: 64.w,
           child: Image.asset(
             'assets/images/tanaman1.png',
-            width: 100,
-            height: 100,
+            width: isTablet ? 20.w : 20.w, // was 100
             fit: BoxFit.fill,
           ),
         ),
+
+        // Karpet
         Positioned(
-          bottom: MediaQuery.of(context).size.height * 0.05,
-          right: MediaQuery.of(context).size.width * 0.2,
+          bottom: 5.h,
+          left: 100.w,
           child: Image.asset(
             'assets/images/karpet.png',
-            width: 174,
-            height: 66,
+            width: isTablet ? 30.w : 35.w, // was 174
             fit: BoxFit.fill,
           ),
         ),
+
+        // Kucing
         Positioned(
-          bottom: MediaQuery.of(context).size.height * 0.05,
-          right: MediaQuery.of(context).size.width * 0.15,
+          bottom: 5.h,
+          left: 110.w,
           child: Image.asset(
             'assets/images/kucing.png',
-            width: 109,
-            height: 164,
+            width: isTablet ? 20.w : 20.w, // was 109
             fit: BoxFit.fill,
           ),
         ),
+
+        // Main content
         child,
       ],
     );

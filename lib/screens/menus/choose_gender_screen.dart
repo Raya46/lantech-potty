@@ -59,16 +59,20 @@ class _ChooseGenderScreenState extends State<ChooseGenderScreen> {
         gender: _player?.gender ?? 'male',
         child: Column(
           children: [
-            Header(
-              onTapBack: () {
-                Get.off(() => const StartScreen());
-              },
-              title: "Pilih Gender",
+            Expanded(
+              flex: 1,
+              child: Header(
+                onTapBack: () {
+                  Get.off(() => const StartScreen());
+                },
+                title: "Pilih Gender",
+              ),
             ),
             if (_player == null)
               Center(child: CircularProgressIndicator())
             else
               Expanded(
+                flex: 5,
                 child: Center(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,

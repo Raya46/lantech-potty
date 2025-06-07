@@ -1,6 +1,7 @@
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sizer/sizer.dart';
 import 'package:toilet_training/games/hidden_object_game/hidden_object_game.dart';
 import 'package:toilet_training/models/player.dart';
 import 'package:toilet_training/models/scene_object.dart';
@@ -281,15 +282,15 @@ class _LevelThreePlayScreenState extends State<LevelThreePlayScreen> {
     }
 
     return Scaffold(
-      body: Background(
-        gender: _player!.gender!,
+      body: Container(
+        color: Color(0xFFF7E4D5), // New color
         child: Column(
           children: [
             Header(
               onTapBack: () {
                 Get.off(() => LevelThreeStartScreen());
               },
-              title: "Level 3: Cari Benda",
+              title: "Level 3",
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -299,7 +300,7 @@ class _LevelThreePlayScreenState extends State<LevelThreePlayScreen> {
                     ? "Semua Benda Ditemukan!"
                     : "Temukanlah benda berikut ini:",
                 style: TextStyle(
-                  fontSize: 20,
+                  fontSize: 10.sp,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF8B5A2B),
                 ),
@@ -325,7 +326,7 @@ class _LevelThreePlayScreenState extends State<LevelThreePlayScreen> {
                         label: Text(
                           obj.name,
                           style: TextStyle(
-                            fontSize: 30,
+                            fontSize: 10.sp,
                             color: Colors.white,
                             fontWeight: FontWeight.w600,
                           ),
@@ -356,17 +357,24 @@ class _LevelThreePlayScreenState extends State<LevelThreePlayScreen> {
                   style: TextStyle(color: Colors.grey[600], fontSize: 16),
                 ),
               ),
-            SizedBox(height: 15),
+            // SizedBox(height: 15),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12.0),
-                  child: GameWidget(game: _game),
+                padding: const EdgeInsets.all(16),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Color(0xFFEEDD6C3), // EDD6C3 in hex
+                    borderRadius: BorderRadius.circular(24.0),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12.0),
+                    child: GameWidget(game: _game),
+                  ),
                 ),
               ),
             ),
-            SizedBox(height: 10),
+
+            // SizedBox(height: 10),
           ],
         ),
       ),

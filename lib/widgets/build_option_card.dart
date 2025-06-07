@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
 import 'package:toilet_training/models/step.dart';
 import 'package:toilet_training/widgets/build_feedback_card.dart';
 
@@ -44,10 +45,10 @@ class _BuildOptionCardState extends State<BuildOptionCard>
       child: Draggable<ToiletStep>(
         data: widget.step,
         feedback: BuildFeedbackCard(step: widget.step),
-        childWhenDragging: const SizedBox(width: 100, height: 140),
+        childWhenDragging: SizedBox(width: 20.w, height: 20.h),
         child: SizedBox(
-          width: 100,
-          height: 140,
+          width: 25.w,
+          height: 25.h,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Image.asset(widget.step.image, fit: BoxFit.contain),

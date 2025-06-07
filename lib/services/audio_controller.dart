@@ -8,7 +8,7 @@ class AudioController {
 
   AudioController._internal() {
     _player.setReleaseMode(ReleaseMode.loop); 
-    _player.setVolume(0.2); 
+    _player.setVolume(0.4); 
   }
 
   Future<void> startBackgroundMusic() async {
