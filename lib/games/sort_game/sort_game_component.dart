@@ -50,6 +50,21 @@ class ImageSprite extends SpriteComponent with DragCallbacks {
   Future<void> onLoad() async {
     await super.onLoad();
     anchor = Anchor.center;
+
+    if (sprite != null) {
+      final originalAspectRatio =
+          sprite!.originalSize.x / sprite!.originalSize.y;
+      final boundingBox = size.clone();
+
+      if (originalAspectRatio > 1) {
+        size.x = boundingBox.x;
+        size.y = boundingBox.x / originalAspectRatio;
+      } else {
+        size.y = boundingBox.y;
+        size.x = boundingBox.y * originalAspectRatio;
+      }
+    }
+
     scale = Vector2.zero();
 
     final appearSequence = SequenceEffect([

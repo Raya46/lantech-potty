@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sizer/sizer.dart';
 import 'package:toilet_training/models/player.dart';
 import 'package:toilet_training/screens/levels/level1/level1_start_screen.dart';
 import 'package:toilet_training/screens/levels/level2/level2_start_screen.dart';

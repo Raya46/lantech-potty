@@ -75,17 +75,13 @@ class _LevelOnePlayScreenState extends State<LevelOnePlayScreen> {
             }).toList();
         steps.sort((a, b) => a.id.compareTo(b.id));
         _currentImagePathsForGame = steps.map((step) => step.image).toList();
-
-        if (_currentImagePathsForGame.isEmpty) {}
       } else {
         _currentIsFocused = widget.isFocused;
         _currentImagePathsForGame = List.from(widget.imagePathsForGame);
       }
     } catch (e) {
-      _currentIsFocused = widget.isFocused; 
-      _currentImagePathsForGame = List.from(
-        widget.imagePathsForGame,
-      ); 
+      _currentIsFocused = widget.isFocused;
+      _currentImagePathsForGame = List.from(widget.imagePathsForGame);
     }
     if (mounted) {
       setState(() {

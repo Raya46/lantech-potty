@@ -9,7 +9,7 @@ import 'package:toilet_training/services/player_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await AudioController().startBackgroundMusic(); 
+  await AudioController().startBackgroundMusic();
 
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.landscapeLeft,
