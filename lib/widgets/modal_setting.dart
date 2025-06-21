@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:toilet_training/models/player.dart';
+import 'package:toilet_training/services/audio_controller.dart';
 import 'package:toilet_training/services/player_service.dart';
 
 class _SettingOption extends StatelessWidget {
@@ -50,14 +51,9 @@ class _SettingOption extends StatelessWidget {
 class SettingsModalContent extends StatefulWidget {
   final VoidCallback? onClose;
   final VoidCallback? onTapSound;
-  final VoidCallback? onTapMusic;
 
-  const SettingsModalContent({
-    Key? key,
-    this.onClose,
-    this.onTapSound,
-    this.onTapMusic,
-  }) : super(key: key);
+  const SettingsModalContent({Key? key, this.onClose, this.onTapSound})
+    : super(key: key);
 
   @override
   State<SettingsModalContent> createState() => _SettingsModalContentState();
@@ -130,6 +126,13 @@ class _SettingsModalContentState extends State<SettingsModalContent> {
     }
   }
 
+  Future<void> _toggleMusic() async {
+    await AudioController().toggleMusic();
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     const Color cardBackgroundColor = Color(0xFFFFF8E1);
@@ -178,6 +181,18 @@ class _SettingsModalContentState extends State<SettingsModalContent> {
                   ),
                 ],
               ),
+              if (_player?.accumulatedScore != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 16.0),
+                  child: Text(
+                    "Skor Rata-rata: ${_player!.accumulatedScore!.toStringAsFixed(2)}",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blueGrey,
+                    ),
+                  ),
+                ),
               const SizedBox(height: 24),
               _isLoadingPlayer
                   ? CircularProgressIndicator()
@@ -185,14 +200,10 @@ class _SettingsModalContentState extends State<SettingsModalContent> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       _SettingOption(
-                        icon: Icons.volume_up,
-                        label: "Suara",
-                        onTap: widget.onTapSound,
-                      ),
-                      _SettingOption(
                         icon: Icons.music_note,
                         label: "Musik",
-                        onTap: widget.onTapMusic,
+                        onTap: _toggleMusic,
+                        isActive: AudioController().isMusicOn,
                       ),
                       _SettingOption(
                         icon: Icons.center_focus_strong,

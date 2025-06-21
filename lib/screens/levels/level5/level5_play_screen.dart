@@ -2,6 +2,8 @@ import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:toilet_training/games/puzzle/puzzle_game.dart';
+import 'package:toilet_training/models/player.dart';
+import 'package:toilet_training/services/player_service.dart';
 import 'package:toilet_training/widgets/background.dart';
 import 'package:toilet_training/widgets/header.dart';
 import 'package:toilet_training/screens/levels/level5/level5_start_screen.dart';
@@ -20,6 +22,7 @@ class _LevelFivePlayScreenState extends State<LevelFivePlayScreen> {
   PuzzleGame? _puzzleGame;
   String? _initializationError;
   late ConfettiController _confettiController;
+  Player? _player;
 
   @override
   void initState() {
@@ -27,12 +30,20 @@ class _LevelFivePlayScreenState extends State<LevelFivePlayScreen> {
     _confettiController = ConfettiController(
       duration: const Duration(seconds: 2),
     );
+    _loadPlayerAndInitializeGame();
+  }
+
+  Future<void> _loadPlayerAndInitializeGame() async {
     try {
-      _puzzleGame = PuzzleGame(onPuzzleSolved: _showPuzzleSolvedDialog);
+      _player = await getPlayer();
+      _puzzleGame = PuzzleGame(onPuzzleSolved: _onPuzzleSolved);
+      if (mounted) setState(() {});
     } catch (e) {
-      setState(() {
-        _initializationError = e.toString();
-      });
+      if (mounted) {
+        setState(() {
+          _initializationError = e.toString();
+        });
+      }
     }
   }
 
@@ -68,10 +79,56 @@ class _LevelFivePlayScreenState extends State<LevelFivePlayScreen> {
     }
   }
 
-  void _showPuzzleSolvedDialog() {
-    if (!mounted) return;
+  Future<void> _onPuzzleSolved() async {
+    if (!mounted || _player == null) return;
 
     const int starsEarned = 3;
+    _player!.level5Score = starsEarned;
+    await updatePlayer(_player!);
+
+    if (_player!.level1Score != null &&
+        _player!.level2Score != null &&
+        _player!.level3Score != null &&
+        _player!.level4Score != null &&
+        _player!.accumulatedScore == null) {
+      final scores = [
+        _player!.level1Score!,
+        _player!.level2Score!,
+        _player!.level3Score!,
+        _player!.level4Score!,
+        _player!.level5Score!,
+      ];
+      final double avgScore = scores.reduce((a, b) => a + b) / scores.length;
+      _player!.accumulatedScore = avgScore;
+      await updatePlayer(_player!);
+
+      _showAccumulatedScoreDialog(avgScore);
+    } else {
+      _showPuzzleSolvedDialog(starsEarned);
+    }
+  }
+
+  void _showAccumulatedScoreDialog(double accumulatedScore) {
+    if (!mounted) return;
+    _confettiController.play();
+    ModalResult.show(
+      context: context,
+      title: "Semua Level Selesai!",
+      message:
+          "Selamat! Kamu telah menyelesaikan semua level.\nSkor rata-ratamu adalah: ${accumulatedScore.toStringAsFixed(2)}",
+      starsEarned: 3,
+      isSuccess: true,
+      confettiController: _confettiController,
+      primaryActionText: "Kembali ke Awal",
+      onPrimaryAction: () {
+        Get.off(() => const LevelFiveStartScreen());
+      },
+    );
+  }
+
+  void _showPuzzleSolvedDialog(int starsEarned) {
+    if (!mounted) return;
+
     _playSoundForResult(starsEarned);
 
     ModalResult.show(
@@ -86,7 +143,7 @@ class _LevelFivePlayScreenState extends State<LevelFivePlayScreen> {
         if (_puzzleGame != null) {
           setState(() {
             _initializationError = null;
-            _puzzleGame = PuzzleGame(onPuzzleSolved: _showPuzzleSolvedDialog);
+            _puzzleGame = PuzzleGame(onPuzzleSolved: _onPuzzleSolved);
           });
         }
       },
@@ -110,7 +167,7 @@ class _LevelFivePlayScreenState extends State<LevelFivePlayScreen> {
       );
     }
 
-    if (_puzzleGame == null) {
+    if (_puzzleGame == null || _player == null) {
       return Scaffold(body: const Center(child: CircularProgressIndicator()));
     }
 
@@ -118,7 +175,7 @@ class _LevelFivePlayScreenState extends State<LevelFivePlayScreen> {
       body: Stack(
         children: [
           Background(
-            gender: 'perempuan',
+            gender: _player?.gender ?? 'perempuan',
             child: Column(
               children: [
                 Header(

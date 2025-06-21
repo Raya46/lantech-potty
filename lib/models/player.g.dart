@@ -17,43 +17,48 @@ const PlayerSchema = CollectionSchema(
   name: r'Player',
   id: -1052842935974721688,
   properties: {
-    r'gender': PropertySchema(
+    r'accumulatedScore': PropertySchema(
       id: 0,
+      name: r'accumulatedScore',
+      type: IsarType.double,
+    ),
+    r'gender': PropertySchema(
+      id: 1,
       name: r'gender',
       type: IsarType.string,
     ),
     r'isFocused': PropertySchema(
-      id: 1,
+      id: 2,
       name: r'isFocused',
       type: IsarType.bool,
     ),
     r'level': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'level',
       type: IsarType.long,
     ),
     r'level1Score': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'level1Score',
       type: IsarType.long,
     ),
     r'level2Score': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'level2Score',
       type: IsarType.long,
     ),
     r'level3Score': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'level3Score',
       type: IsarType.long,
     ),
     r'level4Score': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'level4Score',
       type: IsarType.long,
     ),
     r'level5Score': PropertySchema(
-      id: 7,
+      id: 8,
       name: r'level5Score',
       type: IsarType.long,
     )
@@ -93,14 +98,15 @@ void _playerSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeString(offsets[0], object.gender);
-  writer.writeBool(offsets[1], object.isFocused);
-  writer.writeLong(offsets[2], object.level);
-  writer.writeLong(offsets[3], object.level1Score);
-  writer.writeLong(offsets[4], object.level2Score);
-  writer.writeLong(offsets[5], object.level3Score);
-  writer.writeLong(offsets[6], object.level4Score);
-  writer.writeLong(offsets[7], object.level5Score);
+  writer.writeDouble(offsets[0], object.accumulatedScore);
+  writer.writeString(offsets[1], object.gender);
+  writer.writeBool(offsets[2], object.isFocused);
+  writer.writeLong(offsets[3], object.level);
+  writer.writeLong(offsets[4], object.level1Score);
+  writer.writeLong(offsets[5], object.level2Score);
+  writer.writeLong(offsets[6], object.level3Score);
+  writer.writeLong(offsets[7], object.level4Score);
+  writer.writeLong(offsets[8], object.level5Score);
 }
 
 Player _playerDeserialize(
@@ -110,16 +116,17 @@ Player _playerDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = Player(
-    reader.readLongOrNull(offsets[2]),
+    reader.readStringOrNull(offsets[1]),
   );
-  object.gender = reader.readStringOrNull(offsets[0]);
+  object.accumulatedScore = reader.readDoubleOrNull(offsets[0]);
   object.id = id;
-  object.isFocused = reader.readBoolOrNull(offsets[1]);
-  object.level1Score = reader.readLongOrNull(offsets[3]);
-  object.level2Score = reader.readLongOrNull(offsets[4]);
-  object.level3Score = reader.readLongOrNull(offsets[5]);
-  object.level4Score = reader.readLongOrNull(offsets[6]);
-  object.level5Score = reader.readLongOrNull(offsets[7]);
+  object.isFocused = reader.readBoolOrNull(offsets[2]);
+  object.level = reader.readLongOrNull(offsets[3]);
+  object.level1Score = reader.readLongOrNull(offsets[4]);
+  object.level2Score = reader.readLongOrNull(offsets[5]);
+  object.level3Score = reader.readLongOrNull(offsets[6]);
+  object.level4Score = reader.readLongOrNull(offsets[7]);
+  object.level5Score = reader.readLongOrNull(offsets[8]);
   return object;
 }
 
@@ -131,11 +138,11 @@ P _playerDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readDoubleOrNull(offset)) as P;
     case 1:
-      return (reader.readBoolOrNull(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 2:
-      return (reader.readLongOrNull(offset)) as P;
+      return (reader.readBoolOrNull(offset)) as P;
     case 3:
       return (reader.readLongOrNull(offset)) as P;
     case 4:
@@ -145,6 +152,8 @@ P _playerDeserializeProp<P>(
     case 6:
       return (reader.readLongOrNull(offset)) as P;
     case 7:
+      return (reader.readLongOrNull(offset)) as P;
+    case 8:
       return (reader.readLongOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -239,6 +248,86 @@ extension PlayerQueryWhere on QueryBuilder<Player, Player, QWhereClause> {
 }
 
 extension PlayerQueryFilter on QueryBuilder<Player, Player, QFilterCondition> {
+  QueryBuilder<Player, Player, QAfterFilterCondition> accumulatedScoreIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'accumulatedScore',
+      ));
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterFilterCondition>
+      accumulatedScoreIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'accumulatedScore',
+      ));
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterFilterCondition> accumulatedScoreEqualTo(
+    double? value, {
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'accumulatedScore',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterFilterCondition>
+      accumulatedScoreGreaterThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'accumulatedScore',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterFilterCondition> accumulatedScoreLessThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'accumulatedScore',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterFilterCondition> accumulatedScoreBetween(
+    double? lower,
+    double? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'accumulatedScore',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
   QueryBuilder<Player, Player, QAfterFilterCondition> genderIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -882,6 +971,18 @@ extension PlayerQueryObject on QueryBuilder<Player, Player, QFilterCondition> {}
 extension PlayerQueryLinks on QueryBuilder<Player, Player, QFilterCondition> {}
 
 extension PlayerQuerySortBy on QueryBuilder<Player, Player, QSortBy> {
+  QueryBuilder<Player, Player, QAfterSortBy> sortByAccumulatedScore() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'accumulatedScore', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterSortBy> sortByAccumulatedScoreDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'accumulatedScore', Sort.desc);
+    });
+  }
+
   QueryBuilder<Player, Player, QAfterSortBy> sortByGender() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'gender', Sort.asc);
@@ -980,6 +1081,18 @@ extension PlayerQuerySortBy on QueryBuilder<Player, Player, QSortBy> {
 }
 
 extension PlayerQuerySortThenBy on QueryBuilder<Player, Player, QSortThenBy> {
+  QueryBuilder<Player, Player, QAfterSortBy> thenByAccumulatedScore() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'accumulatedScore', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Player, Player, QAfterSortBy> thenByAccumulatedScoreDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'accumulatedScore', Sort.desc);
+    });
+  }
+
   QueryBuilder<Player, Player, QAfterSortBy> thenByGender() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'gender', Sort.asc);
@@ -1090,6 +1203,12 @@ extension PlayerQuerySortThenBy on QueryBuilder<Player, Player, QSortThenBy> {
 }
 
 extension PlayerQueryWhereDistinct on QueryBuilder<Player, Player, QDistinct> {
+  QueryBuilder<Player, Player, QDistinct> distinctByAccumulatedScore() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'accumulatedScore');
+    });
+  }
+
   QueryBuilder<Player, Player, QDistinct> distinctByGender(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -1144,6 +1263,12 @@ extension PlayerQueryProperty on QueryBuilder<Player, Player, QQueryProperty> {
   QueryBuilder<Player, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
+    });
+  }
+
+  QueryBuilder<Player, double?, QQueryOperations> accumulatedScoreProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'accumulatedScore');
     });
   }
 
