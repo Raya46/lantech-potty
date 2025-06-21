@@ -1,16 +1,21 @@
-import 'package:flame/game.dart';
+import 'dart:convert';
+import 'dart:math';
+
+import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:get/get.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:sizer/sizer.dart';
-import 'package:toilet_training/games/hidden_object_game/hidden_object_game.dart';
 import 'package:toilet_training/models/player.dart';
 import 'package:toilet_training/models/scene_object.dart';
 import 'package:toilet_training/screens/levels/level3/level3_start_screen.dart';
+import 'package:toilet_training/screens/levels/level4/level4_start_screen.dart';
 import 'package:toilet_training/services/player_service.dart';
 import 'package:toilet_training/widgets/background.dart';
 import 'package:toilet_training/widgets/header.dart';
-import 'package:toilet_training/screens/levels/level4/level4_start_screen.dart';
-import 'package:just_audio/just_audio.dart';
+import 'package:toilet_training/widgets/modal_result.dart';
+import 'package:toilet_training/widgets/scene_object_guess_card.dart';
 
 class LevelThreePlayScreen extends StatefulWidget {
   const LevelThreePlayScreen({super.key});
@@ -20,101 +25,129 @@ class LevelThreePlayScreen extends StatefulWidget {
 }
 
 class _LevelThreePlayScreenState extends State<LevelThreePlayScreen> {
-  late HiddenObjectGame _game;
-  List<SceneObjectData> _currentTargets = [];
-  Set<String> _currentFoundIds = {};
-  bool _isLoadingGame = true;
   Player? _player;
-  bool _isLoadingPlayer = true;
+  List<SceneObjectData> _allItems = [];
+  List<SceneObjectData> _correctItems = [];
+  List<SceneObjectData> _currentChoices = [];
+  Set<String> _foundItemIds = {};
+  bool _isLoading = true;
+  String _feedbackMessage = "";
+  bool _levelFinished = false;
+  late ConfettiController _confettiController;
+  int _wrongAttemptsInQuestion = 0;
+  final _audioPlayer = AudioPlayer();
 
   @override
   void initState() {
     super.initState();
-    _loadPlayerDataAndInitializeGame();
+    _confettiController = ConfettiController(
+      duration: const Duration(seconds: 2),
+    );
+    _initializeGame();
   }
 
-  Future<void> _loadPlayerDataAndInitializeGame() async {
+  Future<void> _initializeGame() async {
+    await _loadPlayer();
+    await _loadItems();
+  }
+
+  @override
+  void dispose() {
+    _confettiController.dispose();
+    _audioPlayer.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadPlayer() async {
+    try {
+      Player playerData = await getPlayer();
+      if (mounted) {
+        setState(() {
+          _player = playerData;
+          _player?.level3Score ??= 0;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _player = Player(null)..level3Score = 0;
+        });
+      }
+    }
+  }
+
+  Future<void> _loadItems() async {
     setState(() {
-      _isLoadingPlayer = true;
-      _isLoadingGame = true;
+      _isLoading = true;
     });
     try {
-      _player = await getPlayer();
-      _player?.level3Score ??= 0;
+      final String response = await rootBundle.loadString(
+        'lib/models/static/random-things-static.json',
+      );
+      final List<dynamic> data = json.decode(response);
+      if (mounted) {
+        setState(() {
+          _allItems =
+              data.map((item) => SceneObjectData.fromJson(item)).toList();
+          _isLoading = false;
+          _setupNewQuestion();
+        });
+      }
     } catch (e) {
-      _player = Player(null)..level3Score = 0;
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _feedbackMessage = "Gagal memuat data permainan.";
+        });
+      }
     }
-    _initializeGame();
+  }
+
+  void _setupNewQuestion() {
+    if (_allItems.isEmpty) return;
     if (mounted) {
       setState(() {
-        _isLoadingPlayer = false;
+        _levelFinished = false;
+        _feedbackMessage = "";
+        _wrongAttemptsInQuestion = 0;
+        _correctItems.clear();
+        _foundItemIds.clear();
+
+        final random = Random();
+        const bathroomItemIds = {1, 2, 4, 5, 6, 8, 9};
+
+        final bathroomItems =
+            _allItems
+                .where(
+                  (item) =>
+                      bathroomItemIds.contains(int.tryParse(item.id) ?? -1),
+                )
+                .toList();
+        final distractors =
+            _allItems
+                .where(
+                  (item) =>
+                      !bathroomItemIds.contains(int.tryParse(item.id) ?? -1),
+                )
+                .toList();
+
+        bathroomItems.shuffle(random);
+        distractors.shuffle(random);
+
+        _correctItems = bathroomItems.take(3).toList();
+
+        final currentDistractors = distractors.take(5).toList();
+
+        _currentChoices = [..._correctItems, ...currentDistractors];
+        _currentChoices.shuffle(random);
       });
     }
   }
 
-  void _initializeGame() {
-    _game = HiddenObjectGame(
-      onTargetsUpdated: (targets, foundIds) {
-        if (mounted) {
-          setState(() {
-            _currentTargets = List.from(targets);
-            _currentFoundIds = Set.from(foundIds);
-            if (_isLoadingGame) _isLoadingGame = false;
-          });
-        }
-      },
-      onAllTargetsFound: (int wrongTaps) {
-        if (mounted) {
-          int stars = _calculateStars(wrongTaps);
-          _saveScore(stars);
-          _showSuccessDialog(starsEarned: stars, wrongAttempts: wrongTaps);
-          _playSoundForResult(stars);
-        }
-      },
-      onShowFeedback: (message) {
-        if (mounted && message.isNotEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(message),
-              duration: Duration(seconds: 1),
-              backgroundColor: Colors.orange,
-            ),
-          );
-        }
-      },
-    );
-  }
-
   int _calculateStars(int wrongAttempts) {
-    if (wrongAttempts == 0) return 3;
-    if (wrongAttempts <= 3) return 2;
+    if (wrongAttempts <= 1) return 3;
+    if (wrongAttempts <= 4) return 2;
     return 1;
-  }
-
-  Future<void> _playSoundForResult(int starsEarned) async {
-    String? soundPath;
-    if (starsEarned == 3) {
-      soundPath = 'assets/sounds/3_bintang.mp3';
-    } else if (starsEarned == 2) {
-      soundPath = 'assets/sounds/2_bintang.mp3';
-    } else if (starsEarned == 1) {
-      soundPath = 'assets/sounds/belum_berhasil.mp3';
-    }
-
-    if (soundPath != null) {
-      final audioPlayer = AudioPlayer();
-      try {
-        await audioPlayer.setAsset(soundPath);
-        audioPlayer.play();
-        audioPlayer.processingStateStream.listen((state) {
-          if (state == ProcessingState.completed) {
-            audioPlayer.dispose();
-          }
-        });
-      } catch (e) {
-        audioPlayer.dispose();
-      }
-    }
   }
 
   Future<void> _saveScore(int stars) async {
@@ -125,258 +158,208 @@ class _LevelThreePlayScreenState extends State<LevelThreePlayScreen> {
     } catch (e) {}
   }
 
-  void _resetLevel() {
-    setState(() {
-      _isLoadingGame = true;
-      _currentTargets.clear();
-      _currentFoundIds.clear();
-    });
-
-    _game.resetGame().then((_) {});
+  Future<void> _playSound(String soundPath) async {
+    if (_audioPlayer.playing) {
+      await _audioPlayer.stop();
+    }
+    try {
+      await _audioPlayer.setAsset(soundPath);
+      _audioPlayer.play();
+    } catch (e) {}
   }
 
-  void _showSuccessDialog({
-    required int starsEarned,
-    required int wrongAttempts,
-  }) {
-    Widget starDisplay = Row(
-      mainAxisSize: MainAxisSize.min,
-      children: List.generate(3, (index) {
-        return Icon(
-          index < starsEarned ? Icons.star : Icons.star_border,
-          color: Colors.amber,
-          size: 30,
-        );
-      }),
+  void _checkAnswer(SceneObjectData selectedItem) {
+    if (_levelFinished || _foundItemIds.contains(selectedItem.id)) return;
+
+    final bool isCorrect = _correctItems.any(
+      (item) => item.id == selectedItem.id,
     );
 
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          backgroundColor: const Color(0xFFFFF0E1),
-          title: Center(
-            child: Text(
-              "Yeayy!!! Kamu berhasil!",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Color(0xFFD98555),
-                fontSize: 20,
-              ),
-            ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                "Kamu menemukan semua benda dengan $wrongAttempts kesalahan.",
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16, color: Color(0xFF8B5A2B)),
-              ),
-              SizedBox(height: 15),
-              starDisplay,
-              SizedBox(height: 5),
-              Text(
-                "Kamu mendapatkan $starsEarned bintang!",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF8B5A2B),
-                ),
-              ),
-              Wrap(
-                spacing: 8.0,
-                runSpacing: 4.0,
-                alignment: WrapAlignment.center,
-                children:
-                    _currentTargets
-                        .map(
-                          (obj) => Chip(
-                            label: Text(
-                              obj.name,
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            backgroundColor: _getChipColor(obj.name, true),
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 8,
-                            ),
-                          ),
-                        )
-                        .toList(),
-              ),
-            ],
-          ),
-          actionsAlignment: MainAxisAlignment.center,
-          actions: <Widget>[
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFFF0AD4E),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 15.0,
-                  vertical: 10.0,
-                ),
-                child: Text(
-                  "Main Lagi",
-                  style: TextStyle(fontSize: 16, color: Colors.white),
-                ),
-              ),
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-                _resetLevel();
-              },
-            ),
-            SizedBox(width: 10),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF5C9A4A),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 15.0,
-                  vertical: 10.0,
-                ),
-                child: Text(
-                  "Lanjut Level 4",
-                  style: TextStyle(fontSize: 16, color: Colors.white),
-                ),
-              ),
-              onPressed: () {
-                Get.off(() => const LevelFourStartScreen());
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+    if (isCorrect) {
+      setState(() {
+        _foundItemIds.add(selectedItem.id);
+      });
 
-  Color _getChipColor(String name, bool found) {
-    final colors = [
-      Colors.amber[600]!,
-      Colors.green[600]!,
-      Colors.blue[600]!,
-      Colors.redAccent[400]!,
-      Colors.purple[600]!,
-    ];
-    final hash = name.hashCode % colors.length;
-    Color baseColor = colors[hash];
-    return found ? baseColor : baseColor.withOpacity(0.7);
+      if (_foundItemIds.length == _correctItems.length) {
+        setState(() {
+          _levelFinished = true;
+        });
+        _feedbackMessage = "Hebat! Kamu menemukan semua benda.";
+        _confettiController.play();
+        int starsEarned = _calculateStars(_wrongAttemptsInQuestion);
+        _saveScore(starsEarned);
+        if (starsEarned >= 2) {
+          _playSound(
+            starsEarned == 3
+                ? 'assets/sounds/3_bintang.mp3'
+                : 'assets/sounds/2_bintang.mp3',
+          );
+        }
+
+        ModalResult.show(
+          context: context,
+          title: "Luar Biasa! 🎉",
+          message: _feedbackMessage,
+          starsEarned: starsEarned,
+          isSuccess: true,
+          playerGender: _player?.gender,
+          primaryActionText: "Main Lagi",
+          onPrimaryAction: _setupNewQuestion,
+          secondaryActionText: "Lanjut Level 4",
+          onSecondaryAction: () {
+            Get.off(() => const LevelFourStartScreen());
+          },
+        );
+      }
+    } else {
+      _wrongAttemptsInQuestion++;
+      _feedbackMessage =
+          "Oops, itu bukan salah satu target. Coba perhatikan lagi!";
+      _playSound('assets/sounds/wrong-answer.mp3');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(_feedbackMessage),
+          duration: const Duration(seconds: 1),
+          backgroundColor: Colors.orange,
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoadingPlayer || _player == null) {
+    if (_player == null || _isLoading) {
       return Scaffold(
         body: Background(
           gender: _player?.gender ?? 'laki-laki',
-          child: Center(child: CircularProgressIndicator()),
+          child: const Center(child: CircularProgressIndicator()),
         ),
       );
     }
 
     return Scaffold(
-      body: Container(
-        color: Color(0xFFF7E4D5), // New color
-        child: Column(
-          children: [
-            Header(
-              onTapBack: () {
-                Get.off(() => LevelThreeStartScreen());
-              },
-              title: "Level 3",
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Text(
-                _currentFoundIds.length == _currentTargets.length &&
-                        _currentTargets.isNotEmpty
-                    ? "Semua Benda Ditemukan!"
-                    : "Temukanlah benda berikut ini:",
-                style: TextStyle(
-                  fontSize: 10.sp,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF8B5A2B),
+      body: Stack(
+        children: [
+          Background(
+            gender: _player!.gender!,
+            child: Column(
+              children: [
+                Header(
+                  onTapBack: () {
+                    Get.off(() => const LevelThreeStartScreen());
+                  },
+                  title: "Level 3",
                 ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            if (_isLoadingGame && _currentTargets.isEmpty)
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: CircularProgressIndicator(),
-              )
-            else if (_currentTargets.isNotEmpty)
-              Wrap(
-                spacing: 8.0,
-                runSpacing: 6.0,
-                alignment: WrapAlignment.center,
-                children:
-                    _currentTargets.map((obj) {
-                      bool isActuallyFound = _currentFoundIds.contains(
-                        obj.id.toString(),
-                      );
-                      return Chip(
-                        label: Text(
-                          obj.name,
-                          style: TextStyle(
-                            fontSize: 10.sp,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        backgroundColor: _getChipColor(
-                          obj.name,
-                          isActuallyFound,
-                        ),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          side: BorderSide(
-                            color: Colors.white.withOpacity(0.8),
-                            width: 1,
-                          ),
-                        ),
-                      );
-                    }).toList(),
-              )
-            else if (!_isLoadingGame && _currentTargets.isEmpty)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 20.0),
-                child: Text(
-                  "Tidak ada target untuk ditemukan.",
-                  style: TextStyle(color: Colors.grey[600], fontSize: 16),
-                ),
-              ),
-            // SizedBox(height: 15),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Color(0xFFEEDD6C3), // EDD6C3 in hex
-                    borderRadius: BorderRadius.circular(24.0),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 8.0,
                   ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12.0),
-                    child: GameWidget(game: _game),
+                  child: Column(
+                    children: [
+                      Text(
+                        "Temukan 3 benda berikut:",
+                        style: TextStyle(
+                          fontSize: 10.sp,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF8B5A2B),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      if (_correctItems.isNotEmpty)
+                        Wrap(
+                          spacing: 8.0,
+                          runSpacing: 4.0,
+                          alignment: WrapAlignment.center,
+                          children:
+                              _correctItems.map((item) {
+                                final isFound = _foundItemIds.contains(item.id);
+                                return Chip(
+                                  label: Text(
+                                    item.name,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      decoration:
+                                          isFound
+                                              ? TextDecoration.lineThrough
+                                              : TextDecoration.none,
+                                    ),
+                                  ),
+                                  backgroundColor:
+                                      isFound ? Colors.green : Colors.blueGrey,
+                                );
+                              }).toList(),
+                        ),
+                    ],
                   ),
                 ),
-              ),
+                Expanded(
+                  child:
+                      _isLoading
+                          ? const Center(child: CircularProgressIndicator())
+                          : _allItems.isEmpty && !_isLoading
+                          ? Center(
+                            child: Text(
+                              _feedbackMessage.isNotEmpty
+                                  ? _feedbackMessage
+                                  : "Tidak ada data permainan.",
+                            ),
+                          )
+                          : _correctItems.isEmpty
+                          ? const Center(child: Text("Memuat pertanyaan..."))
+                          : Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: GridView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 4,
+                                    crossAxisSpacing: 10,
+                                    mainAxisSpacing: 10,
+                                    childAspectRatio: 2,
+                                  ),
+                              itemCount: _currentChoices.length,
+                              itemBuilder: (context, index) {
+                                final item = _currentChoices[index];
+                                final isCorrect = _correctItems.any(
+                                  (c) => c.id == item.id,
+                                );
+                                return SceneObjectGuessCard(
+                                  onTap: () => _checkAnswer(item),
+                                  answered:
+                                      _levelFinished ||
+                                      _foundItemIds.contains(item.id),
+                                  item: item,
+                                  correctItem:
+                                      isCorrect ? item : _correctItems.first,
+                                );
+                              },
+                            ),
+                          ),
+                ),
+              ],
             ),
-
-            // SizedBox(height: 10),
-          ],
-        ),
+          ),
+          Align(
+            alignment: Alignment.topCenter,
+            child: ConfettiWidget(
+              confettiController: _confettiController,
+              blastDirectionality: BlastDirectionality.explosive,
+              shouldLoop: false,
+              colors: const [
+                Colors.green,
+                Colors.blue,
+                Colors.pink,
+                Colors.orange,
+                Colors.purple,
+              ],
+              gravity: 0.3,
+              emissionFrequency: 0.05,
+              numberOfParticles: 15,
+            ),
+          ),
+        ],
       ),
     );
   }

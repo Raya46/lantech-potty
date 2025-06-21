@@ -52,8 +52,7 @@ class _PlayButtonState extends State<PlayButton>
   @override
   Widget build(BuildContext context) {
     isTablet = Responsive.isTablet(context);
-    buttonSize = widget.size ??
-        (isTablet ? 12.w : 10.w); // Slighly larger on tablet
+    buttonSize = widget.size ?? (isTablet ? 12.w : 10.w);
     outlineWidth = widget.outlineWidth ?? (isTablet ? 0.8.w : 0.5.w);
 
     return GestureDetector(

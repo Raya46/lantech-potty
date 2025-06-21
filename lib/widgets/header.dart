@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 import 'package:toilet_training/responsive.dart';
 import 'package:toilet_training/widgets/modal_setting.dart';
+import 'package:toilet_training/services/audio_controller.dart';
 
 class Header extends StatelessWidget {
   final VoidCallback? onTapSettings;
@@ -35,8 +36,9 @@ class Header extends StatelessWidget {
             onClose: () {
               Get.back(canPop: false);
             },
-            onTapSound: () {},
-            onTapMusic: () {},
+            onTapSound: () {
+              AudioController().toggleMusic();
+            },
           ),
         );
       },
@@ -47,8 +49,6 @@ class Header extends StatelessWidget {
   Widget build(BuildContext context) {
     const Color buttonBackgroundColor = Color(0xFF3498DB);
     const Color buttonOutlineColor = Color(0xFF2C3E50);
-    const Color textFillColor = Color(0xFFFFA07A);
-    const Color textOutlineColor = Color(0xFF808080);
 
     return Container(
       height: 50.0,

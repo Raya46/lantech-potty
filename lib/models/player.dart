@@ -3,7 +3,7 @@ part 'player.g.dart';
 
 @collection
 class Player {
-  Player(this.level);
+  Player(this.gender);
   Id id = Isar.autoIncrement;
   int? level;
   bool? isFocused;
@@ -13,4 +13,5 @@ class Player {
   int? level3Score;
   int? level4Score;
   int? level5Score;
+  double? accumulatedScore;
 }

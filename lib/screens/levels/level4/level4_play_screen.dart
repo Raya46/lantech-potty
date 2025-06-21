@@ -436,7 +436,7 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
                                 ),
                               ),
                             ),
-                            SizedBox(height: 2.h,),
+                            SizedBox(height: 2.h),
                             Expanded(
                               flex: 6,
                               child: Row(
@@ -513,34 +513,42 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
                                         setState(() {
                                           _droppedStepOnTarget = droppedStep;
                                         });
-                                                      
+
                                         bool isFinalStepInSequenceDropped =
                                             (currentStepIndex + 1 ==
                                                 _steps.length - 1);
-                                                      
+
                                         if (isFinalStepInSequenceDropped) {
-                                          Future.delayed(Duration(seconds: 1), () {
-                                            if (mounted) {
-                                              setState(() {
-                                                currentStepIndex++;
-                                              });
-                                              _saveScore(
-                                                _calculateStars(_wrongAttempts),
-                                              );
-                                              _showCompletionDialog(
-                                                "Level 4 Selesai!",
-                                              );
-                                            }
-                                          });
+                                          Future.delayed(
+                                            Duration(seconds: 1),
+                                            () {
+                                              if (mounted) {
+                                                setState(() {
+                                                  currentStepIndex++;
+                                                });
+                                                _saveScore(
+                                                  _calculateStars(
+                                                    _wrongAttempts,
+                                                  ),
+                                                );
+                                                _showCompletionDialog(
+                                                  "Level 4 Selesai!",
+                                                );
+                                              }
+                                            },
+                                          );
                                         } else {
-                                          Future.delayed(Duration(seconds: 1), () {
-                                            if (mounted) {
-                                              setState(() {
-                                                currentStepIndex++;
-                                                _droppedStepOnTarget = null;
-                                              });
-                                            }
-                                          });
+                                          Future.delayed(
+                                            Duration(seconds: 1),
+                                            () {
+                                              if (mounted) {
+                                                setState(() {
+                                                  currentStepIndex++;
+                                                  _droppedStepOnTarget = null;
+                                                });
+                                              }
+                                            },
+                                          );
                                         }
                                       } else {
                                         if (mounted) {
@@ -548,7 +556,9 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
                                             _wrongAttempts++;
                                           });
                                         }
-                                        ScaffoldMessenger.of(context).showSnackBar(
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
                                           SnackBar(
                                             content: Text(
                                               "Bukan itu langkahnya, coba lagi!",
@@ -574,9 +584,7 @@ class _LevelFourPlayScreenState extends State<LevelFourPlayScreen> {
                                 options
                                     .map(
                                       (step) => Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          // horizontal: 12,
-                                        ),
+                                        padding: const EdgeInsets.symmetric(),
                                         child: BuildOptionCard(step: step),
                                       ),
                                     )

@@ -13,12 +13,41 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:toilet_training/models/puzzle_item.dart';
 import 'package:toilet_training/models/piece_shape.dart';
 
+class PuzzlePreviewComponent extends PositionComponent {
+  final ui.Image image;
+
+  PuzzlePreviewComponent({
+    required this.image,
+    required Vector2 position,
+    required Vector2 size,
+  }) : super(position: position, size: size);
+
+  @override
+  void render(Canvas canvas) {
+    super.render(canvas);
+    final paint = Paint();
+    canvas.drawImageRect(
+      image,
+      Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble()),
+      Rect.fromLTWH(0, 0, size.x, size.y),
+      paint,
+    );
+    final borderPaint =
+        Paint()
+          ..color = Colors.black.withOpacity(0.6)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2;
+    canvas.drawRect(Rect.fromLTWH(0, 0, size.x, size.y), borderPaint);
+  }
+}
+
 class PuzzleGame extends FlameGame with PanDetector, HasGameReference {
   late List<PuzzleItem> _puzzleItems;
   PuzzleItem? _selectedItem;
   List<PuzzlePieceComponent> _pieces = [];
   PuzzleBoardComponent? _board;
   ui.Image? _fullUiImage;
+  PuzzlePreviewComponent? _preview;
 
   static const int gridSize = 2;
   double pieceCoreSize = 0;
@@ -40,9 +69,6 @@ class PuzzleGame extends FlameGame with PanDetector, HasGameReference {
   Future<void> onLoad() async {
     await super.onLoad();
     gameSize = size;
-    final double referenceDimension = math.min(gameSize.x, gameSize.y);
-    pieceCoreSize = (referenceDimension * 0.5) / gridSize;
-    tabSize = pieceCoreSize * 0.25;
     _cumulativeAnimationDelayMs = 0.0;
 
     _generatePieceShapes();
@@ -52,8 +78,35 @@ class PuzzleGame extends FlameGame with PanDetector, HasGameReference {
     if (_selectedItem != null) {
       await _loadUiImage(_selectedItem!.image);
       if (_fullUiImage != null) {
+        final double boardAreaWidth = gameSize.x * 0.45;
+        final double previewAreaWidth = gameSize.x * 0.25;
+
+        final double padding = 20.0;
+
+        final double boardSizeDimension = math.min(
+          boardAreaWidth,
+          gameSize.y * 0.6,
+        );
+        final boardPosition = Vector2(
+          padding,
+          (gameSize.y - boardSizeDimension) / 2,
+        );
+
+        pieceCoreSize = boardSizeDimension / gridSize;
+        tabSize = pieceCoreSize * 0.25;
+
+        _createBoard(boardPosition, Vector2.all(boardSizeDimension));
+
+        final double imageAspectRatio =
+            _fullUiImage!.width / _fullUiImage!.height;
+        final double previewHeight = previewAreaWidth / imageAspectRatio;
+        final previewSize = Vector2(previewAreaWidth, previewHeight);
+        final previewPosition = Vector2(
+          gameSize.x - previewAreaWidth - padding,
+          (gameSize.y - previewHeight) / 2,
+        );
+        _createPreview(previewPosition, previewSize);
         _createPuzzlePieces();
-        _createBoard();
       }
     }
   }
@@ -79,6 +132,16 @@ class PuzzleGame extends FlameGame with PanDetector, HasGameReference {
         }
       }
     }
+  }
+
+  void _createPreview(Vector2 position, Vector2 size) {
+    if (_fullUiImage == null) return;
+    _preview = PuzzlePreviewComponent(
+      image: _fullUiImage!,
+      position: position,
+      size: size,
+    );
+    add(_preview!);
   }
 
   Future<void> _loadUiImage(String imagePath) async {
@@ -109,7 +172,7 @@ class PuzzleGame extends FlameGame with PanDetector, HasGameReference {
   }
 
   void _createPuzzlePieces() {
-    if (_fullUiImage == null || _selectedItem == null) return;
+    if (_fullUiImage == null || _selectedItem == null || _board == null) return;
 
     final imageWidth = _fullUiImage!.width.toDouble();
     final imageHeight = _fullUiImage!.height.toDouble();
@@ -119,8 +182,7 @@ class PuzzleGame extends FlameGame with PanDetector, HasGameReference {
     _pieces.clear();
     _cumulativeAnimationDelayMs = 0.0;
 
-    final double boardMarginX = gameSize.x * 0.1;
-    final double boardMarginY = gameSize.y * 0.1;
+    final boardTopLeft = _board!.position.clone();
 
     for (int r = 0; r < gridSize; r++) {
       for (int c = 0; c < gridSize; c++) {
@@ -140,7 +202,7 @@ class PuzzleGame extends FlameGame with PanDetector, HasGameReference {
           corePieceSize: pieceCoreSize,
           tabSize: tabSize,
           correctGridPosition: Vector2(c.toDouble(), r.toDouble()),
-          boardTopLeft: Vector2(boardMarginX, boardMarginY),
+          boardTopLeft: boardTopLeft,
           animationDelay: Duration(
             milliseconds: _cumulativeAnimationDelayMs.toInt(),
           ),
@@ -154,32 +216,29 @@ class PuzzleGame extends FlameGame with PanDetector, HasGameReference {
     final random = math.Random();
     _pieces.shuffle(random);
 
-    final double pieceLayoutSpacing = 5.0;
-    final double areaMargin = 20.0;
-    final double boardDimension =
-        pieceCoreSize * gridSize + (gridSize - 1) * tabSize * 0.5;
+    final double pieceLayoutSpacing = 10.0;
+    final double boardRight = _board!.position.x + _board!.size.x;
+    final double previewLeft = _preview!.position.x;
+    final double initialPiecesAreaStartX = boardRight + 30;
+    final double availableWidthForPieces =
+        previewLeft - initialPiecesAreaStartX - 30;
 
-    double initialPiecesAreaStartX;
-    double initialPiecesAreaStartY;
-
-    if (gameSize.x > gameSize.y) {
-      initialPiecesAreaStartX = boardMarginX + boardDimension + areaMargin;
-      initialPiecesAreaStartY = boardMarginY;
-    } else {
-      initialPiecesAreaStartX = boardMarginX;
-      initialPiecesAreaStartY = boardMarginY + boardDimension + areaMargin;
-    }
+    int numCols =
+        (availableWidthForPieces /
+                (pieceCoreSize + tabSize + pieceLayoutSpacing))
+            .floor();
+    if (numCols == 0) numCols = 1;
 
     for (int i = 0; i < _pieces.length; i++) {
       final piece = _pieces[i];
-      final int col = i % gridSize;
-      final int row = i ~/ gridSize;
+      final int col = i % numCols;
+      final int row = i ~/ numCols;
 
       double xPos =
           initialPiecesAreaStartX +
           col * (pieceCoreSize + tabSize + pieceLayoutSpacing);
       double yPos =
-          initialPiecesAreaStartY +
+          _board!.position.y +
           row * (pieceCoreSize + tabSize + pieceLayoutSpacing);
 
       piece.position = Vector2(xPos, yPos);
@@ -188,12 +247,10 @@ class PuzzleGame extends FlameGame with PanDetector, HasGameReference {
     }
   }
 
-  void _createBoard() {
-    final double boardMarginX = gameSize.x * 0.1;
-    final double boardMarginY = gameSize.y * 0.1;
+  void _createBoard(Vector2 position, Vector2 size) {
     _board = PuzzleBoardComponent(
-      position: Vector2(boardMarginX, boardMarginY),
-      size: Vector2.all(pieceCoreSize * gridSize),
+      position: position,
+      size: size,
       pieceSize: pieceCoreSize,
       gridSize: gridSize,
     );
@@ -216,8 +273,12 @@ class PuzzleGame extends FlameGame with PanDetector, HasGameReference {
     if (_board != null) {
       remove(_board!);
     }
+    if (_preview != null) {
+      remove(_preview!);
+    }
     _pieces.clear();
     _board = null;
+    _preview = null;
     _fullUiImage = null;
     _cumulativeAnimationDelayMs = 0.0;
 
@@ -225,8 +286,34 @@ class PuzzleGame extends FlameGame with PanDetector, HasGameReference {
     if (_selectedItem != null) {
       _loadUiImage(_selectedItem!.image).then((_) {
         if (_fullUiImage != null) {
+          final double boardAreaWidth = gameSize.x * 0.45;
+          final double previewAreaWidth = gameSize.x * 0.25;
+          final double padding = 20.0;
+
+          final double boardSizeDimension = math.min(
+            boardAreaWidth,
+            gameSize.y * 0.6,
+          );
+          final boardPosition = Vector2(
+            padding,
+            (gameSize.y - boardSizeDimension) / 2,
+          );
+
+          pieceCoreSize = boardSizeDimension / gridSize;
+          tabSize = pieceCoreSize * 0.25;
+
+          final double imageAspectRatio =
+              _fullUiImage!.width / _fullUiImage!.height;
+          final double previewHeight = previewAreaWidth / imageAspectRatio;
+          final previewSize = Vector2(previewAreaWidth, previewHeight);
+          final previewPosition = Vector2(
+            gameSize.x - previewAreaWidth - padding,
+            (gameSize.y - previewHeight) / 2,
+          );
+
+          _createPreview(previewPosition, previewSize);
+          _createBoard(boardPosition, Vector2.all(boardSizeDimension));
           _createPuzzlePieces();
-          _createBoard();
         }
       });
     }

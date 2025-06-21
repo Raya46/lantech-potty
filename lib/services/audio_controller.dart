@@ -5,33 +5,44 @@ class AudioController {
   factory AudioController() => _instance;
 
   final AudioPlayer _player = AudioPlayer();
+  bool isMusicOn = true;
 
   AudioController._internal() {
-    _player.setReleaseMode(ReleaseMode.loop); 
-    _player.setVolume(0.4); 
+    _player.setReleaseMode(ReleaseMode.loop);
+    _player.setVolume(0.4);
   }
 
   Future<void> startBackgroundMusic() async {
-    try {
-      await _player.play(AssetSource('sounds/backgound_music.mp3'));
-    } catch (e) {
-      print('❌ Failed to play music: $e');
+    if (isMusicOn) {
+      await _player.play(AssetSource('sounds/background_music.mp3'));
+    }
+  }
+
+  Future<void> toggleMusic() async {
+    if (isMusicOn) {
+      await stopMusic();
+    } else {
+      await resumeMusic();
     }
   }
 
   Future<void> setVolume(double volume) async {
-    await _player.setVolume(volume); 
+    await _player.setVolume(volume);
   }
 
   Future<void> stopMusic() async {
     await _player.stop();
+    isMusicOn = false;
   }
 
   Future<void> pauseMusic() async {
-    await _player.pause();
+    if (isMusicOn) {
+      await _player.pause();
+    }
   }
 
   Future<void> resumeMusic() async {
     await _player.resume();
+    isMusicOn = true;
   }
 }

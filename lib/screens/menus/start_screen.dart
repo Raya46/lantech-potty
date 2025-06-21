@@ -62,7 +62,6 @@ class _StartScreenState extends State<StartScreen> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Left side image
               Expanded(
                 flex: 2,
                 child: Center(
@@ -76,7 +75,6 @@ class _StartScreenState extends State<StartScreen> {
                 ),
               ),
 
-              // Right side content
               Expanded(
                 flex: 3,
                 child: Container(
@@ -116,7 +114,6 @@ class _StartScreenState extends State<StartScreen> {
                       ),
                       SizedBox(height: 1.h),
 
-                      // Play Button
                       PlayButton(
                         onPressed: () {
                           Get.to(

@@ -20,7 +20,9 @@ class GenderCard extends StatelessWidget {
     final bool isTablet = Responsive.isTablet(context);
 
     final Color cardColor =
-        gender == 'perempuan' ? const Color(0xFFEA9077) : const Color(0xFF78C0E0);
+        gender == 'perempuan'
+            ? const Color(0xFFEA9077)
+            : const Color(0xFF78C0E0);
 
     final String imageAssetPath =
         gender == 'perempuan'
@@ -29,7 +31,6 @@ class GenderCard extends StatelessWidget {
 
     final Color topBackgroundColor = const Color(0xFFFFF8E1);
 
-    // Sizes using Sizer (mobile: ~180x250, tablet: slightly larger)
     final double cardWidth = isTablet ? 50.w : 40.w;
     final double cardHeight = isTablet ? 30.h : 30.h;
     final double fontSize = isTablet ? 12.sp : 10.sp;
@@ -47,7 +48,6 @@ class GenderCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                // ignore: deprecated_member_use
                 color: Colors.grey.withOpacity(0.3),
                 spreadRadius: 1,
                 blurRadius: 5,
@@ -58,18 +58,14 @@ class GenderCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Image section
               Expanded(
                 flex: 4,
                 child: Padding(
                   padding: EdgeInsets.all(imagePadding),
-                  child: Image.asset(
-                    imageAssetPath,
-                    fit: BoxFit.contain,
-                  ),
+                  child: Image.asset(imageAssetPath, fit: BoxFit.contain),
                 ),
               ),
-              // Text section
+
               Expanded(
                 flex: 1,
                 child: Container(
